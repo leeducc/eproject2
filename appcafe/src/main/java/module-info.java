@@ -14,4 +14,6 @@ module com.example.cafemanagemnet {
 
   opens com.example.cafemanagemnet to javafx.fxml;
   exports com.example.cafemanagemnet;
+  exports com.example.cafemanagemnet.page;
+  opens com.example.cafemanagemnet.page to javafx.fxml;
 }
