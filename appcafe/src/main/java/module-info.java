@@ -13,8 +13,8 @@ module com.example.cafemanagemnet {
   requires java.desktop;
   requires java.sql;
 
-  opens com.example.cafemanagemnet to javafx.fxml;
-  exports com.example.cafemanagemnet;
-  exports com.example.cafemanagemnet.page;
-  opens com.example.cafemanagemnet.page to javafx.fxml;
+  opens com.example.cafemanagement to javafx.fxml;
+  exports com.example.cafemanagement;
+  exports com.example.cafemanagement.page;
+  opens com.example.cafemanagement.page to javafx.fxml;
 }

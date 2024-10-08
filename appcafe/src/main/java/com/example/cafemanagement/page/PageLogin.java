@@ -1,4 +1,4 @@
-package com.example.cafemanagemnet.page;
+package com.example.cafemanagement.page;
 
 import java.util.Objects;
 import javafx.geometry.Insets;

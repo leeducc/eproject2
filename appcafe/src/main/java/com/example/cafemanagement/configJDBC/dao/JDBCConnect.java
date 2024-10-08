@@ -1,6 +1,6 @@
-package com.example.cafemanagemnet.configJDBC.dao;
+package com.example.cafemanagement.configJDBC.dao;
 
-import com.example.cafemanagemnet.configJDBC.config.IDBConfig;
+import com.example.cafemanagement.configJDBC.config.IDBConfig;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package com.example.cafemanagemnet.configJDBC.config;
+package com.example.cafemanagement.configJDBC.config;
 
 public interface IDBConfig {
     public static final String HOSTNAME ="localhost";

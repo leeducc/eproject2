@@ -1,7 +1,7 @@
-package com.example.cafemanagemnet;
+package com.example.cafemanagement;
 
 
-import com.example.cafemanagemnet.page.PageLogin;
+import com.example.cafemanagement.page.PageLogin;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
