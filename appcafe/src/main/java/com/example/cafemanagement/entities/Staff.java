@@ -1,5 +1,5 @@
 package com.example.cafemanagement.entities;
 
-public class admin {
+public class Staff {
 
 }
