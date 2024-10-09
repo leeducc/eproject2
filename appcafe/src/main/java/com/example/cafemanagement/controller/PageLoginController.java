@@ -2,7 +2,9 @@ package com.example.cafemanagement.controller;
 
 import com.example.cafemanagement.page.admin.CreateNewUserPage;
 import com.example.cafemanagement.page.admin.PageHome;
+import com.example.cafemanagement.service.HashPassword;
 import com.example.cafemanagement.service.PageLoginService;
+import com.example.cafemanagement.service.StaffService;
 import com.example.cafemanagement.util.AlertUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -20,6 +21,8 @@ import java.util.Objects;
 public class PageLoginController {
 
   PageLoginService service = new PageLoginService();
+  StaffService staffService = new StaffService();
+  HashPassword hashPasswordService = new HashPassword();
 
 
   public Scene pageLogin(Stage primaryStage) {
@@ -38,14 +41,13 @@ public class PageLoginController {
     passwordField.setPromptText("Mật khẩu");
 
     // Role selection
-    ToggleGroup roleGroup = service.createRoleGroup();
 
     // Login button
     Button loginButton = new Button("ĐĂNG NHẬP");
 
     // Add elements to layout
     mainLayout.getChildren()
-        .addAll(logo, usernameField, passwordField, service.createRoleSelectionBox(roleGroup), loginButton);
+        .addAll(logo, usernameField, passwordField, service.createRoleSelectionBox(), loginButton);
 
     // Create scene and stage
     Scene scene = new Scene(mainLayout, 400, 300);
@@ -69,12 +71,18 @@ public class PageLoginController {
     loginButton.setOnAction(e -> {
       String enteredUsername = usernameField.getText();
       String enteredPassword = passwordField.getText();
-
+      String passwordHash = staffService.getStaffByUserName(enteredUsername).getPasswordHash();
+      String userName = staffService.getStaffByUserName(enteredUsername).getName();
+      String passwordHashed = HashPassword.hashPassword(enteredPassword);
       if (enteredUsername.equals("admin") && enteredPassword.equals("123")) {
         // Successful login
         primaryStage.setScene(service.getDashboardScene());
         primaryStage.setTitle("Dashboard");
-      } else {
+      }else if (enteredUsername.equals(userName) && passwordHashed.equals(passwordHash)){
+        primaryStage.setScene(service.getDashboardScene());
+        primaryStage.setTitle("Dashboard");
+      }
+      else {
         // Invalid credentials
         AlertUtil.showErrorLoginAlert();
       }

@@ -19,10 +19,13 @@
 
 
 /* Styling for the radio buttons */
-.radio-button {
-  -fx-text-fill: #52342e; /* Brown text */
+.combo-box {
+  -fx-background-color: #f5e6d1;
+  -fx-border-color: #52342e;
+  -fx-border-width: 1px;
+  -fx-padding: 10;
   -fx-font-size: 14px;
-  -fx-padding: 5px;
+  -fx-text-fill: #52342e;
 }
 
 /* Style for the login button */

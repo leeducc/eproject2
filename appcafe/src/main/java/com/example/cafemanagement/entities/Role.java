@@ -6,6 +6,11 @@ public class Role {
   private int id;
   private RoleStaff RoleStaff;
 
+  public Role(int id, RoleStaff roleStaff) {
+    this.id = id;
+    RoleStaff = roleStaff;
+  }
+
   public int getId() {
     return id;
   }

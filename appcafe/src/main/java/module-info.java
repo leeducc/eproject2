@@ -22,4 +22,6 @@ module com.example.cafemanagemnet {
   exports com.example.cafemanagement.page.admin to javafx.graphics;
   opens com.example.cafemanagement.controller to javafx.fxml;
   exports com.example.cafemanagement.controller;
+  exports com.example.cafemanagement.service;
+  opens com.example.cafemanagement.service to javafx.fxml;
 }
