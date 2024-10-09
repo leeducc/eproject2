@@ -6,7 +6,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
@@ -20,15 +19,9 @@ import javafx.stage.Stage;
 import java.util.Objects;
 
 public class PageLogin {
-  private PageHome pageHome;
+
   private Scene dashboardScene;
 
-  public PageLogin(PageHome pageHome) {
-    this.pageHome = pageHome;
-  }
-
-  public PageLogin() {
-  }
 
   public Scene pageLogin(Stage primaryStage) {
     VBox mainLayout = new VBox(20);
@@ -52,7 +45,8 @@ public class PageLogin {
     Button loginButton = new Button("ĐĂNG NHẬP");
 
     // Add elements to layout
-    mainLayout.getChildren().addAll(logo, usernameField, passwordField, createRoleSelectionBox(roleGroup), loginButton);
+    mainLayout.getChildren()
+        .addAll(logo, usernameField, passwordField, createRoleSelectionBox(roleGroup), loginButton);
 
     // Create scene and stage
     Scene scene = new Scene(mainLayout, 400, 300);
@@ -62,7 +56,9 @@ public class PageLogin {
 
     // Load CSS
     try {
-      scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/css/cssfilepagelogin.css")).toExternalForm());
+      scene.getStylesheets().add(
+          Objects.requireNonNull(getClass().getResource("/css/cssfilepagelogin.css"))
+              .toExternalForm());
     } catch (Exception e) {
       System.out.println("CSS file not found!");
     }
@@ -91,7 +87,8 @@ public class PageLogin {
   private ImageView createLogo() {
     ImageView logo = null;
     try {
-      logo = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/images/logo.png")).toExternalForm()));
+      logo = new ImageView(new Image(
+          Objects.requireNonNull(getClass().getResource("/images/logo.png")).toExternalForm()));
       logo.setFitWidth(150);
       logo.setPreserveRatio(true);
     } catch (Exception e) {
@@ -124,19 +121,16 @@ public class PageLogin {
   }
 
   private void createDashboardScene(Stage primaryStage) {
-    Label welcomeLabel = new Label("Welcome to the Dashboard!");
+    PageHome pageHome = new PageHome();
     Button logoutButton = new Button("Logout");
-
-    VBox dashboardLayout = new VBox(10, welcomeLabel, logoutButton);
+    VBox dashboardLayout = pageHome.viewHomePage(logoutButton);
     dashboardLayout.setAlignment(Pos.CENTER);
-
     // Handle logout button click
     logoutButton.setOnAction(event -> {
       // Switch back to the login scene
       primaryStage.setScene(pageLogin(primaryStage));
       primaryStage.setTitle("Login Screen");
     });
-
     // Create dashboard scene
     dashboardScene = new Scene(dashboardLayout, 400, 300);
   }
