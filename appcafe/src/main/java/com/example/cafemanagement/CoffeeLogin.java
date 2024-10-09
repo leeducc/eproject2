@@ -1,13 +1,13 @@
 package com.example.cafemanagement;
 
-import com.example.cafemanagement.page.PageLogin;
+import com.example.cafemanagement.controller.PageLoginController;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 
 public class CoffeeLogin extends Application {
 
-  PageLogin pageLogin = new PageLogin();
+  PageLoginController pageLogin = new PageLoginController();
 
   @Override
   public void start(Stage primaryStage) {

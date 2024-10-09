@@ -20,4 +20,6 @@ module com.example.cafemanagemnet {
 
   // Export the package containing your application class
   exports com.example.cafemanagement.page.admin to javafx.graphics;
+  opens com.example.cafemanagement.controller to javafx.fxml;
+  exports com.example.cafemanagement.controller;
 }
