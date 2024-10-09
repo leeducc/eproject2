@@ -8,6 +8,13 @@ public class Staff {
   private String contactNumber;
   private int roleId;
 
+  public Staff(int staffId, String password, String name, String contactNumber) {
+    this.id = staffId;
+    this.passwordHash = password;
+    this.name = name;
+    this.contactNumber = contactNumber;
+  }
+
   public int getId() {
     return id;
   }
