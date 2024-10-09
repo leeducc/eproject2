@@ -1,18 +1,17 @@
 package com.example.cafemanagement.page;
 
+import com.example.cafemanagement.page.admin.CreateNewUserPage;
 import com.example.cafemanagement.page.staff.PageHome;
+import com.example.cafemanagement.service.PageLoginService;
 import com.example.cafemanagement.util.AlertUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,7 +19,7 @@ import java.util.Objects;
 
 public class PageLogin {
 
-  private Scene dashboardScene;
+  PageLoginService service = new PageLoginService();
 
 
   public Scene pageLogin(Stage primaryStage) {
@@ -29,7 +28,7 @@ public class PageLogin {
     mainLayout.setAlignment(Pos.CENTER);
 
     // Add logo
-    ImageView logo = createLogo();
+    ImageView logo = service.createLogo();
 
     // Username and Password fields
     TextField usernameField = new TextField();
@@ -39,14 +38,14 @@ public class PageLogin {
     passwordField.setPromptText("Mật khẩu");
 
     // Role selection
-    ToggleGroup roleGroup = createRoleGroup();
+    ToggleGroup roleGroup = service.createRoleGroup();
 
     // Login button
     Button loginButton = new Button("ĐĂNG NHẬP");
 
     // Add elements to layout
     mainLayout.getChildren()
-        .addAll(logo, usernameField, passwordField, createRoleSelectionBox(roleGroup), loginButton);
+        .addAll(logo, usernameField, passwordField, service.createRoleSelectionBox(roleGroup), loginButton);
 
     // Create scene and stage
     Scene scene = new Scene(mainLayout, 400, 300);
@@ -73,7 +72,7 @@ public class PageLogin {
 
       if (enteredUsername.equals("admin") && enteredPassword.equals("123")) {
         // Successful login
-        primaryStage.setScene(dashboardScene);
+        primaryStage.setScene(service.getDashboardScene());
         primaryStage.setTitle("Dashboard");
       } else {
         // Invalid credentials
@@ -84,54 +83,28 @@ public class PageLogin {
     return scene;
   }
 
-  private ImageView createLogo() {
-    ImageView logo = null;
-    try {
-      logo = new ImageView(new Image(
-          Objects.requireNonNull(getClass().getResource("/images/logo.png")).toExternalForm()));
-      logo.setFitWidth(150);
-      logo.setPreserveRatio(true);
-    } catch (Exception e) {
-      System.out.println("Logo image not found!");
-    }
-    return logo;
-  }
-
-  private ToggleGroup createRoleGroup() {
-    ToggleGroup roleGroup = new ToggleGroup();
-    RadioButton rbPhucVu = new RadioButton("Phục Vụ");
-    RadioButton rbThuNgan = new RadioButton("Thu Ngân");
-    RadioButton rbAdmin = new RadioButton("Quản Lý");
-
-    rbPhucVu.setToggleGroup(roleGroup);
-    rbThuNgan.setToggleGroup(roleGroup);
-    rbAdmin.setToggleGroup(roleGroup);
-
-    rbPhucVu.setSelected(true);  // Default selection
-    return roleGroup;
-  }
-
-  private HBox createRoleSelectionBox(ToggleGroup roleGroup) {
-    RadioButton rbPhucVu = (RadioButton) roleGroup.getToggles().get(0);
-    RadioButton rbThuNgan = (RadioButton) roleGroup.getToggles().get(1);
-    RadioButton rbAdmin = (RadioButton) roleGroup.getToggles().get(2);
-    HBox roleSelectionBox = new HBox(10, rbPhucVu, rbThuNgan, rbAdmin);
-    roleSelectionBox.setAlignment(Pos.CENTER);
-    return roleSelectionBox;
-  }
-
   private void createDashboardScene(Stage primaryStage) {
     PageHome pageHome = new PageHome();
+    CreateNewUserPage createNewUser = new CreateNewUserPage();
     Button logoutButton = new Button("Logout");
-    VBox dashboardLayout = pageHome.viewHomePage(logoutButton);
+    Button creatStaff = new Button("Tạo Tài Khoản Nhân viên");
+    VBox dashboardLayout = pageHome.viewHomePage(logoutButton, creatStaff);
     dashboardLayout.setAlignment(Pos.CENTER);
+    VBox dashboardLayoutCreate = createNewUser.createNewUserPage(creatStaff);
     // Handle logout button click
     logoutButton.setOnAction(event -> {
       // Switch back to the login scene
       primaryStage.setScene(pageLogin(primaryStage));
       primaryStage.setTitle("Login Screen");
     });
+    creatStaff.setOnAction(event -> {
+      primaryStage.setScene(service.getDashboardSceneCreate());
+      primaryStage.setTitle("Create Screen");
+    })
+    ;
     // Create dashboard scene
-    dashboardScene = new Scene(dashboardLayout, 400, 300);
+    service.setDashboardScene(new Scene(dashboardLayout, 400, 300)) ;
+    service.getDashboardScene().getStylesheets().add(getClass().getResource("/css/stylessAdminPage.css").toExternalForm());
+    service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 400, 300));
   }
 }
