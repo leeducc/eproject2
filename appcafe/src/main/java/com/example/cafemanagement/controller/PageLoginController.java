@@ -71,22 +71,34 @@ public class PageLoginController {
     loginButton.setOnAction(e -> {
       String enteredUsername = usernameField.getText();
       String enteredPassword = passwordField.getText();
-      String passwordHash = staffService.getStaffByUserName(enteredUsername).getPasswordHash();
-      String userName = staffService.getStaffByUserName(enteredUsername).getName();
-      String passwordHashed = HashPassword.hashPassword(enteredPassword);
-      if (enteredUsername.equals("admin") && enteredPassword.equals("123")) {
-        // Successful login
-        primaryStage.setScene(service.getDashboardScene());
-        primaryStage.setTitle("Dashboard");
-      }else if (enteredUsername.equals(userName) && passwordHashed.equals(passwordHash)){
-        primaryStage.setScene(service.getDashboardScene());
-        primaryStage.setTitle("Dashboard");
-      }
-      else {
-        // Invalid credentials
+
+      // Check if username and password fields are not empty
+      if (!enteredUsername.trim().isEmpty() && !enteredPassword.trim().isEmpty()) {
+        String passwordHash = staffService.getStaffByUserName(enteredUsername).getPasswordHash();
+        String userName = staffService.getStaffByUserName(enteredUsername).getName();
+        String passwordHashed = HashPassword.hashPassword(enteredPassword);
+
+        // Check for admin credentials
+        if (enteredUsername.equals("admin") && enteredPassword.equals("123")) {
+          // Successful login for admin
+          primaryStage.setScene(service.getDashboardScene());
+          primaryStage.setTitle("Dashboard");
+        }
+        // Check for other users
+        else if (enteredUsername.equals(userName) && passwordHashed.equals(passwordHash)) {
+          primaryStage.setScene(service.getDashboardScene());
+          primaryStage.setTitle("Dashboard");
+        }
+        else {
+          // Invalid credentials
+          AlertUtil.showErrorLoginAlert();
+        }
+      } else {
+        // Empty username or password field
         AlertUtil.showErrorLoginAlert();
       }
     });
+
 
     return scene;
   }
