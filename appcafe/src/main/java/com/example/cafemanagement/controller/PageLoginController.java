@@ -50,7 +50,7 @@ public class PageLoginController {
         .addAll(logo, usernameField, passwordField, service.createRoleSelectionBox(), loginButton);
 
     // Create scene and stage
-    Scene scene = new Scene(mainLayout, 400, 300);
+    Scene scene = new Scene(mainLayout, 800, 600);
     primaryStage.setTitle("Coffee Login");
     primaryStage.setScene(scene);
     primaryStage.show();
@@ -123,9 +123,9 @@ public class PageLoginController {
     })
     ;
     // Create dashboard scene
-    service.setDashboardScene(new Scene(dashboardLayout, 400, 300)) ;
+    service.setDashboardScene(new Scene(dashboardLayout, 800, 600)) ;
     service.getDashboardScene();
-    service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 400, 300));
+    service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 800, 600));
 
   }
 }
