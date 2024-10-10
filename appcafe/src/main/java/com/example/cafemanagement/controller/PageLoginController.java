@@ -1,7 +1,7 @@
 package com.example.cafemanagement.controller;
 
+import com.example.cafemanagement.page.admin.AdminHomePage;
 import com.example.cafemanagement.page.admin.CreateNewUserPage;
-import com.example.cafemanagement.page.admin.PageHome;
 import com.example.cafemanagement.service.HashPassword;
 import com.example.cafemanagement.service.PageLoginService;
 import com.example.cafemanagement.service.StaffService;
@@ -104,11 +104,11 @@ public class PageLoginController {
   }
 
   private void createDashboardScene(Stage primaryStage) {
-    PageHome pageHome = new PageHome();
+    AdminHomePage adminHomePage = new AdminHomePage();
     CreateNewUserPage createNewUser = new CreateNewUserPage();
     Button logoutButton = new Button("Logout");
     Button creatStaff = new Button("Tạo Tài Khoản Nhân viên");
-    VBox dashboardLayout = pageHome.viewHomePage(logoutButton, creatStaff);
+    VBox dashboardLayout = adminHomePage.viewHomePage(logoutButton, creatStaff);
     dashboardLayout.setAlignment(Pos.CENTER);
     VBox dashboardLayoutCreate = createNewUser.createNewUserPage(creatStaff);
     // Handle logout button click
