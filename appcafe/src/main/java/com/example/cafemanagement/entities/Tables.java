@@ -5,7 +5,22 @@ import com.example.cafemanagement.enummethod.StatusTable;
 public class Tables {
   private int id;
   private String name;
-  private StatusTable satatus;
+  private int statusId;
+
+
+  public Tables(String name, int statusId) {
+
+    this.name = name;
+    this.statusId = statusId;
+  }
+
+  public int getStatusId() {
+    return statusId;
+  }
+
+  public void setStatusId(int statusId) {
+    this.statusId = statusId;
+  }
 
   public int getId() {
     return id;
@@ -23,11 +38,4 @@ public class Tables {
     this.name = name;
   }
 
-  public StatusTable getSatatus() {
-    return satatus;
-  }
-
-  public void setSatatus(StatusTable satatus) {
-    this.satatus = satatus;
-  }
 }

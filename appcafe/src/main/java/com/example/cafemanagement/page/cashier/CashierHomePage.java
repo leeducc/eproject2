@@ -1,8 +1,10 @@
 package com.example.cafemanagement.page.cashier;
 
 
+import com.example.cafemanagement.service.TableCoffeeService;
 import com.example.cafemanagement.service.cashier.CashierService;
 import com.example.cafemanagement.util.AlertUtil;
+import java.util.ArrayList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,7 +26,6 @@ public class CashierHomePage {
   private static Label selectedTableLabel;  // Khai báo nhãn này để cập nhật khi chọn bàn
 
 
-
   public static VBox viewTableOrder() {
     GridPane floorTable = new GridPane();
     floorTable.setPadding(new Insets(10));
@@ -39,14 +40,12 @@ public class CashierHomePage {
     upstairTable.setAlignment(Pos.CENTER);
 
     // Thêm các bàn vào khu A (Tầng trệt)
-    String[] floorTables = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"};
+    ArrayList<String> floorTables = TableCoffeeService.getNameTable(1);
     addButtonsToGrid(floorTable, floorTables);
 
     // Thêm các bàn vào khu B (Tầng lầu)
-    String[] upstairTables = {
-        "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
-        "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34",
-        "35", "36"};
+    ArrayList<String> upstairTables = TableCoffeeService.getNameTable(2);
+    System.out.println(upstairTables.size() );
     addButtonsToGrid(upstairTable, upstairTables);
 
     // Tạo các nhãn cho khu vực bàn
@@ -58,7 +57,7 @@ public class CashierHomePage {
     // Thêm các nhãn và khu vực bàn vào layout
     VBox layoutTableSelection = new VBox(10);
     layoutTableSelection.getChildren()
-        .addAll(labelFloorTables, floorTable, labelUpstairTables, upstairTable);
+        .addAll(labelFloorTables, floorTable, upstairTable, labelUpstairTables);
     layoutTableSelection.setPadding(new Insets(20));
     layoutTableSelection.setAlignment(Pos.CENTER);
     layoutTableSelection.getStylesheets().add(
@@ -133,17 +132,17 @@ public class CashierHomePage {
   }
 
   // Phương thức để thêm các nút bàn vào GridPane
-  private static void addButtonsToGrid(GridPane grid, String[] tableNames) {
+  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames) {
     int count = 0;
     int rows = 6;
     int cols = 6;
     for (int row = 0; row < rows; row++) {
       for (int col = 0; col < cols; col++) {
-        if (count >= tableNames.length) {
+        if (count >= tableNames.size()) {
           break;
         }
-        Button tableButton = new Button(tableNames[count]);
-        tableButton.setPrefSize(70, 70);
+        Button tableButton = new Button(tableNames.get(count));
+        tableButton.setPrefSize(90, 90);
         tableButton.setStyle("-fx-background-color: lightgray;");
 
         // Khi nhấn vào nút bàn, chuyển qua giao diện chọn đồ uống và thanh toán
