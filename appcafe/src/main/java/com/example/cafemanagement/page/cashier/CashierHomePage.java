@@ -45,7 +45,6 @@ public class CashierHomePage {
 
     // Thêm các bàn vào khu B (Tầng lầu)
     ArrayList<String> upstairTables = TableCoffeeService.getNameTable(2);
-    System.out.println(upstairTables.size() );
     addButtonsToGrid(upstairTable, upstairTables);
 
     // Tạo các nhãn cho khu vực bàn

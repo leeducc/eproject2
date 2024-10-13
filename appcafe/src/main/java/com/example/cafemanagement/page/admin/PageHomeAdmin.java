@@ -5,13 +5,14 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
 
-public class PageHome {
+public class PageHomeAdmin {
 
   public VBox viewHomePage() {
     TableView<MenuItem> table = new TableView<>();

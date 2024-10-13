@@ -5,7 +5,7 @@ import static com.example.cafemanagement.service.HashPassword.checkPassword;
 
 import com.example.cafemanagement.enummethod.RoleStaff;
 import com.example.cafemanagement.page.admin.CreateNewUserPage;
-import com.example.cafemanagement.page.admin.PageHome;
+import com.example.cafemanagement.page.admin.PageHomeAdmin;
 import com.example.cafemanagement.page.cashier.CashierHomePage;
 import com.example.cafemanagement.service.admin.PageLoginService;
 import com.example.cafemanagement.service.staff.StaffService;
@@ -97,7 +97,7 @@ public class PageLoginController {
         int checkRoleId = staffService.getStaffByUserName(enteredUsername).getRoleId();
 
         // Check for admin credentials
-        if (enteredUsername.equals("admin") && enteredPassword.equals("123") && roleId == checkRoleId) {
+        if ((enteredUsername.equals("admin") && enteredPassword.equals("123")) && roleId == checkRoleId) {
           primaryStage.setScene(service.getDashboardScene());
           primaryStage.setTitle("Dashboard");
         } else if (enteredUsername.equals(userName) && checkPassword(enteredPassword, passwordHash)
@@ -131,21 +131,22 @@ public class PageLoginController {
   }
 
   public void createDashboardScene(Stage primaryStage) {
-    PageHome pageHome = new PageHome();
+    PageHomeAdmin pageHomeAdmin = new PageHomeAdmin();
     CreateNewUserPage createNewUser = new CreateNewUserPage();
     Button creatStaff = new Button("Tạo Tài Khoản Nhân viên");
     Button comeback = new Button("Quay lại");
+    Button nextPage = new Button("Trang Order");
 
     // Tạo nút logout chung
     Button logoutButton = createLogoutButton(primaryStage);
     Button logoutButton1 = createLogoutButton(primaryStage);
 
     // Dashboard chính
-    VBox dashboardLayout = pageHome.viewHomePage();
+    VBox dashboardLayout = pageHomeAdmin.viewHomePage();
     if (dashboardLayout == null) {
       throw new NullPointerException("Dashboard layout is null");
     }
-    dashboardLayout.getChildren().addAll(creatStaff, logoutButton1);
+    dashboardLayout.getChildren().addAll(creatStaff,nextPage, logoutButton1);
     dashboardLayout.setAlignment(Pos.CENTER);
 
     // Trang tạo tài khoản nhân viên
@@ -159,8 +160,10 @@ public class PageLoginController {
    VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
     dashboardLayoutServiceOrder.getChildren().addAll(logoutButton);
 
-
     // Xử lý nút quay lại
+    nextPage.setOnAction(event -> {
+      CashierHomePage.cashierHomePage(primaryStage,service.getDashboardVBoxServiceTableOrder());
+    });
     creatStaff.setOnAction(event -> {
       primaryStage.setScene(service.getDashboardSceneCreate());
       primaryStage.setTitle("Create Screen");
