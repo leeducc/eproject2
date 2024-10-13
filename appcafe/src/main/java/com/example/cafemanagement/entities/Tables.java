@@ -3,6 +3,7 @@ package com.example.cafemanagement.entities;
 import com.example.cafemanagement.enummethod.StatusTable;
 
 public class Tables {
+
   private int id;
   private String name;
   private int statusId;
