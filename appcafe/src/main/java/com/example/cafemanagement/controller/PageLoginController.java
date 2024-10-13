@@ -108,7 +108,7 @@ public class PageLoginController {
               primaryStage.setTitle("Dashboard");
               break;
             case 2:
-              primaryStage.setScene(service.getDashboardSceneServiceTableOrder());
+              CashierHomePage.cashierHomePage(primaryStage,service.getDashboardVBoxServiceTableOrder());
               break;
             case 3:
               System.out.println("Button 3 clicked!");
@@ -119,11 +119,11 @@ public class PageLoginController {
           }
         } else {
           // Invalid credentials
-          AlertUtil.showErrorLoginAlert("Please select a role.");
+          AlertUtil.showErrorLoginAlert("\"Tên đăng nhập hoặc mật khẩu không chính xác.\\nVui lòng nhập lại!\"");
         }
       } else {
         // Empty username or password field
-        AlertUtil.showErrorLoginAlert("Please select a role.");
+        AlertUtil.showErrorLoginAlert("\"Tên đăng nhập hoặc mật khẩu không chính xác.\\nVui lòng nhập lại!\"");
       }
     });
 
@@ -138,13 +138,14 @@ public class PageLoginController {
 
     // Tạo nút logout chung
     Button logoutButton = createLogoutButton(primaryStage);
+    Button logoutButton1 = createLogoutButton(primaryStage);
 
     // Dashboard chính
     VBox dashboardLayout = pageHome.viewHomePage();
     if (dashboardLayout == null) {
       throw new NullPointerException("Dashboard layout is null");
     }
-    dashboardLayout.getChildren().addAll(creatStaff, logoutButton);
+    dashboardLayout.getChildren().addAll(creatStaff, logoutButton1);
     dashboardLayout.setAlignment(Pos.CENTER);
 
     // Trang tạo tài khoản nhân viên
@@ -154,8 +155,10 @@ public class PageLoginController {
     }
 
     // Trang dịch vụ (Cashier Home Page)
-    VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
+
+   VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
     dashboardLayoutServiceOrder.getChildren().addAll(logoutButton);
+
 
     // Xử lý nút quay lại
     creatStaff.setOnAction(event -> {
@@ -170,7 +173,7 @@ public class PageLoginController {
     // Tạo các cảnh cho từng trang
     service.setDashboardScene(new Scene(dashboardLayout, 800, 600));
     service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 800, 600));
-    service.setDashboardSceneServiceTableOrder(new Scene(dashboardLayoutServiceOrder, 800, 600));
+    service.setDashboardVBoxServiceTableOrder(dashboardLayoutServiceOrder);
   }
 
   public Button createLogoutButton(Stage primaryStage) {

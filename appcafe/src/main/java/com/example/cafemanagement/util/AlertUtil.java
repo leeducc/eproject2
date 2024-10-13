@@ -23,7 +23,7 @@ public class AlertUtil {
     imageView.setFitWidth(100);
 
     // Create the label for the error message
-    Label messageLabel = new Label("Tên đăng nhập hoặc mật khẩu không chính xác.\nVui lòng nhập lại!");
+    Label messageLabel = new Label(s);
     messageLabel.getStyleClass().add("error-message");
 
     // Create layout and add image and message

@@ -12,20 +12,22 @@ import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 
 
 public class PageLoginService {
   private Scene dashboardScene;
   private Scene dashboardSceneCreate;
-  private Scene dashboardSceneServiceTableOrder;
+  private VBox dashboardVBoxServiceTableOrder;
 
-  public Scene getDashboardSceneServiceTableOrder() {
-    return dashboardSceneServiceTableOrder;
+  public VBox getDashboardVBoxServiceTableOrder() {
+    return dashboardVBoxServiceTableOrder;
   }
 
-  public void setDashboardSceneServiceTableOrder(Scene dashboardSceneServiceTableOrder) {
-    this.dashboardSceneServiceTableOrder = dashboardSceneServiceTableOrder;
+  public void setDashboardVBoxServiceTableOrder(VBox dashboardVBoxServiceTableOrder) {
+    this.dashboardVBoxServiceTableOrder = dashboardVBoxServiceTableOrder;
   }
+
 
   public Scene getDashboardScene() {
     return dashboardScene;
