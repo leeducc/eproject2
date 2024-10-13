@@ -13,7 +13,7 @@ import javafx.scene.layout.VBox;
 
 public class PageHome {
 
-  public VBox viewHomePage(Button creatStaff, Button staff) {
+  public VBox viewHomePage() {
     TableView<MenuItem> table = new TableView<>();
 
     // Define columns
@@ -41,10 +41,10 @@ public class PageHome {
     table.setItems(items);
     // Layout
     VBox dashboardLayout = new VBox(10);
-    dashboardLayout.getChildren().addAll(new MenuBar(), table, creatStaff,staff);
+    dashboardLayout.getChildren().addAll(new MenuBar(), table);
     dashboardLayout.setPadding(new Insets(20));
     dashboardLayout.setAlignment(Pos.CENTER);
-    dashboardLayout.getStylesheets().add(getClass().getResource("/css/stylessAdminPage.css").toExternalForm());
+    dashboardLayout.getStylesheets().add(getClass().getResource("/css/stylesAdminPage.css").toExternalForm());
     return dashboardLayout;
   }
 

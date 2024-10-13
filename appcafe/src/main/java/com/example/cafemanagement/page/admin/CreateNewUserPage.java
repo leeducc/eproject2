@@ -5,8 +5,8 @@ import static com.example.cafemanagement.enummethod.RoleStaff.fromDisplayName;
 import com.example.cafemanagement.service.HashPassword;
 import com.example.cafemanagement.entities.Staff;
 import com.example.cafemanagement.enummethod.RoleStaff;
-import com.example.cafemanagement.service.PageLoginService;
-import com.example.cafemanagement.service.StaffService;
+import com.example.cafemanagement.service.admin.PageLoginService;
+import com.example.cafemanagement.service.staff.StaffService;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -22,7 +22,7 @@ public class CreateNewUserPage {
   StaffService staffService = new StaffService();
   PageLoginService service = new PageLoginService();
 
-  public VBox createNewUserPage(Button primaryStage) {
+  public VBox createNewUserPage() {
     VBox mainLayout = new VBox(20);
     mainLayout.setPadding(new Insets(20));
     mainLayout.setAlignment(Pos.CENTER);
@@ -66,7 +66,7 @@ public class CreateNewUserPage {
           new Staff(staffId, password, name, contactNumber, roleId));
       if (result) {
         resultMessage.setText("Tạo tài khoản thành công!");
-        resultMessage.setText(String.valueOf(roleId));
+//        resultMessage.setText(String.valueOf(roleId));
 
       } else {
         resultMessage.setText("Tạo tài khoản thất bại!");
@@ -75,7 +75,7 @@ public class CreateNewUserPage {
 
     mainLayout.getChildren()
         .addAll(staffIdField, passwordField, nameField, contactNumberField, roleLabel,
-            roleComboBox, registerButton, resultMessage);
+            roleComboBox, registerButton,resultMessage);
     mainLayout.setPadding(new Insets(20));
     mainLayout.setAlignment(Pos.CENTER);
     mainLayout.getStylesheets()

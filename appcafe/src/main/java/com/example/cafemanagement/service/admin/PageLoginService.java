@@ -1,9 +1,10 @@
-package com.example.cafemanagement.service;
+package com.example.cafemanagement.service.admin;
 
 import static com.example.cafemanagement.enummethod.RoleStaff.fromDisplayName;
 
 import com.example.cafemanagement.entities.Role;
 import com.example.cafemanagement.enummethod.RoleStaff;
+import com.example.cafemanagement.service.staff.StaffService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,15 @@ import javafx.scene.image.ImageView;
 public class PageLoginService {
   private Scene dashboardScene;
   private Scene dashboardSceneCreate;
+  private Scene dashboardSceneServiceTableOrder;
+
+  public Scene getDashboardSceneServiceTableOrder() {
+    return dashboardSceneServiceTableOrder;
+  }
+
+  public void setDashboardSceneServiceTableOrder(Scene dashboardSceneServiceTableOrder) {
+    this.dashboardSceneServiceTableOrder = dashboardSceneServiceTableOrder;
+  }
 
   public Scene getDashboardScene() {
     return dashboardScene;
@@ -46,7 +56,7 @@ public class PageLoginService {
     return logo;
   }
 
-  public ComboBox createRoleSelectionBox( ) {
+  public ComboBox createRoleSelectionBox() {
     List<Role> roles = new ArrayList<>();
     StaffService staffService = new StaffService();
     ComboBox<String> roleComboBox = new ComboBox<>();

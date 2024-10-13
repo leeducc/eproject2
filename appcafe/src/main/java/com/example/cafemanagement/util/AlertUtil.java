@@ -31,7 +31,7 @@ public class AlertUtil {
     vbox.setAlignment(Pos.CENTER);
     vbox.getStyleClass().add("custom-alert");
 
-    Scene alertScene = new Scene(vbox, 400, 200);
+    Scene alertScene = new Scene(vbox, 450, 200);
     // Apply the external CSS file
     alertScene.getStylesheets().add(
         Objects.requireNonNull(AlertUtil.class.getResource("/css/errorLoginAlert.css")).toExternalForm());

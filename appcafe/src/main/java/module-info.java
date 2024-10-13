@@ -12,6 +12,7 @@ module com.example.cafemanagemnet {
   requires com.almasb.fxgl.all;
   requires java.desktop;
   requires java.sql;
+  requires jbcrypt;
 
   opens com.example.cafemanagement to javafx.fxml;
   exports com.example.cafemanagement;
@@ -27,4 +28,8 @@ module com.example.cafemanagemnet {
   exports com.example.cafemanagement.controller;
   exports com.example.cafemanagement.service;
   opens com.example.cafemanagement.service to javafx.fxml;
+  exports com.example.cafemanagement.service.admin;
+  opens com.example.cafemanagement.service.admin to javafx.fxml;
+  exports com.example.cafemanagement.service.staff;
+  opens com.example.cafemanagement.service.staff to javafx.fxml;
 }

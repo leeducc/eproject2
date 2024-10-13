@@ -1,4 +1,4 @@
-package com.example.cafemanagement.service;
+package com.example.cafemanagement.service.staff;
 
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
 import com.example.cafemanagement.entities.Role;

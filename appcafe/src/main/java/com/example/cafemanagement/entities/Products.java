@@ -7,6 +7,13 @@ public class Products {
   private String name;
   private double price;
 
+  public Products(String imageLink, String category, String name, double price) {
+    this.imageLink = imageLink;
+    this.category = category;
+    this.name = name;
+    this.price = price;
+  }
+
   public int getId() {
     return id;
   }

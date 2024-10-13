@@ -1,15 +1,21 @@
 package com.example.cafemanagement.controller;
 
+import static com.example.cafemanagement.enummethod.RoleStaff.fromDisplayName;
+import static com.example.cafemanagement.service.HashPassword.checkPassword;
+
+import com.example.cafemanagement.enummethod.RoleStaff;
 import com.example.cafemanagement.page.admin.CreateNewUserPage;
 import com.example.cafemanagement.page.admin.PageHome;
-import com.example.cafemanagement.service.HashPassword;
-import com.example.cafemanagement.service.PageLoginService;
-import com.example.cafemanagement.service.StaffService;
+import com.example.cafemanagement.page.cashier.CashierHomePage;
+import com.example.cafemanagement.service.HandleButton;
+import com.example.cafemanagement.service.admin.PageLoginService;
+import com.example.cafemanagement.service.staff.StaffService;
 import com.example.cafemanagement.util.AlertUtil;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -22,9 +28,6 @@ public class PageLoginController {
 
   PageLoginService service = new PageLoginService();
   StaffService staffService = new StaffService();
-  HashPassword hashPasswordService = new HashPassword();
-
-
   public Scene pageLogin(Stage primaryStage) {
     VBox mainLayout = new VBox(20);
     mainLayout.setPadding(new Insets(20));
@@ -40,14 +43,13 @@ public class PageLoginController {
     PasswordField passwordField = new PasswordField();
     passwordField.setPromptText("Mật khẩu");
 
-    // Role selection
-
+    ComboBox<String> roleComboBox = service.createRoleSelectionBox();
     // Login button
     Button loginButton = new Button("ĐĂNG NHẬP");
 
     // Add elements to layout
     mainLayout.getChildren()
-        .addAll(logo, usernameField, passwordField, service.createRoleSelectionBox(), loginButton);
+        .addAll(logo, usernameField, passwordField, roleComboBox, loginButton);
 
     // Create scene and stage
     Scene scene = new Scene(mainLayout, 800, 600);
@@ -66,30 +68,43 @@ public class PageLoginController {
 
     // Create dashboard scene
     createDashboardScene(primaryStage);
-
     // Set up login button action
     loginButton.setOnAction(e -> {
       String enteredUsername = usernameField.getText();
       String enteredPassword = passwordField.getText();
-
+      String roleValueName = roleComboBox.getValue();
+      RoleStaff role = fromDisplayName(roleValueName);
+      int roleId = staffService.getRoleByValue(String.valueOf(role));
       // Check if username and password fields are not empty
-      if (!enteredUsername.trim().isEmpty() && !enteredPassword.trim().isEmpty()) {
+      if (!enteredUsername.trim().isEmpty() && !enteredPassword.trim().isEmpty()
+          && staffService.getStaffByUserName(enteredUsername) != null) {
         String passwordHash = staffService.getStaffByUserName(enteredUsername).getPasswordHash();
         String userName = staffService.getStaffByUserName(enteredUsername).getName();
-        String passwordHashed = HashPassword.hashPassword(enteredPassword);
-
+        int checkRoleId = staffService.getStaffByUserName(enteredUsername).getRoleId();
         // Check for admin credentials
-        if (enteredUsername.equals("admin") && enteredPassword.equals("123")) {
+        if (enteredUsername.equals("admin") && enteredPassword.equals("123")
+            && roleId == checkRoleId) {
           // Successful login for admin
           primaryStage.setScene(service.getDashboardScene());
           primaryStage.setTitle("Dashboard");
-        }
-        // Check for other users
-        else if (enteredUsername.equals(userName) && passwordHashed.equals(passwordHash)) {
-          primaryStage.setScene(service.getDashboardScene());
-          primaryStage.setTitle("Dashboard");
-        }
-        else {
+        } else if (enteredUsername.equals(userName) && checkPassword(enteredPassword, passwordHash)
+            && roleId == checkRoleId) {
+          switch (checkRoleId) {
+            case 1:
+              primaryStage.setScene(service.getDashboardScene());
+              primaryStage.setTitle("Dashboard");
+              break;
+            case 2:
+              primaryStage.setScene(service.getDashboardSceneServiceTableOrder());
+              break;
+            case 3:
+              System.out.println("Button 3 clicked!");
+              break;
+            default:
+              System.out.println("Unknown action");
+              break;
+          }
+        } else {
           // Invalid credentials
           AlertUtil.showErrorLoginAlert();
         }
@@ -98,34 +113,55 @@ public class PageLoginController {
         AlertUtil.showErrorLoginAlert();
       }
     });
-
-
     return scene;
   }
-
-  private void createDashboardScene(Stage primaryStage) {
+  public void createDashboardScene(Stage primaryStage) {
     PageHome pageHome = new PageHome();
     CreateNewUserPage createNewUser = new CreateNewUserPage();
-    Button logoutButton = new Button("Logout");
     Button creatStaff = new Button("Tạo Tài Khoản Nhân viên");
-    VBox dashboardLayout = pageHome.viewHomePage(logoutButton, creatStaff);
+    Button comeback = new Button("Quay lại");
+
+    // Tạo nút logout chung
+    Button logoutButton = createLogoutButton(primaryStage);
+
+    // Dashboard chính
+    VBox dashboardLayout = pageHome.viewHomePage();
+    dashboardLayout.getChildren().addAll(creatStaff,logoutButton);
     dashboardLayout.setAlignment(Pos.CENTER);
-    VBox dashboardLayoutCreate = createNewUser.createNewUserPage(creatStaff);
-    // Handle logout button click
-    logoutButton.setOnAction(event -> {
-      // Switch back to the login scene
-      primaryStage.setScene(pageLogin(primaryStage));
-      primaryStage.setTitle("Login Screen");
-    });
+
+    // Trang tạo tài khoản nhân viên
+    VBox dashboardLayoutCreate = createNewUser.createNewUserPage();
+    dashboardLayoutCreate.getChildren().addAll(comeback);
+
+
+    // Trang dịch vụ (Cashier Home Page)
+    VBox dashboardLayoutServiceOrderTable = CashierHomePage.viewTableOrder();
+    dashboardLayoutServiceOrderTable.getChildren().addAll(logoutButton);
+
+    // Xử lý nút quay lại
     creatStaff.setOnAction(event -> {
       primaryStage.setScene(service.getDashboardSceneCreate());
       primaryStage.setTitle("Create Screen");
-    })
-    ;
-    // Create dashboard scene
-    service.setDashboardScene(new Scene(dashboardLayout, 800, 600)) ;
-    service.getDashboardScene();
-    service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 800, 600));
+    });
+    comeback.setOnAction(event -> {
+      primaryStage.setScene(service.getDashboardScene());
+      primaryStage.setTitle("Dashboard");
+    });
 
+    // Tạo các cảnh cho từng trang
+    service.setDashboardScene(new Scene(dashboardLayout, 800, 600));
+    service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 800, 600));
+    service.setDashboardSceneServiceTableOrder(
+        new Scene(dashboardLayoutServiceOrderTable, 800, 600));
+  }
+  public Button createLogoutButton(Stage primaryStage) {
+    Button logoutButton = new Button("Logout");
+    logoutButton.setOnAction(event -> handleLogout(primaryStage));
+    return logoutButton;
+  }
+  private void handleLogout(Stage primaryStage) {
+    primaryStage.setScene(pageLogin(primaryStage));
+    primaryStage.setTitle("Login Screen");
   }
 }
+
