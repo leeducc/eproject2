@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class AlertUtil {
 
-  public static void showErrorLoginAlert() {
+  public static void showErrorLoginAlert(String s) {
     Stage alertStage = new Stage();
     alertStage.initModality(Modality.APPLICATION_MODAL);
 

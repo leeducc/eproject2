@@ -136,6 +136,32 @@
       <artifactId>jbcrypt</artifactId>
       <version>0.4</version>
     </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>20</version>
+    </dependency>
+
+    <!-- JavaFX FXML (nếu bạn sử dụng) -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>20</version>
+    </dependency>
+
+    <!-- JavaFX Base -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-base</artifactId>
+      <version>20</version>
+    </dependency>
+
+    <!-- JavaFX Graphics -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>20</version>
+    </dependency>
   </dependencies>
 
   <build>

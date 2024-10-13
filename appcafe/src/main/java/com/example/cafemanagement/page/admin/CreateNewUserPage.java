@@ -22,7 +22,7 @@ public class CreateNewUserPage {
   StaffService staffService = new StaffService();
   PageLoginService service = new PageLoginService();
 
-  public VBox createNewUserPage() {
+  public VBox createNewUserPage(Button button) {
     VBox mainLayout = new VBox(20);
     mainLayout.setPadding(new Insets(20));
     mainLayout.setAlignment(Pos.CENTER);
@@ -75,7 +75,7 @@ public class CreateNewUserPage {
 
     mainLayout.getChildren()
         .addAll(staffIdField, passwordField, nameField, contactNumberField, roleLabel,
-            roleComboBox, registerButton,resultMessage);
+            roleComboBox, registerButton, button,resultMessage);
     mainLayout.setPadding(new Insets(20));
     mainLayout.setAlignment(Pos.CENTER);
     mainLayout.getStylesheets()
