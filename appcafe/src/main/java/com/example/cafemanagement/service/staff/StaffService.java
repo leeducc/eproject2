@@ -3,6 +3,7 @@ package com.example.cafemanagement.service.staff;
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
 import com.example.cafemanagement.entities.Role;
 import com.example.cafemanagement.entities.Staff;
+import com.example.cafemanagement.entities.StaffProperty;
 import com.example.cafemanagement.enummethod.RoleStaff;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -86,5 +87,60 @@ public class StaffService {
     return staff;
   }
 
+//  public List<Staff> getAllStaff(){
+//    List<Staff> staffList = new ArrayList<>();
+//    String sql = "SELECT * FROM staff";
+//    try (Connection connection = JDBCConnect.getJDBCConnection();
+//        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+//        ResultSet resultSet = preparedStatement.executeQuery()) {
+//      while (resultSet.next()) {
+//        Staff staff = new Staff(
+//            resultSet.getInt("staff_id"),
+//            resultSet.getString("password_hash"),
+//            resultSet.getString("name"),
+//            resultSet.getString("contact_number"),
+//            resultSet.getInt("role_id")
+//        );
+//        staffList.add(staff);
+//      }
+//    } catch (SQLException e) {
+//      e.printStackTrace();
+//    }
+//    return staffList;
+//  }
+
+  public static List<StaffProperty> viewStaffProperties(){
+    List<StaffProperty> staffProperties = new ArrayList<>();
+    RoleStaff role = null;
+    String sql = "SELECT s.staff_id, s.name, s.contact_number, r.role_name FROM staff s JOIN role r ON s.role_id = r.id";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ResultSet resultSet = preparedStatement.executeQuery()) {
+      while (resultSet.next()) {
+        StaffProperty staffProperty = new StaffProperty(
+            resultSet.getString("staff_id"),
+            resultSet.getString("name"),
+            resultSet.getString("contact_number"),
+            resultSet.getString("role_name")
+        );
+        switch (staffProperty.getRoleStaff()) {
+          case "ADMIN":
+            staffProperty.setRoleStaff(role.ADMIN.getRoleValueStaff());
+            break;
+          case "CASHIER":
+            staffProperty.setRoleStaff(role.CASHIER.getRoleValueStaff());
+            break;
+          case "SERVER":
+            staffProperty.setRoleStaff(role.SERVER.getRoleValueStaff());
+            break;
+          default:
+        }
+        staffProperties.add(staffProperty);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return staffProperties;
+  }
 
 }

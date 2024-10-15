@@ -16,6 +16,12 @@ public class Staff {
     this.roleId = roleId;
   }
 
+  public Staff(int startId, String name, int roleId) {
+    this.startId = startId;
+    this.name = name;
+    this.roleId = roleId;
+  }
+
   public int getId() {
     return id;
   }

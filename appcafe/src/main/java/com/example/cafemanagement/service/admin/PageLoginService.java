@@ -16,9 +16,19 @@ import javafx.scene.layout.VBox;
 
 
 public class PageLoginService {
+
+  public Scene getDashboardSceneHr() {
+    return dashboardSceneHr;
+  }
+
+  public void setDashboardSceneHr(Scene dashboardSceneHr) {
+    this.dashboardSceneHr = dashboardSceneHr;
+  }
+
   private Scene dashboardScene;
   private Scene dashboardSceneCreate;
   private VBox dashboardVBoxServiceTableOrder;
+  private Scene dashboardSceneHr;
 
   public VBox getDashboardVBoxServiceTableOrder() {
     return dashboardVBoxServiceTableOrder;
