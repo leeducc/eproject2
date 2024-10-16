@@ -26,20 +26,20 @@ public enum RoleStaff {
     }
     throw new IllegalArgumentException("Không tìm thấy vai trò với tên hiển thị: " + displayName);
   }
-//  public static RoleStaff fromDisplayValue(String displayName) {
-//    for (RoleStaff role : RoleStaff.values()) {
-//      if (role.equals(displayName)) {
-//        return role;
-//      }
-//    }
-//    throw new IllegalArgumentException("Không tìm thấy vai trò với tên hiển thị: " + displayName);
-//  }
+  public static RoleStaff fromDisplayValue(String displayName) {
+    for (RoleStaff role : RoleStaff.values()) {
+      if (role.equals(displayName)) {
+        return role;
+      }
+    }
+    throw new IllegalArgumentException("Không tìm thấy vai trò với tên hiển thị: " + displayName);
+  }
 
-//  public static void main(String[] args) {
-//    RoleStaff role = null;
-//    String displayName = "ADMIN";
-//    System.out.println(role.ADMIN.equals("ADMIN"));
-//  }
+  public static void main(String[] args) {
+    RoleStaff role = null;
+    String displayName = "ADMIN";
+    System.out.println(role.ADMIN);
+  }
 
 
 }

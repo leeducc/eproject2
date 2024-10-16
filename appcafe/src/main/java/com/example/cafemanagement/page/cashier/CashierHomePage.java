@@ -127,7 +127,6 @@ public class CashierHomePage {
     // Hiển thị giao diện chọn bàn lúc khởi động
     window.setScene(sceneTableSelection);
     window.show();
-
   }
 
   // Phương thức để thêm các nút bàn vào GridPane

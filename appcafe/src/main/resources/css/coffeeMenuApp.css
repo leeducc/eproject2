@@ -1,0 +1,9 @@
+/* styles.css */
+.image-view {
+  -fx-alignment: center; /* Canh giữa nội dung */
+  -fx-padding: 10; /* Thêm khoảng đệm */
+}
+
+.coffee-item {
+  -fx-alignment: center; /* Canh giữa các item */
+}

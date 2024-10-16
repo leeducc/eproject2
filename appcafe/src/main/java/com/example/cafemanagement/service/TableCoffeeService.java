@@ -1,7 +1,5 @@
 package com.example.cafemanagement.service;
-
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
-import com.example.cafemanagement.entities.Products;
 import com.example.cafemanagement.entities.Tables;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -10,11 +10,12 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class PageHomeAdmin {
 
-  public VBox viewHomePage() {
+  public VBox viewHomePage(Button button1, Button button2, Button button3, Button button4) {
     TableView<MenuItem> table = new TableView<>();
 
     // Define columns
@@ -41,11 +42,14 @@ public class PageHomeAdmin {
     );
     table.setItems(items);
     // Layout
+    HBox buttonBox = new HBox(10);
+    buttonBox.setPadding(new Insets(10));
+    buttonBox.getChildren().addAll(button1, button2, button3, button4);
     VBox dashboardLayout = new VBox(10);
-    dashboardLayout.getChildren().addAll(new MenuBar(), table);
+    dashboardLayout.getChildren().addAll(new MenuBar(), table, buttonBox);
     dashboardLayout.setPadding(new Insets(20));
     dashboardLayout.setAlignment(Pos.CENTER);
-    dashboardLayout.getStylesheets().add(getClass().getResource("/css/stylesAdminPage.css").toExternalForm());
+    dashboardLayout.getStylesheets().add(getClass().getResource("/css/viewMember.css").toExternalForm());
     return dashboardLayout;
   }
 

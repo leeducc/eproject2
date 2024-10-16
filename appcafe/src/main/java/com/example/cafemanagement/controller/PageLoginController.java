@@ -98,10 +98,10 @@ public class PageLoginController {
         int checkRoleId = staffService.getStaffByUserName(enteredUsername).getRoleId();
 
         // Check for admin credentials
-//        if ((enteredUsername.equals("admin") && enteredPassword.equals("123")) && roleId == checkRoleId) {
-//          primaryStage.setScene(service.getDashboardScene());
-//          primaryStage.setTitle("Dashboard");
-//        } else
+        if ((enteredUsername.equals("admin") && enteredPassword.equals("123")) && roleId == checkRoleId) {
+          primaryStage.setScene(service.getDashboardScene());
+          primaryStage.setTitle("Dashboard");
+        } else
           if (enteredUsername.equals(userName) && checkPassword(enteredPassword, passwordHash)
             && roleId == checkRoleId) {
           switch (checkRoleId) {
@@ -137,24 +137,26 @@ public class PageLoginController {
     CreateNewUserPage createNewUser = new CreateNewUserPage();
     ViewMember viewMember = new ViewMember();
     Button creatStaff = new Button("Tạo Tài Khoản Nhân viên");
-    Button comeback = new Button("Quay lại");
+//    Button comeback = new Button("Quay lại");
     Button nextPage = new Button("Trang Order");
     Button viewMemberButton = new Button("Quản lý Nhân Sự");
+    //Tạo nút chung comeback
+    Button comebacktButton = createComeBackButton(primaryStage);
+    Button comebacktButton1 = createComeBackButton(primaryStage);
 
     // Tạo nút logout chung
     Button logoutButton = createLogoutButton(primaryStage);
     Button logoutButton1 = createLogoutButton(primaryStage);
 
     // Dashboard chính
-    VBox dashboardLayout = pageHomeAdmin.viewHomePage();
+    VBox dashboardLayout = pageHomeAdmin.viewHomePage(creatStaff,nextPage,viewMemberButton,logoutButton1);
     if (dashboardLayout == null) {
       throw new NullPointerException("Dashboard layout is null");
     }
-    dashboardLayout.getChildren().addAll(creatStaff,nextPage,viewMemberButton, logoutButton1);
     dashboardLayout.setAlignment(Pos.CENTER);
 
     // Trang tạo tài khoản nhân viên
-    VBox dashboardLayoutCreate = createNewUser.createNewUserPage(comeback);
+    VBox dashboardLayoutCreate = createNewUser.createNewUserPage(comebacktButton);
     if (dashboardLayoutCreate == null) {
       throw new NullPointerException("Create account layout is null");
     }
@@ -164,7 +166,7 @@ public class PageLoginController {
    VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
     dashboardLayoutServiceOrder.getChildren().addAll(logoutButton);
 
-    VBox dashboardLayoutViewMember = viewMember.viewTableViewMember();
+    VBox dashboardLayoutViewMember = viewMember.viewTableViewMember(comebacktButton1);
     // Xử lý nút quay lại
     nextPage.setOnAction(event -> {
       CashierHomePage.cashierHomePage(primaryStage,service.getDashboardVBoxServiceTableOrder());
@@ -173,10 +175,10 @@ public class PageLoginController {
       primaryStage.setScene(service.getDashboardSceneCreate());
       primaryStage.setTitle("Create Screen");
     });
-    comeback.setOnAction(event -> {
-      primaryStage.setScene(service.getDashboardScene());
-      primaryStage.setTitle("Dashboard");
-    });
+//    comeback.setOnAction(event -> {
+//      primaryStage.setScene(service.getDashboardScene());
+//      primaryStage.setTitle("Dashboard");
+//    });
     viewMemberButton.setOnAction(event -> {
      primaryStage.setScene(service.getDashboardSceneHr());
     });
@@ -197,5 +199,15 @@ public class PageLoginController {
   private void handleLogout(Stage primaryStage) {
     primaryStage.setScene(pageLogin(primaryStage));
     primaryStage.setTitle("Login Screen");
+  }
+  public Button createComeBackButton(Stage primaryStage) {
+    Button combackButton = new Button("Quay Lại");
+    combackButton.setOnAction(event -> handleComeBackButton(primaryStage));
+    return combackButton;
+  }
+
+  private void handleComeBackButton(Stage primaryStage) {
+    primaryStage.setScene(service.getDashboardScene());
+    primaryStage.setTitle("Dashboard");
   }
 }

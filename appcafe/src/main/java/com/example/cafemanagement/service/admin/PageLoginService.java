@@ -3,6 +3,7 @@ package com.example.cafemanagement.service.admin;
 import static com.example.cafemanagement.enummethod.RoleStaff.fromDisplayName;
 
 import com.example.cafemanagement.entities.Role;
+import com.example.cafemanagement.entities.StaffProperty;
 import com.example.cafemanagement.enummethod.RoleStaff;
 import com.example.cafemanagement.service.staff.StaffService;
 import java.util.ArrayList;
@@ -80,4 +81,5 @@ public class PageLoginService {
     }
     return roleComboBox;
   }
+
 }
