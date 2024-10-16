@@ -15,7 +15,7 @@ import javafx.scene.layout.VBox;
 
 public class PageHomeAdmin {
 
-  public VBox viewHomePage(Button button1, Button button2, Button button3, Button button4) {
+  public VBox viewHomePage(Button button1, Button button2, Button button3, Button button4, Button button5) {
     TableView<MenuItem> table = new TableView<>();
 
     // Define columns
@@ -44,7 +44,7 @@ public class PageHomeAdmin {
     // Layout
     HBox buttonBox = new HBox(10);
     buttonBox.setPadding(new Insets(10));
-    buttonBox.getChildren().addAll(button1, button2, button3, button4);
+    buttonBox.getChildren().addAll(button1, button2, button3, button4, button5);
     VBox dashboardLayout = new VBox(10);
     dashboardLayout.getChildren().addAll(new MenuBar(), table, buttonBox);
     dashboardLayout.setPadding(new Insets(20));

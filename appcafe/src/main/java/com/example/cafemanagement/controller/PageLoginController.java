@@ -8,6 +8,7 @@ import com.example.cafemanagement.page.admin.CreateNewUserPage;
 import com.example.cafemanagement.page.admin.PageHomeAdmin;
 import com.example.cafemanagement.page.admin.ViewMember;
 import com.example.cafemanagement.page.cashier.CashierHomePage;
+import com.example.cafemanagement.page.cashier.CoffeeMenuApp;
 import com.example.cafemanagement.service.admin.PageLoginService;
 import com.example.cafemanagement.service.staff.StaffService;
 import com.example.cafemanagement.util.AlertUtil;
@@ -70,7 +71,8 @@ public class PageLoginController {
     // Load CSS
     try {
       scene.getStylesheets().add(
-          Objects.requireNonNull(getClass().getResource("/css/cssfilepagelogin.css")).toExternalForm());
+          Objects.requireNonNull(getClass().getResource("/css/cssfilepagelogin.css"))
+              .toExternalForm());
     } catch (Exception e) {
       System.out.println("CSS file not found!");
     }
@@ -98,11 +100,11 @@ public class PageLoginController {
         int checkRoleId = staffService.getStaffByUserName(enteredUsername).getRoleId();
 
         // Check for admin credentials
-        if ((enteredUsername.equals("admin") && enteredPassword.equals("123")) && roleId == checkRoleId) {
+        if ((enteredUsername.equals("admin") && enteredPassword.equals("123"))
+            && roleId == checkRoleId) {
           primaryStage.setScene(service.getDashboardScene());
           primaryStage.setTitle("Dashboard");
-        } else
-          if (enteredUsername.equals(userName) && checkPassword(enteredPassword, passwordHash)
+        } else if (enteredUsername.equals(userName) && checkPassword(enteredPassword, passwordHash)
             && roleId == checkRoleId) {
           switch (checkRoleId) {
             case 1:
@@ -110,7 +112,8 @@ public class PageLoginController {
               primaryStage.setTitle("Dashboard");
               break;
             case 2:
-              CashierHomePage.cashierHomePage(primaryStage,service.getDashboardVBoxServiceTableOrder());
+              CashierHomePage.cashierHomePage(primaryStage,
+                  service.getDashboardVBoxServiceTableOrder());
               break;
             case 3:
               System.out.println("Button 3 clicked!");
@@ -121,11 +124,13 @@ public class PageLoginController {
           }
         } else {
           // Invalid credentials
-          AlertUtil.showErrorLoginAlert("\"Tên đăng nhập hoặc mật khẩu không chính xác.\\nVui lòng nhập lại!\"");
+          AlertUtil.showErrorLoginAlert(
+              "\"Tên đăng nhập hoặc mật khẩu không chính xác.\\nVui lòng nhập lại!\"");
         }
       } else {
         // Empty username or password field
-        AlertUtil.showErrorLoginAlert("\"Tên đăng nhập hoặc mật khẩu không chính xác.\\nVui lòng nhập lại!\"");
+        AlertUtil.showErrorLoginAlert(
+            "\"Tên đăng nhập hoặc mật khẩu không chính xác.\\nVui lòng nhập lại!\"");
       }
     });
 
@@ -135,21 +140,25 @@ public class PageLoginController {
   public void createDashboardScene(Stage primaryStage) {
     PageHomeAdmin pageHomeAdmin = new PageHomeAdmin();
     CreateNewUserPage createNewUser = new CreateNewUserPage();
+    CoffeeMenuApp coffeeMenuApp = new CoffeeMenuApp();
     ViewMember viewMember = new ViewMember();
     Button creatStaff = new Button("Tạo Tài Khoản Nhân viên");
-//    Button comeback = new Button("Quay lại");
+    Button viewMenu = new Button("Menu Đồ Uống");
     Button nextPage = new Button("Trang Order");
     Button viewMemberButton = new Button("Quản lý Nhân Sự");
     //Tạo nút chung comeback
     Button comebacktButton = createComeBackButton(primaryStage);
     Button comebacktButton1 = createComeBackButton(primaryStage);
+    Button comebacktButton2 = createComeBackButton(primaryStage);
+    Button comebacktButton3 = createComeBackButton(primaryStage);
 
     // Tạo nút logout chung
     Button logoutButton = createLogoutButton(primaryStage);
     Button logoutButton1 = createLogoutButton(primaryStage);
 
     // Dashboard chính
-    VBox dashboardLayout = pageHomeAdmin.viewHomePage(creatStaff,nextPage,viewMemberButton,logoutButton1);
+    VBox dashboardLayout = pageHomeAdmin.viewHomePage(creatStaff, nextPage, viewMemberButton,
+        logoutButton1,viewMenu);
     if (dashboardLayout == null) {
       throw new NullPointerException("Dashboard layout is null");
     }
@@ -163,24 +172,25 @@ public class PageLoginController {
 
     // Trang dịch vụ (Cashier Home Page)
 
-   VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
-    dashboardLayoutServiceOrder.getChildren().addAll(logoutButton);
+    VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
+    dashboardLayoutServiceOrder.getChildren().addAll(logoutButton,comebacktButton3);
 
     VBox dashboardLayoutViewMember = viewMember.viewTableViewMember(comebacktButton1);
+
+    VBox dashboardLayoutMenuCoffee = coffeeMenuApp.viewProduct(comebacktButton2);
     // Xử lý nút quay lại
     nextPage.setOnAction(event -> {
-      CashierHomePage.cashierHomePage(primaryStage,service.getDashboardVBoxServiceTableOrder());
+      CashierHomePage.cashierHomePage(primaryStage, service.getDashboardVBoxServiceTableOrder());
     });
     creatStaff.setOnAction(event -> {
       primaryStage.setScene(service.getDashboardSceneCreate());
       primaryStage.setTitle("Create Screen");
     });
-//    comeback.setOnAction(event -> {
-//      primaryStage.setScene(service.getDashboardScene());
-//      primaryStage.setTitle("Dashboard");
-//    });
+    viewMenu.setOnAction(event -> {
+      primaryStage.setScene(service.getDashboardSceneCoffeeMenu());
+    });
     viewMemberButton.setOnAction(event -> {
-     primaryStage.setScene(service.getDashboardSceneHr());
+      primaryStage.setScene(service.getDashboardSceneHr());
     });
 
     // Tạo các cảnh cho từng trang
@@ -188,6 +198,7 @@ public class PageLoginController {
     service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 800, 600));
     service.setDashboardVBoxServiceTableOrder(dashboardLayoutServiceOrder);
     service.setDashboardSceneHr(new Scene(dashboardLayoutViewMember, 800, 600));
+    service.setDashboardSceneCoffeeMenu(new Scene(dashboardLayoutMenuCoffee,800,600));
   }
 
   public Button createLogoutButton(Stage primaryStage) {
@@ -200,6 +211,7 @@ public class PageLoginController {
     primaryStage.setScene(pageLogin(primaryStage));
     primaryStage.setTitle("Login Screen");
   }
+
   public Button createComeBackButton(Stage primaryStage) {
     Button combackButton = new Button("Quay Lại");
     combackButton.setOnAction(event -> handleComeBackButton(primaryStage));

@@ -2,34 +2,36 @@ package com.example.cafemanagement.page.cashier;
 
 import com.example.cafemanagement.entities.Products;
 import com.example.cafemanagement.service.cashier.CashierService;
-import java.util.ArrayList;
-import java.util.List;
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-public class CoffeeMenuApp extends Application {
+import java.util.ArrayList;
+import java.util.List;
 
-  private List<Products> productsList = new ArrayList<Products>();
+public class CoffeeMenuApp {
 
-  @Override
-  public void start(Stage primaryStage) {
-    // GridPane layout
-    GridPane gridPane = new GridPane();
-    gridPane.setPadding(new Insets(10));
-    gridPane.setHgap(10);
-    gridPane.setVgap(10);
+  private List<Products> productsList = new ArrayList<>();
+
+
+  public VBox viewProduct (Button comeBack) {
+    // Main layout
+    VBox mainLayout = new VBox(10);
+    mainLayout.setPadding(new Insets(10));
 
     // Search Bar
     TextField searchBar = new TextField();
     searchBar.setPromptText("Nhập mã/Tên món cần tìm");
+    searchBar.setPrefWidth(300);
 
-    // Search Button (placeholder)
+    // Search Button
     Button searchButton = new Button("🔍");
 
     // ComboBox for filtering
@@ -40,51 +42,73 @@ public class CoffeeMenuApp extends Application {
     // Top HBox layout for search bar, search button, and ComboBox
     HBox topLayout = new HBox(10, searchBar, searchButton, comboBox);
     topLayout.setPadding(new Insets(10));
+    topLayout.setAlignment(Pos.CENTER);
 
-    // Coffee menu items (images, names, and prices)
+    // Product Grid Layout
+    GridPane gridPane = new GridPane();
+    gridPane.setPadding(new Insets(10));
+    gridPane.setHgap(15);
+    gridPane.setVgap(15);
+    gridPane.setAlignment(Pos.CENTER);
+
+    // Coffee menu items
     productsList = CashierService.getAllProducts();
 
     // Create coffee menu grid
+    int column = 0;
+    int row = 0;
 
     for (int i = 0; i < productsList.size(); i++) {
       Products product = productsList.get(i);
       String imagePath = product.getImageLink();
+
+      // Ensure the image path is valid
       if (imagePath != null && getClass().getResource(imagePath) != null) {
-        Image coffeeImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175, false, false);
-        ImageView imageView = new ImageView(coffeeImage);
+        Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175, false, false);
+        ImageView imageView = new ImageView(productImage);
 
-        // Coffee name and price
+        // Coffee name and price labels
         Label nameLabel = new Label(product.getName());
-        Label priceLabel = new Label(String.valueOf(product.getPrice()));
+        nameLabel.setFont(new Font("Arial", 18));
+        nameLabel.setStyle("-fx-font-weight: bold;");
+        Label priceLabel = new Label("$" + String.valueOf(product.getPrice()));
+        priceLabel.setFont(new Font("Arial", 14));
+        priceLabel.setStyle("-fx-text-fill: #777;");
 
-        // VBox for each coffee item
-        VBox coffeeItem = new VBox(imageView, nameLabel, priceLabel);
-        gridPane.add(coffeeItem,  i/3, i%3);
+        // VBox for each product item
+        VBox productBox = new VBox(10, imageView, nameLabel, priceLabel);
+        productBox.setPadding(new Insets(10));
+        productBox.setAlignment(Pos.CENTER);
+        productBox.setStyle("-fx-border-color: #ddd; -fx-border-radius: 8; -fx-background-color: #f9f9f9; -fx-background-radius: 8;");
+        productBox.setOnMouseEntered(e -> productBox.setStyle("-fx-background-color: #f0f0f0;"));
+        productBox.setOnMouseExited(e -> productBox.setStyle("-fx-background-color: #f9f9f9;"));
 
-//        col++;
-//        if (col == 4) {  // Assume 3 items per row
-//          col = 0;
-//          row++;
-//        }
+        // Add to grid
+        gridPane.add(productBox, column, row);
+
+        // Adjust column/row for next product
+        column++;
+        if (column == 3) {  // 3 products per row
+          column = 0;
+          row++;
+        }
       } else {
         System.out.println("Invalid image path for product: " + product.getName());
       }
     }
 
-    // Main layout
-    VBox mainLayout = new VBox(10, topLayout, gridPane);
-    mainLayout.setPadding(new Insets(10));
+    // Add components to the main layout
+    mainLayout.getChildren().addAll(topLayout, gridPane,comeBack);
 
     // Set scene and stage
-    Scene scene = new Scene(mainLayout, 800, 600);
-    scene.getStylesheets().add(getClass().getResource("/css/coffeeMenuApp.css").toExternalForm());
-    primaryStage.setTitle("Coffee Menu");
-    primaryStage.setScene(scene);
-    primaryStage.show();
+//    Scene scene = new Scene(mainLayout, 800, 600);
+//    primaryStage.setTitle("Coffee Menu");
+//    primaryStage.setScene(scene);
+//    primaryStage.show();
+    return mainLayout;
   }
 
-  public static void main(String[] args) {
-    launch(args);
-  }
+//  public static void main(String[] args) {
+//    launch(args);
+//  }
 }
-

@@ -18,18 +18,20 @@ import javafx.scene.layout.VBox;
 
 public class PageLoginService {
 
-  public Scene getDashboardSceneHr() {
-    return dashboardSceneHr;
-  }
-
-  public void setDashboardSceneHr(Scene dashboardSceneHr) {
-    this.dashboardSceneHr = dashboardSceneHr;
-  }
-
+  private Scene dashboardSceneCoffeeMenu;
   private Scene dashboardScene;
   private Scene dashboardSceneCreate;
   private VBox dashboardVBoxServiceTableOrder;
   private Scene dashboardSceneHr;
+
+  public Scene getDashboardSceneCoffeeMenu() {
+    return dashboardSceneCoffeeMenu;
+  }
+
+  public void setDashboardSceneCoffeeMenu(Scene dashboardSceneCoffeeMenu) {
+    this.dashboardSceneCoffeeMenu = dashboardSceneCoffeeMenu;
+  }
+
 
   public VBox getDashboardVBoxServiceTableOrder() {
     return dashboardVBoxServiceTableOrder;
@@ -39,6 +41,13 @@ public class PageLoginService {
     this.dashboardVBoxServiceTableOrder = dashboardVBoxServiceTableOrder;
   }
 
+  public Scene getDashboardSceneHr() {
+    return dashboardSceneHr;
+  }
+
+  public void setDashboardSceneHr(Scene dashboardSceneHr) {
+    this.dashboardSceneHr = dashboardSceneHr;
+  }
 
   public Scene getDashboardScene() {
     return dashboardScene;
