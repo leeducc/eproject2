@@ -20,13 +20,11 @@ import javafx.stage.Stage;
 
 public class CashierHomePage {
 
-  private static Stage window;
-  private static Scene sceneTableSelection;
-  private static Scene sceneOrder;
+
   private static Label selectedTableLabel;  // Khai báo nhãn này để cập nhật khi chọn bàn
 
 
-  public static VBox viewTableOrder() {
+  public static VBox viewTableOrder(Stage primaryStage,Button button) {
     GridPane floorTable = new GridPane();
     floorTable.setPadding(new Insets(10));
     floorTable.setHgap(10);
@@ -41,11 +39,11 @@ public class CashierHomePage {
 
     // Thêm các bàn vào khu A (Tầng trệt)
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(1);
-    addButtonsToGrid(floorTable, floorTables);
+    addButtonsToGrid(floorTable,floorTables,button,primaryStage);
 
     // Thêm các bàn vào khu B (Tầng lầu)
     ArrayList<String> upstairTables = TableCoffeeService.getNameTable(2);
-    addButtonsToGrid(upstairTable, upstairTables);
+    addButtonsToGrid(upstairTable, upstairTables,button,primaryStage);
 
     // Tạo các nhãn cho khu vực bàn
     Label labelFloorTables = new Label("Floor Tables");
@@ -64,13 +62,12 @@ public class CashierHomePage {
     return layoutTableSelection;
   }
 
-  public static void cashierHomePage(Stage primaryStage, VBox mainContainer) {
-    window = primaryStage;
-    window.setTitle("Quản lý bàn quán cafe");
+  public static VBox viewCheckOrder(Stage primaryStage,Button backButton ) {
+    primaryStage.setTitle("Quản lý bàn quán cafe");
 
 //
     // Giao diện chọn bàn
-    sceneTableSelection = new Scene(mainContainer, 800, 600);
+//    sceneTableSelection = new Scene(mainContainer, 800, 600);
 
     // ----------- Giao diện thanh toán và chọn đồ uống -----------
     selectedTableLabel = new Label("Bàn: ");
@@ -105,10 +102,6 @@ public class CashierHomePage {
         AlertUtil.showErrorLoginAlert("Vui lòng chọn đồ uống");
       }
     });
-    Button backButton = new Button("Quay về");
-    backButton.setOnAction(e -> {
-      window.setScene(sceneTableSelection); // Quay về giao diện chọn bàn
-    });
 
     // Layout cho giao diện thanh toán
     VBox orderLayout = new VBox(10);
@@ -122,15 +115,17 @@ public class CashierHomePage {
 
     // Thêm nút "Quay về" vào layout của phần thanh toán
     orderLayout.getChildren().add(backButton);
-    sceneOrder = new Scene(orderLayout, 800, 600);
-
-    // Hiển thị giao diện chọn bàn lúc khởi động
-    window.setScene(sceneTableSelection);
-    window.show();
+//    sceneOrder = new Scene(orderLayout, 800, 600);
+//
+//    // Hiển thị giao diện chọn bàn lúc khởi động
+//    window.setScene(sceneTableSelection);
+//    window.show();
+    return orderLayout;
   }
 
   // Phương thức để thêm các nút bàn vào GridPane
-  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames) {
+  // Phương thức để thêm các nút bàn vào GridPane
+  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames,Button button ,Stage primaryStage) {
     int count = 0;
     int rows = 6;
     int cols = 6;
@@ -139,24 +134,29 @@ public class CashierHomePage {
         if (count >= tableNames.size()) {
           break;
         }
+
+        // Tạo mới một nút cho mỗi bàn
         Button tableButton = new Button(tableNames.get(count));
         tableButton.setPrefSize(90, 90);
         tableButton.setStyle("-fx-background-color: lightgray;");
 
-        // Khi nhấn vào nút bàn, chuyển qua giao diện chọn đồ uống và thanh toán
+        // Xử lý hành động khi nút được bấm
         tableButton.setOnAction(e -> {
           // Cập nhật nhãn hiển thị bàn đã chọn
-          selectedTableLabel.setText(
-              "Bàn: " + tableButton.getText());  // Cập nhật trực tiếp nhãn đã có
+          selectedTableLabel.setText("Bàn: " + tableButton.getText());
+
           // Chuyển sang giao diện order
-          window.setScene(sceneOrder);
+          primaryStage.setScene(new Scene(CashierHomePage.viewCheckOrder(primaryStage,button),800,600));
         });
 
+        // Thêm nút vào grid
         grid.add(tableButton, col, row);
         count++;
       }
     }
   }
+
+
 }
 
 

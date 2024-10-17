@@ -21,8 +21,19 @@ public class PageLoginService {
   private Scene dashboardSceneCoffeeMenu;
   private Scene dashboardScene;
   private Scene dashboardSceneCreate;
-  private VBox dashboardVBoxServiceTableOrder;
+  private Scene dashboardVBoxServiceTableOrder;
   private Scene dashboardSceneHr;
+  private Scene dashboardVBoxServiceTableOrderDetail;
+
+
+  public Scene getDashboardVBoxServiceTableOrderDetail() {
+    return dashboardVBoxServiceTableOrderDetail;
+  }
+
+  public void setDashboardVBoxServiceTableOrderDetail(
+      Scene dashboardVBoxServiceTableOrderDetail) {
+    this.dashboardVBoxServiceTableOrderDetail = dashboardVBoxServiceTableOrderDetail;
+  }
 
   public Scene getDashboardSceneCoffeeMenu() {
     return dashboardSceneCoffeeMenu;
@@ -33,11 +44,11 @@ public class PageLoginService {
   }
 
 
-  public VBox getDashboardVBoxServiceTableOrder() {
+  public Scene getDashboardVBoxServiceTableOrder() {
     return dashboardVBoxServiceTableOrder;
   }
 
-  public void setDashboardVBoxServiceTableOrder(VBox dashboardVBoxServiceTableOrder) {
+  public void setDashboardVBoxServiceTableOrder(Scene dashboardVBoxServiceTableOrder) {
     this.dashboardVBoxServiceTableOrder = dashboardVBoxServiceTableOrder;
   }
 

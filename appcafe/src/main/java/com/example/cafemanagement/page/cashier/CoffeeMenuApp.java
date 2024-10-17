@@ -100,15 +100,6 @@ public class CoffeeMenuApp {
     // Add components to the main layout
     mainLayout.getChildren().addAll(topLayout, gridPane,comeBack);
 
-    // Set scene and stage
-//    Scene scene = new Scene(mainLayout, 800, 600);
-//    primaryStage.setTitle("Coffee Menu");
-//    primaryStage.setScene(scene);
-//    primaryStage.show();
     return mainLayout;
   }
-
-//  public static void main(String[] args) {
-//    launch(args);
-//  }
 }

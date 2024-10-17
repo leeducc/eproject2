@@ -10,6 +10,7 @@ import com.example.cafemanagement.page.admin.ViewMember;
 import com.example.cafemanagement.page.cashier.CashierHomePage;
 import com.example.cafemanagement.page.cashier.CoffeeMenuApp;
 import com.example.cafemanagement.service.admin.PageLoginService;
+import com.example.cafemanagement.service.cashier.CashierService;
 import com.example.cafemanagement.service.staff.StaffService;
 import com.example.cafemanagement.util.AlertUtil;
 import javafx.geometry.Insets;
@@ -112,8 +113,10 @@ public class PageLoginController {
               primaryStage.setTitle("Dashboard");
               break;
             case 2:
-              CashierHomePage.cashierHomePage(primaryStage,
-                  service.getDashboardVBoxServiceTableOrder());
+//              CashierHomePage.cashierHomePage(primaryStage,
+//                  service.getDashboardVBoxServiceTableOrder());
+              primaryStage.setScene(service.getDashboardVBoxServiceTableOrder());
+              primaryStage.setTitle("Quản Lý Bàn Uống");
               break;
             case 3:
               System.out.println("Button 3 clicked!");
@@ -146,11 +149,13 @@ public class PageLoginController {
     Button viewMenu = new Button("Menu Đồ Uống");
     Button nextPage = new Button("Trang Order");
     Button viewMemberButton = new Button("Quản lý Nhân Sự");
+    Button orderDetailsButton = new Button("");
     //Tạo nút chung comeback
     Button comebacktButton = createComeBackButton(primaryStage);
     Button comebacktButton1 = createComeBackButton(primaryStage);
     Button comebacktButton2 = createComeBackButton(primaryStage);
     Button comebacktButton3 = createComeBackButton(primaryStage);
+    Button comebackButton1 = new Button("Quay Lại");
 
     // Tạo nút logout chung
     Button logoutButton = createLogoutButton(primaryStage);
@@ -158,30 +163,37 @@ public class PageLoginController {
 
     // Dashboard chính
     VBox dashboardLayout = pageHomeAdmin.viewHomePage(creatStaff, nextPage, viewMemberButton,
-        logoutButton1,viewMenu);
-    if (dashboardLayout == null) {
-      throw new NullPointerException("Dashboard layout is null");
-    }
+        logoutButton1, viewMenu);
+//    if (dashboardLayout == null) {
+//      throw new NullPointerException("Dashboard layout is null");
+//    }
     dashboardLayout.setAlignment(Pos.CENTER);
 
     // Trang tạo tài khoản nhân viên
     VBox dashboardLayoutCreate = createNewUser.createNewUserPage(comebacktButton);
-    if (dashboardLayoutCreate == null) {
-      throw new NullPointerException("Create account layout is null");
-    }
-
-    // Trang dịch vụ (Cashier Home Page)
-
-    VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder();
-    dashboardLayoutServiceOrder.getChildren().addAll(logoutButton,comebacktButton3);
+//    if (dashboardLayoutCreate == null) {
+//      throw new NullPointerException("Create account layout is null");
+//    }
+//    VBox dashboardLayoutServiceOrderDetail = CashierHomePage.viewCheckOrder(primaryStage);
 
     VBox dashboardLayoutViewMember = viewMember.viewTableViewMember(comebacktButton1);
 
     VBox dashboardLayoutMenuCoffee = coffeeMenuApp.viewProduct(comebacktButton2);
     // Xử lý nút quay lại
     nextPage.setOnAction(event -> {
-      CashierHomePage.cashierHomePage(primaryStage, service.getDashboardVBoxServiceTableOrder());
+      primaryStage.setScene(service.getDashboardVBoxServiceTableOrder());
+      primaryStage.setTitle("Order Screen");
+//      CashierHomePage.cashierHomePage(primaryStage, service.getDashboardVBoxServiceTableOrder());
     });
+    comebackButton1.setOnAction(event -> {
+      primaryStage.setScene(service.getDashboardVBoxServiceTableOrder());
+      primaryStage.setTitle("Order Screen");
+
+    });
+//    orderDetailsButton.setOnAction(event ->{
+//      primaryStage.setScene(service.getDashboardVBoxServiceTableOrderDetail());
+//      primaryStage.setTitle("Order Details Screen");
+//    });
     creatStaff.setOnAction(event -> {
       primaryStage.setScene(service.getDashboardSceneCreate());
       primaryStage.setTitle("Create Screen");
@@ -196,9 +208,14 @@ public class PageLoginController {
     // Tạo các cảnh cho từng trang
     service.setDashboardScene(new Scene(dashboardLayout, 800, 600));
     service.setDashboardSceneCreate(new Scene(dashboardLayoutCreate, 800, 600));
-    service.setDashboardVBoxServiceTableOrder(dashboardLayoutServiceOrder);
+    VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder(primaryStage,comebackButton1);
+    dashboardLayoutServiceOrder.getChildren().addAll(logoutButton, comebacktButton3);
+    service.setDashboardVBoxServiceTableOrder(new Scene(dashboardLayoutServiceOrder,800,600));
     service.setDashboardSceneHr(new Scene(dashboardLayoutViewMember, 800, 600));
-    service.setDashboardSceneCoffeeMenu(new Scene(dashboardLayoutMenuCoffee,800,600));
+    service.setDashboardSceneCoffeeMenu(new Scene(dashboardLayoutMenuCoffee, 800, 600));
+    VBox dashboardLayoutServiceOrderDetail = CashierHomePage.viewCheckOrder(primaryStage, comebackButton1);
+    service.setDashboardVBoxServiceTableOrderDetail(new Scene(dashboardLayoutServiceOrderDetail, 800, 600));
+
   }
 
   public Button createLogoutButton(Stage primaryStage) {
