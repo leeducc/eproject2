@@ -4,6 +4,7 @@ package com.example.cafemanagement.page.cashier;
 import com.example.cafemanagement.service.TableCoffeeService;
 import com.example.cafemanagement.service.cashier.CashierService;
 import com.example.cafemanagement.util.AlertUtil;
+import com.google.protobuf.StringValue;
 import java.util.ArrayList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -23,6 +24,15 @@ public class CashierHomePage {
 
   private static Label selectedTableLabel;  // Khai báo nhãn này để cập nhật khi chọn bàn
 
+  private static String title;
+
+  public static String getTitle() {
+    return title;
+  }
+
+  public static void setTitle(String title) {
+    CashierHomePage.title = title;
+  }
 
   public static VBox viewTableOrder(Stage primaryStage,Button button) {
     GridPane floorTable = new GridPane();
@@ -70,7 +80,7 @@ public class CashierHomePage {
 //    sceneTableSelection = new Scene(mainContainer, 800, 600);
 
     // ----------- Giao diện thanh toán và chọn đồ uống -----------
-    selectedTableLabel = new Label("Bàn: ");
+    selectedTableLabel = new Label(CashierHomePage.getTitle());
     ListView<String> drinkList = CashierService.InitializeProductName();
 
     Label quantityLabel = new Label("Số lượng:");
@@ -143,8 +153,8 @@ public class CashierHomePage {
         // Xử lý hành động khi nút được bấm
         tableButton.setOnAction(e -> {
           // Cập nhật nhãn hiển thị bàn đã chọn
-          selectedTableLabel.setText("Bàn: " + tableButton.getText());
-
+         selectedTableLabel = new Label(tableButton.getText());
+         CashierHomePage.setTitle(tableButton.getText());
           // Chuyển sang giao diện order
           primaryStage.setScene(new Scene(CashierHomePage.viewCheckOrder(primaryStage,button),800,600));
         });

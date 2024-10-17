@@ -24,7 +24,16 @@ public class PageLoginService {
   private Scene dashboardVBoxServiceTableOrder;
   private Scene dashboardSceneHr;
   private Scene dashboardVBoxServiceTableOrderDetail;
+  private Scene dashboardVBoxServiceTableOrderForCashier;
 
+  public Scene getDashboardVBoxServiceTableOrderForCashier() {
+    return dashboardVBoxServiceTableOrderForCashier;
+  }
+
+  public void setDashboardVBoxServiceTableOrderForCashier(
+      Scene dashboardVBoxServiceTableOrderForCashier) {
+    this.dashboardVBoxServiceTableOrderForCashier = dashboardVBoxServiceTableOrderForCashier;
+  }
 
   public Scene getDashboardVBoxServiceTableOrderDetail() {
     return dashboardVBoxServiceTableOrderDetail;

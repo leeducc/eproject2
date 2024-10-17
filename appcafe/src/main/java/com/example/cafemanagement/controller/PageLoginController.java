@@ -113,9 +113,7 @@ public class PageLoginController {
               primaryStage.setTitle("Dashboard");
               break;
             case 2:
-//              CashierHomePage.cashierHomePage(primaryStage,
-//                  service.getDashboardVBoxServiceTableOrder());
-              primaryStage.setScene(service.getDashboardVBoxServiceTableOrder());
+              primaryStage.setScene(service.getDashboardVBoxServiceTableOrderForCashier());
               primaryStage.setTitle("Quản Lý Bàn Uống");
               break;
             case 3:
@@ -156,10 +154,12 @@ public class PageLoginController {
     Button comebacktButton2 = createComeBackButton(primaryStage);
     Button comebacktButton3 = createComeBackButton(primaryStage);
     Button comebackButton1 = new Button("Quay Lại");
+    Button comebackButton2 = new Button("Quay Lại");
 
     // Tạo nút logout chung
     Button logoutButton = createLogoutButton(primaryStage);
     Button logoutButton1 = createLogoutButton(primaryStage);
+    Button logoutButton2 = createLogoutButton(primaryStage);
 
     // Dashboard chính
     VBox dashboardLayout = pageHomeAdmin.viewHomePage(creatStaff, nextPage, viewMemberButton,
@@ -190,7 +190,11 @@ public class PageLoginController {
       primaryStage.setTitle("Order Screen");
 
     });
-//    orderDetailsButton.setOnAction(event ->{
+    comebackButton2.setOnAction(event -> {
+      primaryStage.setScene(service.getDashboardVBoxServiceTableOrderForCashier());
+      primaryStage.setTitle("Menu Screen");
+    });
+    //    orderDetailsButton.setOnAction(event ->{
 //      primaryStage.setScene(service.getDashboardVBoxServiceTableOrderDetail());
 //      primaryStage.setTitle("Order Details Screen");
 //    });
@@ -211,6 +215,9 @@ public class PageLoginController {
     VBox dashboardLayoutServiceOrder = CashierHomePage.viewTableOrder(primaryStage,comebackButton1);
     dashboardLayoutServiceOrder.getChildren().addAll(logoutButton, comebacktButton3);
     service.setDashboardVBoxServiceTableOrder(new Scene(dashboardLayoutServiceOrder,800,600));
+    VBox dashboardLayoutServiceOrderForCashier = CashierHomePage.viewTableOrder(primaryStage,comebackButton2);
+    dashboardLayoutServiceOrderForCashier.getChildren().addAll(logoutButton2);
+    service.setDashboardVBoxServiceTableOrderForCashier(new Scene(dashboardLayoutServiceOrderForCashier,800,600));
     service.setDashboardSceneHr(new Scene(dashboardLayoutViewMember, 800, 600));
     service.setDashboardSceneCoffeeMenu(new Scene(dashboardLayoutMenuCoffee, 800, 600));
     VBox dashboardLayoutServiceOrderDetail = CashierHomePage.viewCheckOrder(primaryStage, comebackButton1);
