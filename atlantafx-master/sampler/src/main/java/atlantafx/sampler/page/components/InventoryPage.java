@@ -15,10 +15,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public final class InventoryPage extends OutlinePage {
     public static final String NAME = "Inventory";
@@ -45,65 +42,57 @@ public final class InventoryPage extends OutlinePage {
 
     private void createTable() {
         table = new TableView<>();
-
-        // Define columns
-        TableColumn<Supply, String> supplyCodeCol = new TableColumn<>("Supply Code");
-        supplyCodeCol.setCellValueFactory(new PropertyValueFactory<>("supplyCode"));
-
-        TableColumn<Supply, String> nameCol = new TableColumn<>("Name");
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-        TableColumn<Supply, String> unitCol = new TableColumn<>("Unit");
-        unitCol.setCellValueFactory(new PropertyValueFactory<>("unit"));
-
-        TableColumn<Supply, Double> priceCol = new TableColumn<>("Price");
-        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-
-        TableColumn<Supply, Double> quantityCol = new TableColumn<>("Quantity");
-        quantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
-        TableColumn<Supply, String> supplierNameCol = new TableColumn<>("Supplier Name");
-        supplierNameCol.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
-
-        TableColumn<Supply, Double> totalValueCol = new TableColumn<>("Total Value");
-        totalValueCol.setCellValueFactory(new PropertyValueFactory<>("totalValue"));
-
-        // Add columns to table
-        table.getColumns().addAll(supplyCodeCol, nameCol, unitCol, priceCol, quantityCol, supplierNameCol, totalValueCol);
-
-        // Set pagination
-        pagination = new Pagination();
-        pagination.setMaxPageIndicatorCount(5);
-        pagination.setPageFactory(this::createPage);
-
-        // Create filter controls
+        initializeTableColumns();
+        setupPagination();
         createFilterControls();
 
-        // Layout
         VBox layout = new VBox(supplierFilter, searchField, resetButton, pagination);
         layout.getChildren().addAll(table);
         getChildren().addAll(layout);
     }
 
+    private void initializeTableColumns() {
+        table.getColumns().addAll(
+                createTableColumn("Supply Code", "supplyCode"),
+                createTableColumn("Name", "name"),
+                createTableColumn("Unit", "unit"),
+                createTableColumn("Price", "price"),
+                createTableColumn("Quantity", "quantity"),
+                createTableColumn("Supplier Name", "supplierName"),
+                createTableColumn("Total Value", "totalValue")
+        );
+    }
+
+    private TableColumn<Supply, ?> createTableColumn(String title, String property) {
+        TableColumn<Supply, String> column = new TableColumn<>(title);
+        column.setCellValueFactory(new PropertyValueFactory<>(property));
+        return column;
+    }
+
+    private void setupPagination() {
+        pagination = new Pagination();
+        pagination.setMaxPageIndicatorCount(5);
+        pagination.setPageFactory(this::createPage);
+    }
+
     private void createFilterControls() {
-        // Supplier filter dropdown
         supplierFilter = new ComboBox<>();
         supplierFilter.setOnAction(e -> updateTable());
 
-        // Search field for supply name
         searchField = new TextField();
         searchField.setPromptText("Search by name");
         searchField.textProperty().addListener((observable, oldValue, newValue) -> updateTable());
 
-        // Reset button
         resetButton = new Button("Reset Filters");
         resetButton.setOnAction(e -> resetFilters());
     }
 
     private void loadSuppliers() {
-        Connection connection = JDBCConnect.getJDBCConnection();
         String query = "SELECT name FROM suppliers";
-        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(query)) {
+        try (Connection connection = JDBCConnect.getJDBCConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
             while (resultSet.next()) {
                 supplierFilter.getItems().add(resultSet.getString("name"));
             }
@@ -113,7 +102,6 @@ public final class InventoryPage extends OutlinePage {
     }
 
     private StackPane createPage(int pageIndex) {
-        // Load filtered data for the current page
         ObservableList<Supply> data = loadDataForPage(pageIndex);
         table.setItems(data);
         return new StackPane(table);
@@ -124,7 +112,7 @@ public final class InventoryPage extends OutlinePage {
         Connection connection = JDBCConnect.getJDBCConnection();
 
         StringBuilder query = new StringBuilder("SELECT s.id, s.supply_code, s.name, s.unit, s.price, s.quantity, su.name AS supplier_name " +
-                "FROM supplies s JOIN suppliers su ON s.supplier_id = su.id ");
+                "FROM supplies s JOIN suppliers su ON s.suppliers_id = su.suppliers_id "); // Update here
 
         String whereClause = "";
         if (supplierFilter.getValue() != null && !supplierFilter.getValue().isEmpty()) {
@@ -160,11 +148,46 @@ public final class InventoryPage extends OutlinePage {
         return supplies;
     }
 
+
+    private String buildWhereClause() {
+        StringBuilder whereClause = new StringBuilder();
+        boolean hasSupplierFilter = supplierFilter.getValue() != null && !supplierFilter.getValue().isEmpty();
+        boolean hasSearchText = !searchField.getText().isEmpty();
+
+        if (hasSupplierFilter) {
+            whereClause.append("WHERE su.name = ? ");
+        }
+
+        if (hasSearchText) {
+            if (hasSupplierFilter) {
+                whereClause.append("AND ");
+            } else {
+                whereClause.append("WHERE ");
+            }
+            whereClause.append("s.name LIKE ? ");
+        }
+        return whereClause.toString();
+    }
+
+    private void setQueryParameters(PreparedStatement statement, int pageIndex) throws SQLException {
+        int paramIndex = 1;
+        if (supplierFilter.getValue() != null && !supplierFilter.getValue().isEmpty()) {
+            statement.setString(paramIndex++, supplierFilter.getValue());
+        }
+
+        if (!searchField.getText().isEmpty()) {
+            statement.setString(paramIndex++, "%" + searchField.getText() + "%");
+        }
+
+        statement.setInt(paramIndex, pageIndex * 10);
+    }
+
     private void loadData() {
-        // Load all data to update pagination
-        Connection connection = JDBCConnect.getJDBCConnection();
         String countQuery = "SELECT COUNT(*) AS total FROM supplies";
-        try (Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(countQuery)) {
+        try (Connection connection = JDBCConnect.getJDBCConnection();
+             PreparedStatement statement = connection.prepareStatement(countQuery);
+             ResultSet resultSet = statement.executeQuery()) {
+
             if (resultSet.next()) {
                 int totalRecords = resultSet.getInt("total");
                 pagination.setPageCount((int) Math.ceil((double) totalRecords / 10));
@@ -175,7 +198,7 @@ public final class InventoryPage extends OutlinePage {
     }
 
     private void updateTable() {
-        loadData(); // Refresh data based on filter/sorting
+        loadData();
         createPage(0); // Reset to the first page after filtering
     }
 

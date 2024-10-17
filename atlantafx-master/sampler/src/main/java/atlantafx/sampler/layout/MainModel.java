@@ -74,48 +74,49 @@ public class MainModel {
     private NavTree.Item createTree() {
 
         // Warehouse Management (Quản lý kho) group
-        var warehouseManagement = NavTree.Item.group("Warehouse Management", new FontIcon(Material2OutlinedMZ.STORAGE));
+        var warehouseManagement = NavTree.Item.group("Quản lý kho", new FontIcon(Material2OutlinedMZ.STORAGE));
         warehouseManagement.getChildren().setAll(
                 NAV_TREE.get(InventoryPage.class),            // Inventory (Tồn kho)
                 NAV_TREE.get(OrderPage.class),                // Orders (Đặt hàng)
+                NAV_TREE.get(ListOrderPage.class), //     // Danh sách đơn hàng đã dặt
                 NAV_TREE.get(ImportPage.class),               // Import (Nhập hàng)
                 NAV_TREE.get(ReturnPage.class),               // Return (Trả hàng)
                 NAV_TREE.get(ApprovalCancellationPage.class),       // Cancel Approval (Phê duyệt hủy hàng)
                 NAV_TREE.get(AddProductPage.class),           // Add Product (Thêm mới sản phẩm)
-                NAV_TREE.get(AddSupplierPage.class),          // Add Supplier (Thêm mới nhà cung cấp)
+                NAV_TREE.get(SupplierPage.class),          // Add Supplier (Thêm mới nhà cung cấp)
                 NAV_TREE.get(ProductListPage.class)           // Product List (Danh sách sản phẩm)
         );
 
 // Work Shift (Công ca) group
-        var workShift = NavTree.Item.group("Work Shift", new FontIcon(Material2OutlinedMZ.SCHEDULE));
+        var workShift = NavTree.Item.group("Công ca", new FontIcon(Material2OutlinedMZ.SCHEDULE));
         workShift.getChildren().setAll(
                 NAV_TREE.get(LeaveApprovalPage.class),        // Leave Approval (Phê duyệt nghỉ phép)
                 NAV_TREE.get(WorkExplanationApprovalPage.class) // Work Explanation Approval (Phê duyệt giải trình công)
         );
 
 // Orders (Đơn hàng) group
-        var orders = NavTree.Item.group("Orders", new FontIcon(Material2OutlinedMZ.SHOPPING_CART));
+        var orders = NavTree.Item.group("Đơn hàng", new FontIcon(Material2OutlinedMZ.SHOPPING_CART));
         orders.getChildren().setAll(
                 NAV_TREE.get(OrderListPage.class),            // Order List (Danh sách đơn hàng)
                 NAV_TREE.get(DailyRevenuePage.class)          // Daily Revenue (Doanh thu theo ngày)
         );
 
 // Tables (Bàn) group
-        var tables = NavTree.Item.group("Tables", new FontIcon(Material2OutlinedMZ.TABLET));
+        var tables = NavTree.Item.group("Bàn", new FontIcon(Material2OutlinedMZ.TABLET));
         tables.getChildren().setAll(
                 NAV_TREE.get(TableMapPage.class),          // Table Layout (Sơ đồ bàn)
                 NAV_TREE.get(ChangeTablePage.class)           // Change Table (Thay đổi bàn)
         );
 
 // Salary (Lương) group
-        var salary = NavTree.Item.group("Salary", new FontIcon(Material2OutlinedMZ.PAYMENTS));
+        var salary = NavTree.Item.group("Lương", new FontIcon(Material2OutlinedMZ.PAYMENTS));
         salary.getChildren().setAll(
                 NAV_TREE.get(SalaryListPage.class),           // Salary List (Danh sách lương)
                 NAV_TREE.get(ChangeSalaryPage.class)          // Change Salary (Thay đổi lương)
         );
 
 // Staff (Nhân viên) group
-        var staff = NavTree.Item.group("Staff", new FontIcon(Material2OutlinedMZ.PEOPLE));
+        var staff = NavTree.Item.group("Nhân viên", new FontIcon(Material2OutlinedMZ.PEOPLE));
         staff.getChildren().setAll(
                 NAV_TREE.get(StaffListPage.class),            // Staff List (Danh sách nhân viên)
                 NAV_TREE.get(AddStaffPage.class),             // Add Staff (Thêm mới nhân viên)
@@ -123,7 +124,7 @@ public class MainModel {
         );
 
 // Configuration (Cấu hình) group
-        var configuration = NavTree.Item.group("Configuration", new FontIcon(Material2OutlinedAL.ADMIN_PANEL_SETTINGS));
+        var configuration = NavTree.Item.group("Cấu hình", new FontIcon(Material2OutlinedAL.ADMIN_PANEL_SETTINGS));
         configuration.getChildren().setAll(
                 NAV_TREE.get(ChangePasswordSettingsPage.class), // Change Password (Đổi mật khẩu)
                 NAV_TREE.get(SystemConfigurationPage.class)          // System Settings (Cấu hình hệ thống)
@@ -155,11 +156,12 @@ public class MainModel {
         // Quản lý kho (Warehouse Management)
         map.put(InventoryPage.class, NavTree.Item.page("Tồn kho", InventoryPage.class));
         map.put(OrderPage.class, NavTree.Item.page("Đặt hàng", OrderPage.class));
+        map.put(ListOrderPage.class, NavTree.Item.page("Danh sách đơn hàng đã đặt", ListOrderPage.class));
         map.put(ImportPage.class, NavTree.Item.page("Nhập hàng", ImportPage.class));
         map.put(ReturnPage.class, NavTree.Item.page("Trả hàng", ReturnPage.class));
         map.put(ApprovalCancellationPage.class, NavTree.Item.page("Phê duyệt hủy hàng", ApprovalCancellationPage.class));
         map.put(AddProductPage.class, NavTree.Item.page("Thêm mới sản phẩm", AddProductPage.class));
-        map.put(AddSupplierPage.class, NavTree.Item.page("Thêm mới nhà cung cấp", AddSupplierPage.class));
+        map.put(SupplierPage.class, NavTree.Item.page("Nhà cung cấp", SupplierPage.class));
         map.put(ProductListPage.class, NavTree.Item.page("Danh sách sản phẩm", ProductListPage.class));
 
         // Công ca (Work Shift)

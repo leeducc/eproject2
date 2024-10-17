@@ -22,6 +22,7 @@ module atlantafx.sampler {
     requires datafaker;
     requires java.sql;
     requires jbcrypt;
+    requires mysql.connector.j;
 
     exports atlantafx.sampler;
     exports atlantafx.sampler.fake.domain;
