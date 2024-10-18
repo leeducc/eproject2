@@ -2,8 +2,10 @@ package com.example.cafemanagement.service.admin;
 
 import static com.example.cafemanagement.enummethod.RoleStaff.fromDisplayName;
 
+import com.example.cafemanagement.entities.PaymentMethod;
 import com.example.cafemanagement.entities.Role;
 import com.example.cafemanagement.entities.StaffProperty;
+import com.example.cafemanagement.enummethod.Payment;
 import com.example.cafemanagement.enummethod.RoleStaff;
 import com.example.cafemanagement.service.staff.StaffService;
 import java.util.ArrayList;
@@ -109,6 +111,18 @@ public class PageLoginService {
       roleComboBox.setValue(currentRole.getRoleValueStaff());
     }
     return roleComboBox;
+  }
+  public ComboBox createPayMethodSelectionBox() {
+    List<PaymentMethod> Payments = new ArrayList<>();
+    StaffService staffService = new StaffService();
+    ComboBox<String> payComboBox = new ComboBox<>();
+    Payments = staffService.getAllPayMethod();
+    for (PaymentMethod Payment : Payments) {
+      Payment currentMethod = com.example.cafemanagement.enummethod.Payment.fromDisplayName(Payment.getMethod().getStatus());
+      payComboBox.getItems().add(currentMethod.getStatus());
+      payComboBox.setValue(currentMethod.getStatus());
+    }
+    return payComboBox;
   }
 
 }

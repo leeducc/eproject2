@@ -10,6 +10,11 @@ public class PaymentMethod {
     return id;
   }
 
+  public PaymentMethod(int id, Payment method) {
+    this.id = id;
+    this.method = method;
+  }
+
   public void setId(int id) {
     this.id = id;
   }

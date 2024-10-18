@@ -22,4 +22,8 @@ public enum Payment {
     }
     throw new IllegalArgumentException("Không tìm thấy vai trò với tên hiển thị: " + displayName);
   }
+  public static void main(String[] args) {
+    Payment method = null;
+    System.out.println(method.CASH.getStatus());
+  }
 }

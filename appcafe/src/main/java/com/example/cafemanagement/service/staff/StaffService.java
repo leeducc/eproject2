@@ -4,9 +4,11 @@ import static com.example.cafemanagement.enummethod.RoleStaff.ADMIN;
 import static com.example.cafemanagement.enummethod.RoleStaff.fromDisplayName;
 
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
+import com.example.cafemanagement.entities.PaymentMethod;
 import com.example.cafemanagement.entities.Role;
 import com.example.cafemanagement.entities.Staff;
 import com.example.cafemanagement.entities.StaffProperty;
+import com.example.cafemanagement.enummethod.Payment;
 import com.example.cafemanagement.enummethod.RoleStaff;
 import com.google.protobuf.StringValue;
 import java.sql.Connection;
@@ -55,6 +57,24 @@ public class StaffService {
       e.printStackTrace();
     }
     return roles;
+  }
+  public List<PaymentMethod> getAllPayMethod() {
+    List<PaymentMethod> Payments = new ArrayList<>();
+    String sql = "SELECT * FROM payment_method";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        ResultSet resultSet = preparedStatement.executeQuery()) {
+      while (resultSet.next()) {
+        PaymentMethod method = new PaymentMethod(
+            resultSet.getInt("id"),
+            Payment.valueOf(resultSet.getString("method"))
+        );
+        Payments.add(method);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return Payments;
   }
 
   public static int getRoleByValue(String value) {

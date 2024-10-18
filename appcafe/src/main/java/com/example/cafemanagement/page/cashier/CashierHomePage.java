@@ -1,15 +1,20 @@
 package com.example.cafemanagement.page.cashier;
 
 
+import com.example.cafemanagement.entities.Bill;
 import com.example.cafemanagement.service.TableCoffeeService;
+import com.example.cafemanagement.service.admin.PageLoginService;
 import com.example.cafemanagement.service.cashier.CashierService;
+import com.example.cafemanagement.service.staff.StaffService;
 import com.example.cafemanagement.util.AlertUtil;
 import com.google.protobuf.StringValue;
 import java.util.ArrayList;
+import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
@@ -21,7 +26,8 @@ import javafx.stage.Stage;
 
 public class CashierHomePage {
 
-
+  static PageLoginService service = new PageLoginService();
+  static Bill bill = new Bill();
   private static Label selectedTableLabel;  // Khai báo nhãn này để cập nhật khi chọn bàn
 
   private static String title;
@@ -34,7 +40,7 @@ public class CashierHomePage {
     CashierHomePage.title = title;
   }
 
-  public static VBox viewTableOrder(Stage primaryStage,Button button) {
+  public static VBox viewTableOrder(Stage primaryStage, Button button) {
     GridPane floorTable = new GridPane();
     floorTable.setPadding(new Insets(10));
     floorTable.setHgap(10);
@@ -49,11 +55,11 @@ public class CashierHomePage {
 
     // Thêm các bàn vào khu A (Tầng trệt)
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(1);
-    addButtonsToGrid(floorTable,floorTables,button,primaryStage);
+    addButtonsToGrid(floorTable, floorTables, button, primaryStage);
 
     // Thêm các bàn vào khu B (Tầng lầu)
     ArrayList<String> upstairTables = TableCoffeeService.getNameTable(2);
-    addButtonsToGrid(upstairTable, upstairTables,button,primaryStage);
+    addButtonsToGrid(upstairTable, upstairTables, button, primaryStage);
 
     // Tạo các nhãn cho khu vực bàn
     Label labelFloorTables = new Label("Floor Tables");
@@ -72,7 +78,7 @@ public class CashierHomePage {
     return layoutTableSelection;
   }
 
-  public static VBox viewCheckOrder(Stage primaryStage,Button backButton ) {
+  public static VBox viewCheckOrder(Stage primaryStage, Button backButton) {
     primaryStage.setTitle("Quản lý bàn quán cafe");
 
 //
@@ -87,6 +93,7 @@ public class CashierHomePage {
     Spinner<Integer> quantitySpinner = new Spinner<>(1, 20, 1);
 
     Button addButton = new Button("Thêm vào hóa đơn");
+    Button listHasOrdered = new Button("Hóa đơn của bàn");
 
     TextArea billArea = new TextArea();
     billArea.setEditable(false);
@@ -95,6 +102,22 @@ public class CashierHomePage {
     TextField totalField = new TextField();
     totalField.setEditable(false);
     totalField.setText("0");
+    ComboBox<String> methodComboBox = service.createPayMethodSelectionBox();
+    listHasOrdered.setOnAction(e -> {
+      List<Bill> newBill = CashierService.getBillByNameTable(CashierHomePage.getTitle());
+      // Kiểm tra nếu danh sách Bill null hoặc rỗng
+      if (newBill == null || newBill.isEmpty()) {
+        AlertUtil.showErrorLoginAlert("Bàn " + CashierHomePage.getTitle() + " chưa có đặt đồ uống");
+      } else {
+        // Lặp qua danh sách và hiển thị thông tin
+        for (Bill bill : newBill) {
+          billArea.appendText(
+              bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
+                  + bill.getPrice() * bill.getQuantity() + " VND\n"
+          );
+        }
+      }
+    });
 
     addButton.setOnAction(e -> {
       String selectedDrink = drinkList.getSelectionModel().getSelectedItem();
@@ -103,21 +126,30 @@ public class CashierHomePage {
         double price = CashierService.getPriceByName(selectedDrink);
         double total = Double.parseDouble(totalField.getText());
         double subTotal = price * quantity;
-
-        // Cập nhật hóa đơn
-        billArea.appendText(
-            selectedDrink + " - Số lượng: " + quantity + " - Giá: " + price * quantity + " VND\n");
-        totalField.setText(String.valueOf(total + subTotal));
+        bill.setNameTable(CashierHomePage.getTitle());
+        bill.setProductName(selectedDrink);
+        bill.setQuantity(quantity);
+        bill.setPrice(price);
+        CashierService.addOrderBill(bill);
+        List<Bill> newBill = CashierService.getBillByNameTable(CashierHomePage.getTitle());
+        for (Bill bill : newBill) {
+          billArea.appendText(
+              bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
+                  + bill.getPrice() * bill.getQuantity() + " VND\n");
+        }
       } else {
         AlertUtil.showErrorLoginAlert("Vui lòng chọn đồ uống");
       }
     });
 
+    ;
+
     // Layout cho giao diện thanh toán
     VBox orderLayout = new VBox(10);
     orderLayout.getChildren()
-        .addAll(selectedTableLabel, drinkList, quantityLabel, quantitySpinner, addButton, billArea,
-            totalLabel, totalField);
+        .addAll(selectedTableLabel, drinkList, quantityLabel, quantitySpinner, addButton,
+            listHasOrdered, billArea,
+            totalLabel, totalField, methodComboBox);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
     orderLayout.getStylesheets().add(
@@ -135,7 +167,8 @@ public class CashierHomePage {
 
   // Phương thức để thêm các nút bàn vào GridPane
   // Phương thức để thêm các nút bàn vào GridPane
-  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames,Button button ,Stage primaryStage) {
+  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames, Button button,
+      Stage primaryStage) {
     int count = 0;
     int rows = 6;
     int cols = 6;
@@ -153,10 +186,11 @@ public class CashierHomePage {
         // Xử lý hành động khi nút được bấm
         tableButton.setOnAction(e -> {
           // Cập nhật nhãn hiển thị bàn đã chọn
-         selectedTableLabel = new Label(tableButton.getText());
-         CashierHomePage.setTitle(tableButton.getText());
+          selectedTableLabel = new Label(tableButton.getText());
+          CashierHomePage.setTitle(tableButton.getText());
           // Chuyển sang giao diện order
-          primaryStage.setScene(new Scene(CashierHomePage.viewCheckOrder(primaryStage,button),800,600));
+          primaryStage.setScene(
+              new Scene(CashierHomePage.viewCheckOrder(primaryStage, button), 800, 600));
         });
 
         // Thêm nút vào grid
