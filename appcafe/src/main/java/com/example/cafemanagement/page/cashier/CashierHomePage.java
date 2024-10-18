@@ -5,9 +5,7 @@ import com.example.cafemanagement.entities.Bill;
 import com.example.cafemanagement.service.TableCoffeeService;
 import com.example.cafemanagement.service.admin.PageLoginService;
 import com.example.cafemanagement.service.cashier.CashierService;
-import com.example.cafemanagement.service.staff.StaffService;
 import com.example.cafemanagement.util.AlertUtil;
-import com.google.protobuf.StringValue;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Insets;
@@ -21,6 +19,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -87,11 +86,7 @@ public class CashierHomePage {
   public static VBox viewCheckOrder(Stage primaryStage, Button backButton) {
     primaryStage.setTitle("Quản lý bàn quán cafe");
 
-//
     // Giao diện chọn bàn
-//    sceneTableSelection = new Scene(mainContainer, 800, 600);
-
-    // ----------- Giao diện thanh toán và chọn đồ uống -----------
     selectedTableLabel = new Label(CashierHomePage.getTitle());
     ListView<String> drinkList = CashierService.InitializeProductName();
 
@@ -101,26 +96,55 @@ public class CashierHomePage {
     Button addButton = new Button("Thêm vào hóa đơn");
     Button listHasOrdered = new Button("Hóa đơn của bàn");
 
-    TextArea billArea = new TextArea();
-    billArea.setEditable(false);
+    VBox billContainer = new VBox(10);  // Container chứa các mục hóa đơn
 
     Label totalLabel = new Label("Tổng cộng:");
     TextField totalField = new TextField();
     totalField.setEditable(false);
     totalField.setText("0");
     ComboBox<String> methodComboBox = service.createPayMethodSelectionBox();
+
     listHasOrdered.setOnAction(e -> {
       List<Bill> newBill = CashierService.getBillByNameTable(CashierHomePage.getTitle());
+      billContainer.getChildren().clear();  // Xóa các mục cũ trước khi thêm lại
+
       // Kiểm tra nếu danh sách Bill null hoặc rỗng
       if (newBill == null || newBill.isEmpty()) {
         AlertUtil.showErrorLoginAlert("Bàn " + CashierHomePage.getTitle() + " chưa có đặt đồ uống");
       } else {
         // Lặp qua danh sách và hiển thị thông tin
         for (Bill bill : newBill) {
-          billArea.appendText(
-              bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
-                  + bill.getPrice() * bill.getQuantity() + " VND\n"
-          );
+          double subTotal = bill.getQuantity() * bill.getPrice();
+          HBox billRow = new HBox(10);
+
+          Label billInfo = new Label(bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
+              + bill.getPrice() * bill.getQuantity() + " VND");
+
+          // Tạo nút sửa
+          Button editButton = new Button("Sửa");
+          editButton.setOnAction(editEvent -> {
+            // Cập nhật thông tin cho việc sửa
+            drinkList.getSelectionModel().select(bill.getProductName());
+            quantitySpinner.getValueFactory().setValue(bill.getQuantity());
+
+            // Khi sửa, cần xóa mục cũ khỏi danh sách hóa đơn trước
+//            CashierService.removeOrderBill(bill);
+            billContainer.getChildren().remove(billRow);
+            updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
+          });
+
+          // Tạo nút xóa
+          Button deleteButton = new Button("Xóa");
+          deleteButton.setOnAction(deleteEvent -> {
+            // Xóa mục khỏi danh sách hóa đơn
+            CashierService.removeOrderBill(bill);
+            billContainer.getChildren().remove(billRow);
+            updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
+          });
+
+          billRow.getChildren().addAll(billInfo, editButton, deleteButton);
+          billContainer.getChildren().add(billRow);
+          updateTotalField(totalField, subTotal);
         }
       }
     });
@@ -130,32 +154,47 @@ public class CashierHomePage {
       int quantity = quantitySpinner.getValue();
       if (selectedDrink != null) {
         double price = CashierService.getPriceByName(selectedDrink);
-        double total = Double.parseDouble(totalField.getText());
         double subTotal = price * quantity;
         bill.setNameTable(CashierHomePage.getTitle());
         bill.setProductName(selectedDrink);
         bill.setQuantity(quantity);
         bill.setPrice(price);
         CashierService.addOrderBill(bill);
-        List<Bill> newBill = CashierService.getBillByNameTable(CashierHomePage.getTitle());
-        for (Bill bill : newBill) {
-          billArea.appendText(
-              bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
-                  + bill.getPrice() * bill.getQuantity() + " VND\n");
-        }
+
+        HBox billRow = new HBox(10);
+        Label billInfo = new Label(selectedDrink + " - Số lượng: " + quantity + " - Giá: " + subTotal + " VND");
+
+        // Nút sửa
+        Button editButton = new Button("Sửa");
+        editButton.setOnAction(editEvent -> {
+          drinkList.getSelectionModel().select(selectedDrink);
+          quantitySpinner.getValueFactory().setValue(quantity);
+//          CashierService.removeOrderBill(bill);
+          billContainer.getChildren().remove(billRow);
+          updateTotalField(totalField, -subTotal);
+        });
+
+        // Nút xóa
+        Button deleteButton = new Button("Xóa");
+        deleteButton.setOnAction(deleteEvent -> {
+          CashierService.removeOrderBill(bill);
+          billContainer.getChildren().remove(billRow);
+          updateTotalField(totalField, -subTotal);
+        });
+
+        billRow.getChildren().addAll(billInfo, editButton, deleteButton);
+        billContainer.getChildren().add(billRow);
+
+        updateTotalField(totalField, subTotal);
       } else {
         AlertUtil.showErrorLoginAlert("Vui lòng chọn đồ uống");
       }
     });
 
-    ;
-
     // Layout cho giao diện thanh toán
     VBox orderLayout = new VBox(10);
-    orderLayout.getChildren()
-        .addAll(selectedTableLabel, drinkList, quantityLabel, quantitySpinner, addButton,
-            listHasOrdered, billArea,
-            totalLabel, totalField, methodComboBox);
+    orderLayout.getChildren().addAll(selectedTableLabel, drinkList, quantityLabel, quantitySpinner, addButton,
+        listHasOrdered, billContainer, totalLabel, totalField, methodComboBox);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
     orderLayout.getStylesheets().add(
@@ -163,13 +202,17 @@ public class CashierHomePage {
 
     // Thêm nút "Quay về" vào layout của phần thanh toán
     orderLayout.getChildren().add(backButton);
-//    sceneOrder = new Scene(orderLayout, 800, 600);
-//
-//    // Hiển thị giao diện chọn bàn lúc khởi động
-//    window.setScene(sceneTableSelection);
-//    window.show();
+
     return orderLayout;
   }
+
+  // Cập nhật giá trị tổng
+  private static void updateTotalField(TextField totalField, double amount) {
+    double currentTotal = Double.parseDouble(totalField.getText());
+    currentTotal += amount;
+    totalField.setText(String.valueOf(currentTotal));
+  }
+
 
   // Phương thức để thêm các nút bàn vào GridPane
   // Phương thức để thêm các nút bàn vào GridPane

@@ -106,6 +106,29 @@ public class CashierService {
     }
     return bills; // Trả về danh sách Bill
   }
+  public static void removeOrderBill(Bill bill) {
+    String sql = "DELETE FROM bill WHERE nameTable = ? AND productName = ? AND quantity = ?";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      // Thiết lập các tham số cho câu lệnh xóa
+      preparedStatement.setString(1, bill.getNameTable());
+      preparedStatement.setString(2, bill.getProductName());
+      preparedStatement.setInt(3, bill.getQuantity());
+
+      // Thực thi câu lệnh xóa
+      int rowsAffected = preparedStatement.executeUpdate();
+      if (rowsAffected > 0) {
+        System.out.println("Hóa đơn đã được xóa thành công.");
+      } else {
+        System.out.println("Không tìm thấy hóa đơn để xóa.");
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      System.out.println("Lỗi khi xóa hóa đơn: " + e.getMessage());
+    }
+  }
 
 
 }
