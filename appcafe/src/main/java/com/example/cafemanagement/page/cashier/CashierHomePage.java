@@ -39,6 +39,10 @@ public class CashierHomePage {
   public static void setTitle(String title) {
     CashierHomePage.title = title;
   }
+  // Điều kiện để thay đổi màu
+  boolean condition = true; // Ví dụ điều kiện
+
+
 
   public static VBox viewTableOrder(Stage primaryStage, Button button) {
     GridPane floorTable = new GridPane();
@@ -52,6 +56,8 @@ public class CashierHomePage {
     upstairTable.setHgap(10);
     upstairTable.setVgap(10);
     upstairTable.setAlignment(Pos.CENTER);
+// Điều kiện để thay đổi màu
+
 
     // Thêm các bàn vào khu A (Tầng trệt)
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(1);
@@ -181,8 +187,13 @@ public class CashierHomePage {
         // Tạo mới một nút cho mỗi bàn
         Button tableButton = new Button(tableNames.get(count));
         tableButton.setPrefSize(90, 90);
-        tableButton.setStyle("-fx-background-color: lightgray;");
 
+        List<Bill> newBill = CashierService.getBillByNameTable(tableNames.get(count));
+        if (newBill == null || newBill.isEmpty()) {
+          tableButton.setStyle("-fx-background-color: lightgray;");
+        } else {
+          tableButton.setStyle("-fx-background-color: green;");
+        }
         // Xử lý hành động khi nút được bấm
         tableButton.setOnAction(e -> {
           // Cập nhật nhãn hiển thị bàn đã chọn
