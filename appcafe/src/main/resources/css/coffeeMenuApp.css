@@ -7,3 +7,79 @@
 .coffee-item {
   -fx-alignment: center; /* Canh giữa các item */
 }
+.root {
+  -fx-background-color: #D2B49A;
+}
+
+.text-field {
+  -fx-font-size: 14px;
+  -fx-padding: 5px;
+  -fx-background-radius: 5px;
+  -fx-border-color: #A05A4D;
+  -fx-border-radius: 5px;
+  -fx-border-width: 1px;
+}
+
+.combo-box {
+  -fx-background-color: #A05A4D;
+  -fx-font-size: 14px;
+  -fx-text-fill: white;
+}
+
+
+.button {
+  -fx-background-color: #A05A4D;
+-fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-background-radius: 5px;
+  -fx-padding: 5px 10px;
+}
+
+
+.product-box {
+  -fx-border-color: #DDC5B2;
+  -fx-border-radius: 8px;
+  -fx-background-color: #F9F9F9;
+  -fx-background-radius: 8px;
+}
+
+.product-box:hover {
+  -fx-background-color: #F0F0F0;
+}
+
+
+.label {
+  -fx-font-family: Arial;
+  -fx-text-fill: #3E2F2F;
+}
+
+.label-bold {
+  -fx-font-weight: bold;
+}
+
+.label-price {
+  -fx-text-fill: #777;
+}
+
+
+.scroll-pane {
+  -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+  -fx-background-color: transparent;
+}
+
+.scroll-pane .scroll-bar {
+  -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical .thumb {
+  -fx-background-color: #A05A4D;
+-fx-background-radius: 5px;
+}
+
+.scroll-bar:vertical .track {
+  -fx-background-color: #DDC5B2;
+-fx-background-radius: 5px;
+}

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -72,10 +73,17 @@ public class CashierHomePage {
 
     Label labelUpstairTables = new Label("Upstair Tables");
     labelUpstairTables.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
+
+    Button buttonUpdate = new Button("Cập Nhật Trạng Thái Bàn");
+    buttonUpdate.setOnAction(e -> {
+      addButtonsToGrid(upstairTable, upstairTables, button, primaryStage);
+      addButtonsToGrid(floorTable, floorTables, button, primaryStage);
+    });
+
     // Thêm các nhãn và khu vực bàn vào layout
     VBox layoutTableSelection = new VBox(10);
     layoutTableSelection.getChildren()
-        .addAll(labelFloorTables, floorTable, upstairTable, labelUpstairTables);
+        .addAll(labelFloorTables, floorTable, upstairTable, labelUpstairTables,buttonUpdate);
     layoutTableSelection.setPadding(new Insets(20));
     layoutTableSelection.setAlignment(Pos.CENTER);
     layoutTableSelection.getStylesheets().add(
@@ -121,17 +129,20 @@ public class CashierHomePage {
               + bill.getPrice() * bill.getQuantity() + " VND");
 
           // Tạo nút sửa
-          Button editButton = new Button("Sửa");
-          editButton.setOnAction(editEvent -> {
-            // Cập nhật thông tin cho việc sửa
-            drinkList.getSelectionModel().select(bill.getProductName());
-            quantitySpinner.getValueFactory().setValue(bill.getQuantity());
+//          Button editButton = new Button("Sửa");
+//          editButton.setOnAction(editEvent -> {
+//            // Cập nhật thông tin cho việc sửa
+//            drinkList.getSelectionModel().select(bill.getProductName());
+//            quantitySpinner.getValueFactory().setValue(bill.getQuantity());
+//
+//            // Khi sửa, cần xóa mục cũ khỏi danh sách hóa đơn trước
+////            CashierService.removeOrderBill(bill);
+//            billContainer.getChildren().remove(billRow);
+//            updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
+//          });
 
-            // Khi sửa, cần xóa mục cũ khỏi danh sách hóa đơn trước
-//            CashierService.removeOrderBill(bill);
-            billContainer.getChildren().remove(billRow);
-            updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
-          });
+            // ... existing code to add a new order
+             // Update button color after order
 
           // Tạo nút xóa
           Button deleteButton = new Button("Xóa");
@@ -142,7 +153,7 @@ public class CashierHomePage {
             updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
           });
 
-          billRow.getChildren().addAll(billInfo, editButton, deleteButton);
+          billRow.getChildren().addAll(billInfo, deleteButton);
           billContainer.getChildren().add(billRow);
           updateTotalField(totalField, subTotal);
         }
@@ -165,14 +176,14 @@ public class CashierHomePage {
         Label billInfo = new Label(selectedDrink + " - Số lượng: " + quantity + " - Giá: " + subTotal + " VND");
 
         // Nút sửa
-        Button editButton = new Button("Sửa");
-        editButton.setOnAction(editEvent -> {
-          drinkList.getSelectionModel().select(selectedDrink);
-          quantitySpinner.getValueFactory().setValue(quantity);
-//          CashierService.removeOrderBill(bill);
-          billContainer.getChildren().remove(billRow);
-          updateTotalField(totalField, -subTotal);
-        });
+//        Button editButton = new Button("Sửa");
+//        editButton.setOnAction(editEvent -> {
+//          drinkList.getSelectionModel().select(selectedDrink);
+//          quantitySpinner.getValueFactory().setValue(quantity);
+////          CashierService.removeOrderBill(bill);
+//          billContainer.getChildren().remove(billRow);
+//          updateTotalField(totalField, -subTotal);
+//        });
 
         // Nút xóa
         Button deleteButton = new Button("Xóa");
@@ -182,7 +193,7 @@ public class CashierHomePage {
           updateTotalField(totalField, -subTotal);
         });
 
-        billRow.getChildren().addAll(billInfo, editButton, deleteButton);
+        billRow.getChildren().addAll(billInfo, deleteButton);
         billContainer.getChildren().add(billRow);
 
         updateTotalField(totalField, subTotal);
@@ -214,10 +225,18 @@ public class CashierHomePage {
   }
 
 
-  // Phương thức để thêm các nút bàn vào GridPane
-  // Phương thức để thêm các nút bàn vào GridPane
-  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames, Button button,
-      Stage primaryStage) {
+
+  private static void updateTableButtonColor(Button tableButton, String tableName) {
+    List<Bill> newBill = CashierService.getBillByNameTable(tableName);
+    if (newBill == null || newBill.isEmpty()) {
+      tableButton.setStyle("-fx-background-color: lightgray;");
+    } else {
+      tableButton.setStyle("-fx-background-color: green;");
+    }
+  }
+
+  // Modify the addButtonsToGrid method to use the updateTableButtonColor method
+  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames, Button button, Stage primaryStage) {
     int count = 0;
     int rows = 6;
     int cols = 6;
@@ -227,33 +246,32 @@ public class CashierHomePage {
           break;
         }
 
-        // Tạo mới một nút cho mỗi bàn
+        // Create a new button for each table
         Button tableButton = new Button(tableNames.get(count));
         tableButton.setPrefSize(90, 90);
 
-        List<Bill> newBill = CashierService.getBillByNameTable(tableNames.get(count));
-        if (newBill == null || newBill.isEmpty()) {
-          tableButton.setStyle("-fx-background-color: lightgray;");
-        } else {
-          tableButton.setStyle("-fx-background-color: green;");
-        }
-        // Xử lý hành động khi nút được bấm
+        // Set initial color based on the presence of a bill
+        updateTableButtonColor(tableButton, tableNames.get(count));
+
+        // Handle action when the button is pressed
         tableButton.setOnAction(e -> {
-          // Cập nhật nhãn hiển thị bàn đã chọn
+          // Update the label to show the selected table
           selectedTableLabel = new Label(tableButton.getText());
           CashierHomePage.setTitle(tableButton.getText());
-          // Chuyển sang giao diện order
-          primaryStage.setScene(
-              new Scene(CashierHomePage.viewCheckOrder(primaryStage, button), 800, 600));
+
+          // Switch to the order scene
+          primaryStage.setScene(new Scene(CashierHomePage.viewCheckOrder(primaryStage, button), 800, 600));
+
+          // Update the button color after the order
+          updateTableButtonColor(tableButton, tableButton.getText());
         });
 
-        // Thêm nút vào grid
+        // Add the button to the grid
         grid.add(tableButton, col, row);
         count++;
       }
     }
   }
-
 
 }
 

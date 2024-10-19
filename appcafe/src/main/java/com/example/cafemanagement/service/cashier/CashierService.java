@@ -2,13 +2,17 @@ package com.example.cafemanagement.service.cashier;
 
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
 import com.example.cafemanagement.entities.Bill;
+import com.example.cafemanagement.entities.PaymentMethod;
 import com.example.cafemanagement.entities.Products;
+import com.example.cafemanagement.enummethod.Payment;
+import com.example.cafemanagement.service.staff.StaffService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.ListView;
 
@@ -129,6 +133,48 @@ public class CashierService {
       System.out.println("Lỗi khi xóa hóa đơn: " + e.getMessage());
     }
   }
+  public static List<String> getAllCategoriesProduct(){
+    List<String> categories = new ArrayList<>();
+    String sql = "SELECT DISTINCT category FROM products";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        categories.add(resultSet.getString("category"));
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return categories;
+  }
+  public static ComboBox createPayCategoriesSelectionBox() {
+    List<String> categories = new ArrayList<>();
+    ComboBox<String> ctComboBox = new ComboBox<>();
+    categories = CashierService.getAllCategoriesProduct();
+    for (String category : categories) {
+      ctComboBox.getItems().add(category);
+    }
+    return ctComboBox;
+  }
 
-
+  public static List<Products> getProductsByCategory(String category) {
+    List<Products> products = new ArrayList<>();
+    String sql = "SELECT * FROM products WHERE category =?";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, category);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        Products product = new Products(resultSet.getString("image_link"),
+            resultSet.getString("category"),
+            resultSet.getString("name"),
+            resultSet.getDouble("price")
+        );
+        products.add(product);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return products;
+  }
 }
