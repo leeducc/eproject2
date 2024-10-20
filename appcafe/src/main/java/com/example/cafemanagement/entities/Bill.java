@@ -18,6 +18,12 @@ public class Bill {
     this.price = price;
   }
 
+  public Bill(String nameTable, String productName, int quantity) {
+    this.nameTable = nameTable;
+    this.productName = productName;
+    this.quantity = quantity;
+  }
+
   // Getter and Setter methods
   public int getId() {
     return id;

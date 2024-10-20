@@ -55,6 +55,11 @@ public class CoffeeMenuApp {
     // Add a listener to the ComboBox for filtering
     // Coffee menu items
     filteredProducts = CashierService.getAllProducts();
+    searchButton.setOnAction(e ->{
+      String searchText = searchBar.getText().trim();
+      filteredProducts = CashierService.getProductsByKey(searchText);
+      updateProductGrid(gridPane, filteredProducts);
+    });
     comboBox.setOnAction(event -> {
       String selectFilter =  comboBox.getValue();
       if ("All".equals(selectFilter) || selectFilter.isEmpty() || selectFilter == null) {

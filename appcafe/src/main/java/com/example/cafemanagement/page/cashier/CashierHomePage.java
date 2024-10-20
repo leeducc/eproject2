@@ -2,22 +2,26 @@ package com.example.cafemanagement.page.cashier;
 
 
 import com.example.cafemanagement.entities.Bill;
+
 import com.example.cafemanagement.service.TableCoffeeService;
 import com.example.cafemanagement.service.admin.PageLoginService;
 import com.example.cafemanagement.service.cashier.CashierService;
+
 import com.example.cafemanagement.util.AlertUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
+
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -26,6 +30,7 @@ import javafx.stage.Stage;
 
 public class CashierHomePage {
 
+  static ListView<String> drinkList = new ListView<String>();
   static PageLoginService service = new PageLoginService();
   static Bill bill = new Bill();
   private static Label selectedTableLabel;  // Khai báo nhãn này để cập nhật khi chọn bàn
@@ -39,9 +44,9 @@ public class CashierHomePage {
   public static void setTitle(String title) {
     CashierHomePage.title = title;
   }
+
   // Điều kiện để thay đổi màu
   boolean condition = true; // Ví dụ điều kiện
-
 
 
   public static VBox viewTableOrder(Stage primaryStage, Button button) {
@@ -57,7 +62,6 @@ public class CashierHomePage {
     upstairTable.setVgap(10);
     upstairTable.setAlignment(Pos.CENTER);
 // Điều kiện để thay đổi màu
-
 
     // Thêm các bàn vào khu A (Tầng trệt)
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(1);
@@ -83,7 +87,7 @@ public class CashierHomePage {
     // Thêm các nhãn và khu vực bàn vào layout
     VBox layoutTableSelection = new VBox(10);
     layoutTableSelection.getChildren()
-        .addAll(labelFloorTables, floorTable, upstairTable, labelUpstairTables,buttonUpdate);
+        .addAll(labelFloorTables, floorTable, upstairTable, labelUpstairTables, buttonUpdate);
     layoutTableSelection.setPadding(new Insets(20));
     layoutTableSelection.setAlignment(Pos.CENTER);
     layoutTableSelection.getStylesheets().add(
@@ -96,7 +100,42 @@ public class CashierHomePage {
 
     // Giao diện chọn bàn
     selectedTableLabel = new Label(CashierHomePage.getTitle());
-    ListView<String> drinkList = CashierService.InitializeProductName();
+    TextField searchBar = new TextField();
+    searchBar.setPromptText("Nhập mã/Tên món cần tìm");
+    searchBar.setPrefWidth(300);
+    searchBar.getStyleClass().add("text-field");
+
+    // Search Button
+    Button searchButton = new Button("🔍");
+    searchButton.getStyleClass().add("button");
+
+    // ComboBox for filtering
+    ComboBox<String> comboBox = CashierService.createPayCategoriesSelectionBox();
+    comboBox.getItems().add("All");
+    comboBox.setValue("All");
+    comboBox.getStyleClass().add("combo-box");
+    drinkList = CashierService.InitializeProductName();
+    // ComboBox action to filter products by category
+    comboBox.setOnAction(e -> {
+      String selectedFilter = comboBox.getValue();
+      if ("All".equals(selectedFilter)) {
+        // Lấy danh sách tất cả sản phẩm và cập nhật ListView
+        drinkList.setItems(CashierService.InitializeProductName1());
+      } else {
+        // Lấy danh sách sản phẩm theo danh mục và cập nhật ListView
+        drinkList.setItems(CashierService.InitializeProductNameCategory(selectedFilter));
+      }
+    });
+
+// Search button action to search products by keyword
+    searchButton.setOnAction(e -> {
+      String searchText = searchBar.getText().trim();
+      if (searchText.isEmpty()) {
+        drinkList.setItems(CashierService.InitializeProductName1());
+      } else {
+        drinkList.setItems(CashierService.InitializeProductNameByKey(searchText));
+      }
+    });
 
     Label quantityLabel = new Label("Số lượng:");
     Spinner<Integer> quantitySpinner = new Spinner<>(1, 20, 1);
@@ -115,7 +154,7 @@ public class CashierHomePage {
     listHasOrdered.setOnAction(e -> {
       List<Bill> newBill = CashierService.getBillByNameTable(CashierHomePage.getTitle());
       billContainer.getChildren().clear();  // Xóa các mục cũ trước khi thêm lại
-
+      double total = 0;
       // Kiểm tra nếu danh sách Bill null hoặc rỗng
       if (newBill == null || newBill.isEmpty()) {
         AlertUtil.showErrorLoginAlert("Bàn " + CashierHomePage.getTitle() + " chưa có đặt đồ uống");
@@ -125,24 +164,31 @@ public class CashierHomePage {
           double subTotal = bill.getQuantity() * bill.getPrice();
           HBox billRow = new HBox(10);
 
-          Label billInfo = new Label(bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
-              + bill.getPrice() * bill.getQuantity() + " VND");
+          Label billInfo = new Label(
+              bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
+                  + bill.getPrice() * bill.getQuantity() + " VND");
 
           // Tạo nút sửa
-//          Button editButton = new Button("Sửa");
-//          editButton.setOnAction(editEvent -> {
-//            // Cập nhật thông tin cho việc sửa
-//            drinkList.getSelectionModel().select(bill.getProductName());
-//            quantitySpinner.getValueFactory().setValue(bill.getQuantity());
-//
-//            // Khi sửa, cần xóa mục cũ khỏi danh sách hóa đơn trước
-////            CashierService.removeOrderBill(bill);
-//            billContainer.getChildren().remove(billRow);
-//            updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
-//          });
+          Button editButton = new Button("Sửa");
+          editButton.setOnAction(editEvent -> {
+            Bill selectedProduct = CashierService.getOrderBillByNameProduct(
+                CashierHomePage.getTitle(), bill.getProductName());
+            ;
+            if (selectedProduct != null) {
+              Bill updatedBill = showProductDialog("Thay đổi số lượng", selectedProduct);
+              if (updatedBill != null) {
+                CashierService.updateOrderBill(
+                    updatedBill);
+                updateTotalField(totalField, -bill.getPrice() * bill.getQuantity() + bill.getPrice()
+                    * updatedBill.getQuantity());// Ensure you have this method in your StaffService
+              }
+            } else {
+              AlertUtil.showErrorLoginAlert("Vui lòng chọn đồ uống để sửa");
+            }
+          });
 
-            // ... existing code to add a new order
-             // Update button color after order
+          // ... existing code to add a new order
+          // Update button color after order
 
           // Tạo nút xóa
           Button deleteButton = new Button("Xóa");
@@ -153,10 +199,11 @@ public class CashierHomePage {
             updateTotalField(totalField, -bill.getPrice() * bill.getQuantity());
           });
 
-          billRow.getChildren().addAll(billInfo, deleteButton);
+          billRow.getChildren().addAll(billInfo, editButton, deleteButton);
           billContainer.getChildren().add(billRow);
-          updateTotalField(totalField, subTotal);
+          total += subTotal;
         }
+        updateTotalFieldFinal(totalField, total);
       }
     });
 
@@ -164,39 +211,57 @@ public class CashierHomePage {
       String selectedDrink = drinkList.getSelectionModel().getSelectedItem();
       int quantity = quantitySpinner.getValue();
       if (selectedDrink != null) {
-        double price = CashierService.getPriceByName(selectedDrink);
-        double subTotal = price * quantity;
-        bill.setNameTable(CashierHomePage.getTitle());
-        bill.setProductName(selectedDrink);
-        bill.setQuantity(quantity);
-        bill.setPrice(price);
-        CashierService.addOrderBill(bill);
+        Bill billCheck = CashierService.findOrderBillIsExist(CashierHomePage.getTitle(),
+            selectedDrink);
+        if (billCheck != null) {
+          billCheck.setQuantity(quantity + billCheck.getQuantity());
+          CashierService.updateOrderBill(billCheck);
+          AlertUtil.showErrorLoginAlert("Đồ Uống đã có trong hóa đơn và đã được cập nhật!");
+        } else {
+          double price = CashierService.getPriceByName(selectedDrink);
+          double subTotal = price * quantity;
+          bill.setNameTable(CashierHomePage.getTitle());
+          bill.setProductName(selectedDrink);
+          bill.setQuantity(quantity);
+          bill.setPrice(price);
+          CashierService.addOrderBill(bill);
 
-        HBox billRow = new HBox(10);
-        Label billInfo = new Label(selectedDrink + " - Số lượng: " + quantity + " - Giá: " + subTotal + " VND");
+          HBox billRow = new HBox(10);
+          Label billInfo = new Label(
+              selectedDrink + " - Số lượng: " + quantity + " - Giá: " + subTotal + " VND");
 
-        // Nút sửa
-//        Button editButton = new Button("Sửa");
-//        editButton.setOnAction(editEvent -> {
-//          drinkList.getSelectionModel().select(selectedDrink);
-//          quantitySpinner.getValueFactory().setValue(quantity);
-////          CashierService.removeOrderBill(bill);
-//          billContainer.getChildren().remove(billRow);
-//          updateTotalField(totalField, -subTotal);
-//        });
+          // Nút sửa
+          Button editButton = new Button("Sửa");
+          editButton.setOnAction(editEvent -> {
+            Bill selectedProduct = CashierService.getOrderBillByNameProduct(
+                CashierHomePage.getTitle(), bill.getProductName());
+            ;
+            if (selectedProduct != null) {
+              Bill updatedBill = showProductDialog("Thay đổi số lượng", selectedProduct);
+              if (updatedBill != null) {
+                CashierService.updateOrderBill(
+                    updatedBill);
+                updateTotalField(totalField, -bill.getPrice() * bill.getQuantity() + bill.getPrice()
+                    * updatedBill.getQuantity());// Ensure you have this method in your StaffService
+              }
+            } else {
+              AlertUtil.showErrorLoginAlert("Vui lòng chọn đồ uống để sửa");
+            }
+          });
 
-        // Nút xóa
-        Button deleteButton = new Button("Xóa");
-        deleteButton.setOnAction(deleteEvent -> {
-          CashierService.removeOrderBill(bill);
-          billContainer.getChildren().remove(billRow);
-          updateTotalField(totalField, -subTotal);
-        });
+          // Nút xóa
+          Button deleteButton = new Button("Xóa");
+          deleteButton.setOnAction(deleteEvent -> {
+            CashierService.removeOrderBill(bill);
+            billContainer.getChildren().remove(billRow);
+            updateTotalField(totalField, -subTotal);
+          });
 
-        billRow.getChildren().addAll(billInfo, deleteButton);
-        billContainer.getChildren().add(billRow);
+          billRow.getChildren().addAll(billInfo, deleteButton, editButton);
+          billContainer.getChildren().add(billRow);
 
-        updateTotalField(totalField, subTotal);
+          updateTotalField(totalField, subTotal);
+        }
       } else {
         AlertUtil.showErrorLoginAlert("Vui lòng chọn đồ uống");
       }
@@ -204,8 +269,10 @@ public class CashierHomePage {
 
     // Layout cho giao diện thanh toán
     VBox orderLayout = new VBox(10);
-    orderLayout.getChildren().addAll(selectedTableLabel, drinkList, quantityLabel, quantitySpinner, addButton,
-        listHasOrdered, billContainer, totalLabel, totalField, methodComboBox);
+    orderLayout.getChildren()
+        .addAll(selectedTableLabel, searchBar, searchButton, comboBox, drinkList, quantityLabel,
+            quantitySpinner, addButton,
+            listHasOrdered, billContainer, totalLabel, totalField, methodComboBox);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
     orderLayout.getStylesheets().add(
@@ -224,6 +291,11 @@ public class CashierHomePage {
     totalField.setText(String.valueOf(currentTotal));
   }
 
+  private static void updateTotalFieldFinal(TextField totalField, double amount) {
+    double currentTotal = amount;
+//    currentTotal += amount;
+    totalField.setText(String.valueOf(currentTotal));
+  }
 
 
   private static void updateTableButtonColor(Button tableButton, String tableName) {
@@ -236,7 +308,8 @@ public class CashierHomePage {
   }
 
   // Modify the addButtonsToGrid method to use the updateTableButtonColor method
-  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames, Button button, Stage primaryStage) {
+  private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames, Button button,
+      Stage primaryStage) {
     int count = 0;
     int rows = 6;
     int cols = 6;
@@ -260,7 +333,8 @@ public class CashierHomePage {
           CashierHomePage.setTitle(tableButton.getText());
 
           // Switch to the order scene
-          primaryStage.setScene(new Scene(CashierHomePage.viewCheckOrder(primaryStage, button), 800, 600));
+          primaryStage.setScene(
+              new Scene(CashierHomePage.viewCheckOrder(primaryStage, button), 800, 600));
 
           // Update the button color after the order
           updateTableButtonColor(tableButton, tableButton.getText());
@@ -271,6 +345,44 @@ public class CashierHomePage {
         count++;
       }
     }
+  }
+
+  private static Bill showProductDialog(String title, Bill bill) {
+    Dialog<Bill> dialog = new Dialog<>();
+    dialog.setTitle(title);
+    dialog.setHeaderText(null);
+
+    GridPane grid = new GridPane();
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPadding(new Insets(20, 150, 10, 10));
+
+    TextField staffIdField = new TextField(bill.getProductName());
+    TextField nameField = new TextField(bill.getNameTable());
+    TextField quantity = new TextField(String.valueOf(bill.getQuantity()));
+
+    grid.add(new Label("Đồ Uống"), 0, 0);
+    grid.add(staffIdField, 1, 0);
+    grid.add(new Label("Bàn: "), 0, 1);
+    grid.add(nameField, 1, 1);
+    grid.add(new Label("Số luợng"), 0, 2);
+    grid.add(quantity, 1, 2);
+
+    dialog.getDialogPane().setContent(grid);
+    dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+    dialog.setResultConverter(button -> {
+      if (button == ButtonType.OK) {
+        return new Bill(
+            nameField.getText(),
+            staffIdField.getText(),
+            Integer.valueOf(quantity.getText())
+        );
+      }
+      return null;
+    });
+
+    return dialog.showAndWait().orElse(null);
   }
 
 }
