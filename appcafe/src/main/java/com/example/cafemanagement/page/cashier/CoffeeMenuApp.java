@@ -22,6 +22,7 @@ public class CoffeeMenuApp {
 
   CashierService cf = new CashierService();
   List<Products> filteredProducts = new ArrayList<>();
+  static ListView<GridPane> drinkListProduct = new ListView<GridPane>();
   private static File selectedFile;
   FileChooser fileChooser = new FileChooser();
 

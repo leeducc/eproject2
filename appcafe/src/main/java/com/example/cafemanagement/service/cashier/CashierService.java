@@ -3,6 +3,7 @@ package com.example.cafemanagement.service.cashier;
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
 import com.example.cafemanagement.entities.Bill;
 import com.example.cafemanagement.entities.Products;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -300,7 +302,20 @@ public class CashierService {
       return false;
     }
   }
-  public void createProductGrid(List<Products> productList, GridPane gridPane){
+
+  public static boolean deleteProductsByProductName(String name){
+    String sql = "DELETE FROM products WHERE name =?";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, name);
+
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+  public void createProductGrid(List<Products> productList, GridPane gridPane) {
     int column = 0;
     int row = 0;
     for (int i = 0; i < productList.size(); i++) {
@@ -309,8 +324,7 @@ public class CashierService {
 
       // Ensure the image path is valid
       if (imagePath != null && getClass().getResource(imagePath) != null) {
-        Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175,
-            false, false);
+        Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175, false, false);
         ImageView imageView = new ImageView(productImage);
 
         // Coffee name and price labels
@@ -318,16 +332,38 @@ public class CashierService {
         nameLabel.setFont(new Font("Arial", 18));
         nameLabel.getStyleClass().add("label-bold");
 
-        Label priceLabel = new Label("$" + String.valueOf(product.getPrice()));
+        Label priceLabel = new Label("$" + product.getPrice());
         priceLabel.setFont(new Font("Arial", 14));
         priceLabel.getStyleClass().add("label-price");
 
+        // Edit Button
+        Button editButton = new Button("Sửa");
+        Button deleteButton = new Button("Xóa");
+        editButton.setOnAction(e -> {
+          // Handle edit product
+          System.out.println("Edit button clicked for product: " + product.getName());
+        });
+        deleteButton.setOnAction(e -> {
+          Products productToDelete = CashierService.getProductsByProductName(product.getName());
+          String filePath = "src/main/resources/" + productToDelete.getImageLink();
+          File file = new File(filePath);
+          if (file.exists()) {
+            if (file.delete()) {
+              System.out.println("File deleted successfully");
+            } else {
+              System.out.println("Failed to delete the file");
+            }
+          } else {
+            System.out.println("File does not exist");
+          }
+          CashierService.deleteProductsByProductName(productToDelete.getName());
+          System.out.println("Delete button clicked for product: " + product.getName());
+        });
         // VBox for each product item
-        VBox productBox = new VBox(10, imageView, nameLabel, priceLabel);
+        VBox productBox = new VBox(10, imageView, nameLabel, priceLabel, editButton,deleteButton);
         productBox.setPadding(new Insets(10));
         productBox.setAlignment(Pos.CENTER);
         productBox.getStyleClass().add("product-box");
-
         productBox.setOnMouseEntered(e -> productBox.setStyle("-fx-background-color: #f0f0f0;"));
         productBox.setOnMouseExited(e -> productBox.setStyle("-fx-background-color: #f9f9f9;"));
 
