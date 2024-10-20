@@ -178,7 +178,7 @@ public class PageLoginController {
 
     VBox dashboardLayoutViewMember = viewMember.viewTableViewMember(comebacktButton1);
 
-    VBox dashboardLayoutMenuCoffee = coffeeMenuApp.viewProduct(comebacktButton2);
+    VBox dashboardLayoutMenuCoffee = coffeeMenuApp.viewProduct(comebacktButton2,primaryStage);
     // Xử lý nút quay lại
     nextPage.setOnAction(event -> {
       primaryStage.setScene(service.getDashboardVBoxServiceTableOrder());

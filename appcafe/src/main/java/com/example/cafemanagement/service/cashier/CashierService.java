@@ -276,4 +276,20 @@ public class CashierService {
     }
     return products;
   }
+//
+  public static boolean addNewProduct(Products obj){
+    String sql = "INSERT INTO products(image_link, category, name, price) VALUES(?,?,?,?)";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, obj.getImageLink());
+      preparedStatement.setString(2, obj.getCategory());
+      preparedStatement.setString(3, obj.getName());
+      preparedStatement.setDouble(4, obj.getPrice());
+
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
 }
