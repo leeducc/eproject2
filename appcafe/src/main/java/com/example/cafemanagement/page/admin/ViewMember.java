@@ -1,5 +1,4 @@
 package com.example.cafemanagement.page.admin;
-
 import com.example.cafemanagement.entities.StaffProperty;
 import com.example.cafemanagement.service.staff.StaffService;
 import javafx.collections.FXCollections;

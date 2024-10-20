@@ -1,5 +1,4 @@
 package com.example.cafemanagement.service.cashier;
-
 import com.example.cafemanagement.configJDBC.dao.JDBCConnect;
 import com.example.cafemanagement.entities.Bill;
 import com.example.cafemanagement.entities.Products;
@@ -21,6 +20,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
@@ -360,13 +360,16 @@ public class CashierService {
           System.out.println("Delete button clicked for product: " + product.getName());
         });
         // VBox for each product item
-        VBox productBox = new VBox(10, imageView, nameLabel, priceLabel, editButton,deleteButton);
+        HBox buttonBox = new HBox(10, editButton, deleteButton);  // Align buttons horizontally
+        buttonBox.setAlignment(Pos.CENTER);  // Center the buttons in the HBox
+
+        // VBox for each product item
+        VBox productBox = new VBox(10, imageView, nameLabel, priceLabel, buttonBox);
         productBox.setPadding(new Insets(10));
         productBox.setAlignment(Pos.CENTER);
         productBox.getStyleClass().add("product-box");
         productBox.setOnMouseEntered(e -> productBox.setStyle("-fx-background-color: #f0f0f0;"));
         productBox.setOnMouseExited(e -> productBox.setStyle("-fx-background-color: #f9f9f9;"));
-
         // Add to grid
         gridPane.add(productBox, column, row);
 

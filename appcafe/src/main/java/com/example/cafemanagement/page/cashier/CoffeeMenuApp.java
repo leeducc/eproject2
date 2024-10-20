@@ -91,11 +91,6 @@ public class CoffeeMenuApp {
       }
 
     });
-//    refresh.setOnAction(e -> {
-//      filteredProducts = CashierService.getAllProducts();
-//      System.out.println("Da lam moi");
-//    });
-
     cf.createProductGrid(filteredProducts, gridPane);
 
     // ScrollPane for Product Grid Layout

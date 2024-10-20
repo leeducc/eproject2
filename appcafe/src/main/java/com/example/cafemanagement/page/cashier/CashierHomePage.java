@@ -21,6 +21,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
@@ -167,9 +168,11 @@ public class CashierHomePage {
           Label billInfo = new Label(
               bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
                   + bill.getPrice() * bill.getQuantity() + " VND");
+          billInfo.getStyleClass().add("bill-container-label");  // Add CSS class for styling
 
           // Tạo nút sửa
           Button editButton = new Button("Sửa");
+          editButton.getStyleClass().add("bill-button");
           editButton.setOnAction(editEvent -> {
             Bill selectedProduct = CashierService.getOrderBillByNameProduct(
                 CashierHomePage.getTitle(), bill.getProductName());
@@ -192,6 +195,7 @@ public class CashierHomePage {
 
           // Tạo nút xóa
           Button deleteButton = new Button("Xóa");
+          deleteButton.getStyleClass().add("bill-button");
           deleteButton.setOnAction(deleteEvent -> {
             // Xóa mục khỏi danh sách hóa đơn
             CashierService.removeOrderBill(bill);
@@ -228,10 +232,13 @@ public class CashierHomePage {
 
           HBox billRow = new HBox(10);
           Label billInfo = new Label(
-              selectedDrink + " - Số lượng: " + quantity + " - Giá: " + subTotal + " VND");
+              bill.getProductName() + " - Số lượng: " + bill.getQuantity() + " - Giá: "
+                  + bill.getPrice() * bill.getQuantity() + " VND");
+          billInfo.getStyleClass().add("bill-container-label");  // Add CSS class for styling
 
           // Nút sửa
           Button editButton = new Button("Sửa");
+          editButton.getStyleClass().add("bill-button");
           editButton.setOnAction(editEvent -> {
             Bill selectedProduct = CashierService.getOrderBillByNameProduct(
                 CashierHomePage.getTitle(), bill.getProductName());
@@ -251,13 +258,14 @@ public class CashierHomePage {
 
           // Nút xóa
           Button deleteButton = new Button("Xóa");
+          deleteButton.getStyleClass().add("bill-button");
           deleteButton.setOnAction(deleteEvent -> {
             CashierService.removeOrderBill(bill);
             billContainer.getChildren().remove(billRow);
             updateTotalField(totalField, -subTotal);
           });
 
-          billRow.getChildren().addAll(billInfo, deleteButton, editButton);
+          billRow.getChildren().addAll(billInfo, editButton, deleteButton);
           billContainer.getChildren().add(billRow);
 
           updateTotalField(totalField, subTotal);
@@ -267,12 +275,32 @@ public class CashierHomePage {
       }
     });
 
-    // Layout cho giao diện thanh toán
+// Create a ScrollPane for the bill container
+    ScrollPane billScrollPane = new ScrollPane(billContainer);
+    billScrollPane.setFitToWidth(true); // Ensure it fits the width of the layout
+    billScrollPane.setPrefHeight(300); // Set a preferred height for the scroll pane
+    billScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED); // Show scrollbar as needed
+
+// Create an HBox to hold drinkList and billScrollPane
+    HBox containersHBox = new HBox(10); // 10 is the spacing between the two containers
+
+// Set preferred widths to control the ratio
+    VBox drinkListContainer = new VBox(drinkList);
+    drinkListContainer.setPrefWidth(300); // Set a preferred width for the drink list
+    drinkListContainer.getStyleClass().add("drink-list-container");
+
+    VBox billContainerContainer = new VBox(billScrollPane);
+    billContainerContainer.setPrefWidth(700); // Set a preferred width for the bill container
+    billContainerContainer.getStyleClass().add("bill-container");
+
+    containersHBox.getChildren().addAll(drinkListContainer, billContainerContainer);
+// Layout for the entire scene (VBox layout)
     VBox orderLayout = new VBox(10);
     orderLayout.getChildren()
-        .addAll(selectedTableLabel, searchBar, searchButton, comboBox, drinkList, quantityLabel,
-            quantitySpinner, addButton,
-            listHasOrdered, billContainer, totalLabel, totalField, methodComboBox);
+        .addAll(selectedTableLabel, searchBar, searchButton, comboBox, quantityLabel,
+            quantitySpinner, addButton, listHasOrdered, containersHBox, totalLabel, totalField,
+            methodComboBox);
+
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
     orderLayout.getStylesheets().add(

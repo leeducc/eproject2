@@ -83,3 +83,90 @@
   -fx-background-color: #DDC5B2;
 -fx-background-radius: 5px;
 }
+ /*coffeeMenuApp.css*/
+
+/* Root style */
+/*.root {*/
+/*  -fx-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+/*  -fx-background-color: #f8f9fa;*/
+/*}*/
+
+/*!* Text field style *!*/
+/*.text-field {*/
+/*  -fx-border-color: #ced4da;*/
+/*  -fx-border-radius: 4px;*/
+/*  -fx-padding: 5px 10px;*/
+/*  -fx-background-color: #fff;*/
+/*  -fx-background-insets: 0;*/
+/*}*/
+
+/*!* Button style *!*/
+/*.button {*/
+/*  -fx-background-color: #007bff;*/
+/*  -fx-text-fill: #fff;*/
+/*  -fx-padding: 5px 10px;*/
+/*  -fx-border-radius: 4px;*/
+/*  -fx-cursor: hand;*/
+/*}*/
+
+/*.button:hover {*/
+/*  -fx-background-color: #0056b3;*/
+/*}*/
+
+/*!* ComboBox style *!*/
+/*.combo-box {*/
+/*  -fx-border-color: #ced4da;*/
+/*  -fx-border-radius: 4px;*/
+/*  -fx-padding: 5px 10px;*/
+/*  -fx-background-color: #fff;*/
+/*}*/
+
+/*!* Label styles *!*/
+/*.label-bold {*/
+/*  -fx-font-weight: bold;*/
+/*}*/
+
+/*.label-price {*/
+/*  -fx-text-fill: #28a745;*/
+/*}*/
+
+/*!* Product box style *!*/
+/*.product-box {*/
+/*  -fx-background-color: #fff;*/
+/*  -fx-border-color: #ced4da;*/
+/*  -fx-border-radius: 4px;*/
+/*  -fx-padding: 10px;*/
+/*}*/
+/* CSS file (styles.css) */
+.product-box {
+  -fx-background-color: #f9f9f9;
+  -fx-padding: 10px;
+  -fx-border-radius: 10px;
+  -fx-background-radius: 10px;
+  -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+.label-bold {
+  -fx-font-weight: bold;
+}
+
+.label-price {
+  -fx-text-fill: #3E2F2F;
+}
+
+.button-box {
+  spacing: 10px;  /* Adds space between buttons */
+}
+
+.button {
+  -fx-background-color: #A05A4D;
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 5px 15px;
+  -fx-border-radius: 5px;
+  -fx-background-radius: 5px;
+}
+
+.button:hover {
+  -fx-background-color: #A05A4D;
+}
