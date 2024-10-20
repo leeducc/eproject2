@@ -11,8 +11,16 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 
 public class CashierService {
   public static List<Products> getAllProducts() {
@@ -290,6 +298,51 @@ public class CashierService {
     } catch (SQLException e) {
       e.printStackTrace();
       return false;
+    }
+  }
+  public void createProductGrid(List<Products> productList, GridPane gridPane){
+    int column = 0;
+    int row = 0;
+    for (int i = 0; i < productList.size(); i++) {
+      Products product = productList.get(i);
+      String imagePath = product.getImageLink();
+
+      // Ensure the image path is valid
+      if (imagePath != null && getClass().getResource(imagePath) != null) {
+        Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175,
+            false, false);
+        ImageView imageView = new ImageView(productImage);
+
+        // Coffee name and price labels
+        Label nameLabel = new Label(product.getName());
+        nameLabel.setFont(new Font("Arial", 18));
+        nameLabel.getStyleClass().add("label-bold");
+
+        Label priceLabel = new Label("$" + String.valueOf(product.getPrice()));
+        priceLabel.setFont(new Font("Arial", 14));
+        priceLabel.getStyleClass().add("label-price");
+
+        // VBox for each product item
+        VBox productBox = new VBox(10, imageView, nameLabel, priceLabel);
+        productBox.setPadding(new Insets(10));
+        productBox.setAlignment(Pos.CENTER);
+        productBox.getStyleClass().add("product-box");
+
+        productBox.setOnMouseEntered(e -> productBox.setStyle("-fx-background-color: #f0f0f0;"));
+        productBox.setOnMouseExited(e -> productBox.setStyle("-fx-background-color: #f9f9f9;"));
+
+        // Add to grid
+        gridPane.add(productBox, column, row);
+
+        // Adjust column/row for next product
+        column++;
+        if (column == 3) {  // 3 products per row
+          column = 0;
+          row++;
+        }
+      } else {
+        System.out.println("Invalid image path for product: " + product.getName());
+      }
     }
   }
 }
