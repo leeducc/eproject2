@@ -123,7 +123,7 @@
             </resource>
             <!-- copy pages for source code viewer  -->
             <resource>
-                <directory>src/main/java/atlantafx/sampler/page</directory>
+                <directory>src/main/java/atlantafx/sampler/admin/page</directory>
                 <targetPath>atlantafx/sampler/page</targetPath>
                 <filtering>false</filtering>
             </resource>

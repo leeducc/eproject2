@@ -25,25 +25,23 @@ module atlantafx.sampler {
     requires mysql.connector.j;
 
     exports atlantafx.sampler;
-    exports atlantafx.sampler.fake.domain;
-    exports atlantafx.sampler.event;
-    exports atlantafx.sampler.layout;
-    exports atlantafx.sampler.page;
-    exports atlantafx.sampler.entity;
 
-    exports atlantafx.sampler.page.components;
 
-    exports atlantafx.sampler.theme;
-    exports atlantafx.sampler.util;
+    exports atlantafx.sampler.admin.layout;
+    exports atlantafx.sampler.admin.page;
+    exports atlantafx.sampler.admin.entity;
 
-    opens atlantafx.sampler.fake.domain;
+    exports atlantafx.sampler.admin.page.components;
+
+
+    exports atlantafx.sampler.base.util;
+
+
 
     // resources
     opens atlantafx.sampler;
     opens atlantafx.sampler.assets.highlightjs;
     opens atlantafx.sampler.assets.styles;
     opens atlantafx.sampler.images;
-    opens atlantafx.sampler.images.modena;
-    opens atlantafx.sampler.media;
-    opens atlantafx.sampler.entity;
+    opens atlantafx.sampler.admin.entity;
 }
