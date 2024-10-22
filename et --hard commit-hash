@@ -1,0 +1,23 @@
+[33mcommit cd3d3d74d0fddd0817cc55c3e9c2eabc6ae155d0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mleduc[m[33m, [m[1;31morigin/leduc[m[33m)[m
+Author: Lê Minh Đức <leminhduc1212001@gmail.com>
+Date:   Mon Oct 21 07:30:00 2024 +0700
+
+    Fixed issues in MainModel and ListDeliveryOrderPage
+
+[33mcommit 80a8da05538fe05f58ae985819b167828924fde7[m
+Author: Lê Minh Đức <leminhduc1212001@gmail.com>
+Date:   Thu Oct 17 10:05:18 2024 +0700
+
+    dat hang
+
+[33mcommit 1205edee7d7ccee86ca3c629b3909353aff26f38[m
+Author: Lê Minh Đức <leminhduc1212001@gmail.com>
+Date:   Mon Oct 14 10:11:38 2024 +0700
+
+    new base
+
+[33mcommit ec08cce8fb731d362a417624a393948dbfd232ea[m[33m ([m[1;31morigin/win[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: Lê Minh Đức <132467308+leeducc@users.noreply.github.com>
+Date:   Mon Sep 30 10:39:06 2024 +0700
+
+    Initial commit
