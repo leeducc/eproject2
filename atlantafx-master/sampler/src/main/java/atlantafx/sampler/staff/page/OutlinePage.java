@@ -38,7 +38,6 @@ public abstract class OutlinePage extends StackPane implements Page {
     protected final ScrollPane scrollPane = new ScrollPane();
     protected final VBox userContent = new VBox();
     protected final StackPane userContentArea = new StackPane(userContent);
-    protected final Outline outline = new Outline(createOutlineHandler());
     protected boolean isRendered = false;
 
     protected OutlinePage() {
@@ -59,17 +58,9 @@ public abstract class OutlinePage extends StackPane implements Page {
         NodeUtils.setScrollConstraints(scrollPane, AS_NEEDED, true, NEVER, true);
         scrollPane.setMaxHeight(20_000);
 
-        // scroll spy
-        scrollPane.vvalueProperty().addListener((obs, old, val) ->
-            // we need a little gap between changing vValue and fetching header bounds
-            Platform.runLater(() -> outline.select(getFirstVisibleHeader()))
-        );
 
         var pageBody = new StackPane();
-        pageBody.getChildren().setAll(scrollPane, outline);
         pageBody.getStyleClass().add("body");
-        StackPane.setAlignment(outline, Pos.TOP_RIGHT);
-        StackPane.setMargin(outline, new Insets(50, 20, 0, 0));
 
         setMinWidth(Page.MAX_WIDTH);
         getChildren().setAll(pageBody);
@@ -110,15 +101,7 @@ public abstract class OutlinePage extends StackPane implements Page {
                 continue;
             }
 
-            var headingBounds = heading.localToScene(heading.getBoundsInLocal());
-            if (outline.contains(heading.getText())) {
-                // viewport should fully contain heading bounds, not just a part of it
-                if (scrollBounds.contains(headingBounds)) {
-                    return heading.getText();
-                } else {
-                    lastHeading = heading;
-                }
-            }
+
         }
 
         return lastHeading != null ? lastHeading.getText() : null;
@@ -152,7 +135,7 @@ public abstract class OutlinePage extends StackPane implements Page {
         titleLabel.setPadding(new Insets(20, 0, 0, 0));
 
         userContent.getChildren().addAll(titleLabel, content);
-        outline.add(new Heading(title, titleLabel));
+
     }
 
     @Override

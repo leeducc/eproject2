@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 
-package atlantafx.sampler.staff.layout;
+package atlantafx.sampler.cashier.layout;
 
 import atlantafx.base.controls.ModalPane;
 import atlantafx.sampler.base.util.NodeUtils;
@@ -8,14 +8,14 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 
-public final class StaffApp extends AnchorPane {
+public final class CashierApp extends AnchorPane {
 
     public static final int MIN_WIDTH = 1200;
     public static final int SIDEBAR_WIDTH = 250;
     public static final String MAIN_MODAL_ID = "modal-pane";
 
 
-    public StaffApp() {
+    public CashierApp() {
         // this is the place to apply user custom CSS,
         // one level below the ':root'
         var body = new StackPane();

@@ -17,6 +17,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.scenicview.ScenicView;
 
 public class Launcher extends Application {
 
@@ -40,6 +41,7 @@ public class Launcher extends Application {
         stage.setTitle("Login");
         stage.setResizable(false);
         stage.show();
+        ScenicView.show(loginScene);
     }
 
 

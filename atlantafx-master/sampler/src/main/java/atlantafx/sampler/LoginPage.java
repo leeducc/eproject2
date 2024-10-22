@@ -4,6 +4,7 @@ import atlantafx.sampler.admin.layout.AdminApp;
 import atlantafx.sampler.base.service.AuthService;
 import atlantafx.sampler.base.service.UserSession;
 import atlantafx.sampler.staff.layout.StaffApp;
+import atlantafx.sampler.cashier.layout.CashierApp;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -49,7 +50,7 @@ public class LoginPage extends Pane {
 
         Label roleLabel = new Label("Role:");
         ComboBox<String> roleSelector = new ComboBox<>();
-        roleSelector.getItems().addAll("Admin", "Staff");
+        roleSelector.getItems().addAll("Admin","Cashier", "Staff");
 
         Button loginButton = new Button("Login");
         loginButton.setOnAction(event -> {
@@ -66,6 +67,9 @@ public class LoginPage extends Pane {
                 } else if ("Staff".equals(role)) {
                     UserSession.getInstance().setStaffId(username);
                     onLoginSuccess(new StaffApp());
+                } else if ("Cashier".equals(role)) {
+                    onLoginSuccess(new StaffApp());
+
                 }
             } else {
                 System.out.println("Login failed!");

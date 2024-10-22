@@ -44,4 +44,5 @@ module atlantafx.sampler {
     opens atlantafx.sampler.assets.styles;
     opens atlantafx.sampler.images;
     opens atlantafx.sampler.admin.entity;
+    requires org.scenicview.scenicview;
 }

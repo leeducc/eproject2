@@ -5,33 +5,34 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 
 public class OrderItem {
-    private static SimpleStringProperty supplyCode;
+    private SimpleStringProperty supplyCode; // Changed to non-static
     private SimpleStringProperty itemName;
     private SimpleStringProperty supplierName;
     private SimpleIntegerProperty quantity; // Change to SimpleIntegerProperty
-    private SimpleStringProperty unit;
+    private SimpleStringProperty unit; // Make sure to initialize this
     private SimpleDoubleProperty price; // Change to SimpleDoubleProperty
     private SimpleDoubleProperty totalValue; // Change to SimpleDoubleProperty
 
-    // Constructor không tham số
+    // Default constructor
     public OrderItem() {
         this.supplyCode = new SimpleStringProperty();
         this.itemName = new SimpleStringProperty();
         this.supplierName = new SimpleStringProperty();
-        this.quantity = new SimpleIntegerProperty(1); // Khởi tạo số lượng mặc định là 1
+        this.quantity = new SimpleIntegerProperty(1); // Initialize with default quantity of 1
+        this.unit = new SimpleStringProperty(); // Initialize unit
         this.price = new SimpleDoubleProperty();
         this.totalValue = new SimpleDoubleProperty();
     }
 
-    // Constructor có tham số
+    // Constructor with parameters
     public OrderItem(String supplyCode, double price) {
         this();
         setSupplyCode(supplyCode);
         setPrice(price);
     }
 
-    // Getter và Setter cho các thuộc tính
-    public static String getSupplyCode() {
+    // Getter and Setter for properties
+    public String getSupplyCode() {
         return supplyCode.get();
     }
 
@@ -61,7 +62,7 @@ public class OrderItem {
 
     public void setQuantity(int quantity) {
         this.quantity.set(quantity);
-        updateTotalValue(); // Cập nhật giá trị tổng
+        updateTotalValue(); // Update total value
     }
 
     public String getUnit() {
@@ -78,7 +79,7 @@ public class OrderItem {
 
     public void setPrice(double price) {
         this.price.set(price);
-        updateTotalValue(); // Cập nhật giá trị tổng khi giá thay đổi
+        updateTotalValue(); // Update total value when price changes
     }
 
     public double getTotalValue() {
@@ -86,14 +87,10 @@ public class OrderItem {
     }
 
     public void setTotalValue(double totalValue) {
-        this.totalValue.set(totalValue); // Optional setter if you need to set it directly
+        this.totalValue.set(totalValue); // Optional setter if needed
     }
 
     private void updateTotalValue() {
-        this.totalValue.set(price.get() * quantity.get()); // Cập nhật giá trị tổng
-    }
-
-    public static String getSupplyCode(ListDeliveryOrder listDeliveryOrder) {
-        return supplyCode.get();
+        this.totalValue.set(price.get() * quantity.get()); // Update total value
     }
 }

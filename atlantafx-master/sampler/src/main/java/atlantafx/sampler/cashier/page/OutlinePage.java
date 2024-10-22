@@ -1,13 +1,11 @@
 /* SPDX-License-Identifier: MIT */
 
-package atlantafx.sampler.admin.page;
+package atlantafx.sampler.cashier.page;
 
 import atlantafx.base.theme.Styles;
 import atlantafx.sampler.base.util.NodeUtils;
-import javafx.application.Platform;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -59,9 +57,7 @@ public abstract class OutlinePage extends StackPane implements Page {
         scrollPane.setMaxHeight(20_000);
 
 
-
         var pageBody = new StackPane();
-        pageBody.getChildren().setAll(scrollPane);
         pageBody.getStyleClass().add("body");
 
         setMinWidth(Page.MAX_WIDTH);
