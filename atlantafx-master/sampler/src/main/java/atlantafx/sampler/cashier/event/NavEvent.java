@@ -2,7 +2,7 @@
 
 package atlantafx.sampler.cashier.event;
 
-import atlantafx.sampler.staff.page.Page;
+import atlantafx.sampler.cashier.page.Page;
 
 public final class NavEvent extends Event {
 
@@ -12,7 +12,7 @@ public final class NavEvent extends Event {
         this.page = page;
     }
 
-    public Class<? extends atlantafx.sampler.cashier.page.Page> getPage() {
+    public Class<? extends Page> getPage() {
         return page;
     }
 

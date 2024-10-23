@@ -1,0 +1,14 @@
+.custom-alert {
+  -fx-background-color: #5b2f28;  /* Brown background */
+  -fx-padding: 20px;
+  -fx-border-radius: 10px;
+  -fx-background-radius: 10px;
+}
+
+.error-message {
+  -fx-text-fill: white;  /* White text */
+  -fx-font-size: 18px;   /* Font size */
+  -fx-font-family: "Arial";
+  -fx-alignment: center;
+  -fx-text-alignment: center;
+}

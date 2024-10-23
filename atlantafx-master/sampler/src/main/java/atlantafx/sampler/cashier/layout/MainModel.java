@@ -1,9 +1,11 @@
 package atlantafx.sampler.cashier.layout;
 
-import atlantafx.sampler.cashier.page.Page;
-import atlantafx.sampler.cashier.page.components.*;
+import atlantafx.sampler.cashier.page.components.OrderListPage;
+import atlantafx.sampler.cashier.page.components.TableListPage;
 import atlantafx.sampler.cashier.event.DefaultEventBus;
 import atlantafx.sampler.cashier.event.NavEvent;
+import atlantafx.sampler.cashier.page.Page;
+import atlantafx.sampler.cashier.page.components.*;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -19,7 +21,7 @@ import static atlantafx.sampler.cashier.layout.MainModel.SubLayer.SOURCE_CODE;
 
 public class MainModel {
 
-    public static final Class<? extends Page> DEFAULT_PAGE = WorkSchedulePage.class;
+    public static final Class<? extends Page> DEFAULT_PAGE = TableListPage.class;
 
     private static final Map<Class<? extends Page>, NavTree.Item> NAV_TREE = createNavItems();
 
@@ -73,29 +75,16 @@ public class MainModel {
         tables.getChildren().setAll(
                 NAV_TREE.get(TableListPage.class) // Danh sách các bàn
         );
-
-        // Công Và Lương group
-        var salary = NavTree.Item.group("Công Và Lương", new FontIcon(Material2OutlinedMZ.PAYMENTS));
-        salary.getChildren().setAll(
-                NAV_TREE.get(WorkSchedulePage.class),        // Lịch làm việc
-                NAV_TREE.get(TimeAttendancePage.class),      // Chấm công
-                NAV_TREE.get(WorkExplanationPage.class),     // Giai trình công
-                NAV_TREE.get(LeaveRequestPage.class),        // Xin nghỉ phép
-                NAV_TREE.get(SalaryReportPage.class)         // Phiếu báo lương
-        );
-
         // Thông tin cá nhân group
-        var personalInfo = NavTree.Item.group("Thông tin cá nhân", new FontIcon(Material2OutlinedMZ.PEOPLE));
+        var personalInfo = NavTree.Item.group("Chức năng khác", new FontIcon(Material2OutlinedMZ.PEOPLE));
         personalInfo.getChildren().setAll(
-                NAV_TREE.get(ChangePasswordPage.class),      // Đổi mật khẩu
-                NAV_TREE.get(UpdatePersonalInfoPage.class)   // Thay đổi thông tin cá nhân
+                NAV_TREE.get(OrderListPage.class)
         );
 
         // Add all categories to the root navigation tree
         var root = NavTree.Item.root();
         root.getChildren().setAll(
                 tables,
-                salary,
                 personalInfo
         );
 
@@ -113,16 +102,8 @@ public class MainModel {
         // Bàn
         map.put(TableListPage.class, NavTree.Item.page("Danh sách các bàn", TableListPage.class));
 
-        // Công Và Lương
-        map.put(WorkSchedulePage.class, NavTree.Item.page("Lịch làm việc", WorkSchedulePage.class));
-        map.put(TimeAttendancePage.class, NavTree.Item.page("Chấm công", TimeAttendancePage.class));
-        map.put(WorkExplanationPage.class, NavTree.Item.page("Giai trình công", WorkExplanationPage.class));
-        map.put(LeaveRequestPage.class, NavTree.Item.page("Xin nghỉ phép", LeaveRequestPage.class));
-        map.put(SalaryReportPage.class, NavTree.Item.page("Phiếu báo lương", SalaryReportPage.class));
 
-        // Thông tin cá nhân
-        map.put(ChangePasswordPage.class, NavTree.Item.page("Đổi mật khẩu", ChangePasswordPage.class));
-        map.put(UpdatePersonalInfoPage.class, NavTree.Item.page("Thay đổi thông tin cá nhân", UpdatePersonalInfoPage.class));
+       map.put(OrderListPage.class, NavTree.Item.page("Danh sách các hóa đơn", OrderListPage.class));
 
         return map;
     }

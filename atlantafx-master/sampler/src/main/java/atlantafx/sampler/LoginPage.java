@@ -68,7 +68,7 @@ public class LoginPage extends Pane {
                     UserSession.getInstance().setStaffId(username);
                     onLoginSuccess(new StaffApp());
                 } else if ("Cashier".equals(role)) {
-                    onLoginSuccess(new StaffApp());
+                    onLoginSuccess(new CashierApp());
 
                 }
             } else {

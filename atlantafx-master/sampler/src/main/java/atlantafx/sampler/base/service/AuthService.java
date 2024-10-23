@@ -13,6 +13,7 @@ import java.sql.SQLException;
 public class AuthService {
     private static final String QUERY_SELECT_ADMIN_PASSWORD = "SELECT password_hash FROM admin WHERE username = ?";
     private static final String QUERY_SELECT_STAFF_PASSWORD = "SELECT password_hash FROM staff WHERE staff_id = ?";
+    private static final String QUERY_SELECT_CASHIER_PASSWORD = "SELECT password_hash FROM cashier WHERE username = ?";
 
     public boolean authenticate(String username, String password, String role) {
         try (Connection conn = JDBCConnect.getJDBCConnection()) {
@@ -28,6 +29,8 @@ public class AuthService {
                 storedPasswordHash = getPasswordHash(conn, QUERY_SELECT_ADMIN_PASSWORD, username);
             } else if ("Staff".equals(role)) {
                 storedPasswordHash = getPasswordHash(conn, QUERY_SELECT_STAFF_PASSWORD, username);
+            } else if ("Cashier".equals(role)) {
+                storedPasswordHash = getPasswordHash(conn, QUERY_SELECT_CASHIER_PASSWORD, username);
             } else {
                 showAlert("Error", "Invalid role", AlertType.ERROR);
                 return false;
