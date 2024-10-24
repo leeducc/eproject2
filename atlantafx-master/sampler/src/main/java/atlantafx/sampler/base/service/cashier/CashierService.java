@@ -381,7 +381,7 @@ public class CashierService {
         });
         deleteButton.setOnAction(e -> {
           Products productToDelete = CashierService.getProductsByProductName(product.getName());
-          String filePath = "src/main/resources/" + productToDelete.getImageLink();
+          String filePath = "sampler/src/main/resources/" + productToDelete.getImageLink();
           File file = new File(filePath);
           if (file.exists()) {
             if (file.delete()) {

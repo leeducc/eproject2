@@ -3,7 +3,6 @@ package atlantafx.sampler.cashier.page.components;
 import atlantafx.sampler.base.entity.common.Bill;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
-import atlantafx.sampler.base.util.AlertUtil;
 import atlantafx.sampler.cashier.page.OutlinePage;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,11 +73,14 @@ public final class TableListPage extends OutlinePage {
 
         layout.getChildren()
             .addAll(labelFloorTables, floorTable, labelUpstairTables, upstairTable);
+        layout.getStylesheets()
+            .add(getClass().getResource("/css/listTable.css").toExternalForm());
+
         // Thêm vào Scene graph
         getChildren().add(layout);
     }
 
-    private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames) {
+    private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames ) {
         int count = 0;
         int rows = 6;
         int cols = 6;
@@ -100,8 +102,8 @@ public final class TableListPage extends OutlinePage {
                     // Update the label to show the selected table
                     selectedTableLabel = new Label(tableButton.getText());
                     TableListPage.setTitle(tableButton.getText());
-
-                    AlertUtil.showErrorAlert("Lên order cho:" + tableButton.getText());
+                    orderListPage.showCheckOrderDialog();
+//                    AlertUtil.showErrorAlert("Lên order cho:" + tableButton.getText());
 
                     updateTableButtonColor(tableButton, tableButton.getText());
                 });

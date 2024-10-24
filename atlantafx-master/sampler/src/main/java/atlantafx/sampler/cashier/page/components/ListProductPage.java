@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.jetbrains.annotations.NotNull;
 
 public class ListProductPage extends OutlinePage {
 
@@ -146,37 +147,46 @@ public class ListProductPage extends OutlinePage {
     imageView.setFitHeight(200); // Set height
     imageView.setPreserveRatio(true); // Preserve aspect ratio
 
-    Button uploadButton = new Button("Tải 1 ảnh Lên");
+//    Button uploadButton = getButton(fileChooser, imageView, imageLink,"Tải một ảnh lên",primaryStage);
+    Button uploadButton = new Button("Upload Image");
     uploadButton.setOnAction(e -> {
       fileChooser.setTitle("Select Image");
+      selectedFile = fileChooser.showOpenDialog(primaryStage);
       if (selectedFile != null) {
         // Load image
         Image image = new Image(selectedFile.toURI().toString());
         imageView.setImage(image);
         // Update the image link text field
         imageLink.setText(selectedFile.getName()); // Only the file name, adjust as needed
-      } else {
-        AlertUtil.showErrorAlert("Vui lòng chọn ảnh");
       }
     });
-
-    Button editButton = new Button("Chọn ảnh khác");
+    Button editButton = new Button("Edit Image");
     editButton.setOnAction(e -> {
+      fileChooser.setTitle("Select New Image");
+      selectedFile = fileChooser.showOpenDialog(primaryStage);
       if (selectedFile != null) {
-        fileChooser.setTitle("Select New Image");
-        File newFile = fileChooser.showOpenDialog(primaryStage);
-        if (newFile != null) {
-          // Load new image
-          Image image = new Image(newFile.toURI().toString());
-          imageView.setImage(image);
-          imageLink.setText(newFile.getName());
-        } else {
-          AlertUtil.showErrorAlert("Vui lòng chọn ảnh");
-        }
-      } else {
-        AlertUtil.showErrorAlert("Không có ảnh nào được chọn trước đó");
+        // Load new image
+        Image image = new Image(selectedFile.toURI().toString());
+        imageView.setImage(image);
       }
     });
+//    Button editButton = new Button("Chọn ảnh khác");
+//    editButton.setOnAction(e -> {
+//      if (selectedFile != null) {
+//        fileChooser.setTitle("Select New Image");
+//        File newFile = fileChooser.showOpenDialog(primaryStage);
+//        if (newFile != null) {
+//          // Load new image
+//          Image image = new Image(newFile.toURI().toString());
+//          imageView.setImage(image);
+//          imageLink.setText(newFile.getName());
+//        } else {
+//          AlertUtil.showErrorAlert("Vui lòng chọn ảnh");
+//        }
+//      } else {
+//        AlertUtil.showErrorAlert("Không có ảnh nào được chọn trước đó");
+//      }
+//    });
 
     TextField category = new TextField("");
     TextField name = new TextField("");
@@ -223,5 +233,25 @@ public class ListProductPage extends OutlinePage {
     });
     return dialog.showAndWait().orElse(null);
   }
+
+//  private static @NotNull Button getButton(FileChooser fileChooser, ImageView imageView,
+//      TextField imageLink, String title, Stage primaryStage) {
+//    Button uploadButton = new Button(title);
+//    uploadButton.setOnAction(e -> {
+//      fileChooser.setTitle("Select Image");
+//      File selectedFile = fileChooser.showOpenDialog(primaryStage);
+//      if (selectedFile != null) {
+//        // Load image
+//        Image image = new Image(selectedFile.toURI().toString());
+//        imageView.setImage(image);
+//        // Update the image link text field
+//        imageLink.setText(selectedFile.getName()); // Only the file name, adjust as needed
+//      } else {
+//        AlertUtil.showErrorAlert("Vui lòng chọn ảnh");
+//      }
+//    });
+//    return uploadButton;
+//  }
+
 
 }

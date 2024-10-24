@@ -63,12 +63,11 @@ public class LoginPage extends Pane {
             boolean isAuthenticated = authService.authenticate(username, password, role);
             if (isAuthenticated) {
                 if ("Admin".equals(role)) {
-                    onLoginSuccess(new CashierApp());
+                    onLoginSuccess(new AdminApp());
                 } else if ("Staff".equals(role)) {
                     UserSession.getInstance().setStaffId(username);
                     onLoginSuccess(new StaffApp());
                 } else if ("Cashier".equals(role)) {
-                    onLoginSuccess(new AdminApp());
                     onLoginSuccess(new CashierApp());
 
                 }

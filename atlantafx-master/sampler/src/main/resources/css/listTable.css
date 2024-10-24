@@ -1,0 +1,54 @@
+/* General styling for the layout */
+.root {
+  -fx-background-color: #f4f4f4; /* Light background */
+  -fx-padding: 20px;
+}
+
+/* Styling for the table labels */
+.label {
+  -fx-font-size: 18px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #333333; /* Dark gray color */
+  -fx-padding: 10px 0;
+  -fx-alignment: center;
+}
+
+/* Styling for the grid pane holding the tables */
+.grid-pane {
+  -fx-hgap: 15px; /* Horizontal gap between buttons */
+  -fx-vgap: 15px; /* Vertical gap between buttons */
+  -fx-alignment: center;
+}
+
+/* Styling for each table button */
+.button {
+  -fx-background-color: #1a73e8; /* Blue background for the table buttons */
+  -fx-text-fill: white; /* White text color */
+  -fx-font-size: 16px; /* Increase font size */
+  -fx-font-weight: bold;
+  -fx-padding: 15px 30px; /* Increase padding */
+  -fx-border-radius: 5px;
+  -fx-background-radius: 5px;
+  -fx-border-color: #1a73e8;
+  -fx-border-width: 2px;
+  -fx-pref-width: 150px; /* Increase button width */
+  -fx-pref-height: 75px;  /* Increase button height */
+}
+
+/* Hover effect for buttons */
+.button:hover {
+  -fx-background-color: #0f5bb3; /* Darker blue on hover */
+  -fx-border-color: #0f5bb3;
+}
+
+/* Active button styling */
+.button:pressed {
+  -fx-background-color: #134a96; /* Even darker blue when pressed */
+  -fx-border-color: #134a96;
+}
+
+/* Styling for selected table buttons */
+.button.selected {
+  -fx-background-color: #34a853; /* Green background for selected tables */
+  -fx-border-color: #34a853;
+}
