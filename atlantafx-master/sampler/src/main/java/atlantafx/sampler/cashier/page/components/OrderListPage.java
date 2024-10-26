@@ -18,7 +18,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -86,7 +85,6 @@ public class OrderListPage {
 
     Label quantityLabel = new Label("Số lượng:");
     Spinner<Integer> quantitySpinner = new Spinner<>(1, 20, 1);
-    Button listHasOrdered = new Button("Hóa đơn của bàn");
     Button addButton = new Button("Thêm vào hóa đơn");
 
     VBox billContainer = new VBox(10);
@@ -109,15 +107,16 @@ public class OrderListPage {
         drinkList.getSelectionModel().clearSelection();
       }
     });
-
-    listHasOrdered.setOnAction(e -> updateAllBill(billContainer, totalField));
+    updateAllBill(billContainer, totalField);
+//    listHasOrdered.setOnAction(e -> updateAllBill(billContainer, totalField));
     addButton.setOnAction(e -> {
       String selectedDrink = drinkList.getSelectionModel().getSelectedItem();
-      int quantity = quantitySpinner.getValue();
-
+      if (selectedDrink == null) {
+        AlertUtil.showErrorAlert("Vui lòng chọn món để thêm vào hóa đơn");
+      }else {
+        int quantity = quantitySpinner.getValue();
         handleAddToBill(selectedDrink, quantity, billContainer, totalField);
-
-          });
+      }});
 //    drinkList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 //      if (drinkList.getItems() == null || drinkList.getItems().isEmpty() || newValue == null) {
 //        return;
@@ -168,7 +167,7 @@ public class OrderListPage {
     HBox containersHBox = new HBox(10, drinkListContainer, billContainerContainer);
 
     VBox orderLayout = new VBox(10, selectedTableLabel, searchBar, comboBox, quantityLabel,
-        quantitySpinner, addButton,listHasOrdered, containersHBox, totalLabel, totalField,
+        quantitySpinner, addButton, containersHBox, totalLabel, totalField,
         methodComboBox, checkOut);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
@@ -184,7 +183,7 @@ public class OrderListPage {
     if (billCheck != null) {
       billCheck.setQuantity(quantity + billCheck.getQuantity());
       CashierService.updateOrderBill(billCheck);
-      AlertUtil.showErrorAlert("Đồ Uống đã có trong hóa đơn và đã được cập nhật!");
+      updateAllBill(billContainer, totalField);
     } else {
       double price = CashierService.getPriceByName(selectedDrink);
       double subTotal = price * quantity;
@@ -195,6 +194,7 @@ public class OrderListPage {
       billContainer.getChildren().add(billRow);
 
       updateTotalField(totalField, subTotal);
+      updateAllBill(billContainer, totalField);
     }
   }
 
@@ -277,7 +277,7 @@ public class OrderListPage {
     double total = 0;
 
     if (bills == null || bills.isEmpty()) {
-      AlertUtil.showErrorAlert("Bàn " + TableListPage.getTitle() + " chưa có đặt đồ uống");
+      AlertUtil.showErrorAlert("Đặt đồ uống cho Bàn " + TableListPage.getTitle());
     } else {
       for (Bill bill : bills) {
         double subTotal = bill.getQuantity() * bill.getPrice();

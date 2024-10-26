@@ -261,4 +261,31 @@
   -fx-control-inner-background: transparent;
   -fx-padding: 10px;
 }
+/* Main layout styling */
+.root {
+  -fx-background-color: #f5f5f5;
+}
+
+.text-field {
+  -fx-padding: 6px;
+  -fx-border-color: #cfd8dc;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+  -fx-background-color: #ffffff;
+}
+
+.combo-box {
+  -fx-padding: 6px;
+  -fx-background-color: #ffffff;
+  -fx-border-radius: 5;
+  -fx-background-radius: 5;
+}
+
+.add-button {
+  -fx-background-color: #4b56d1;
+  -fx-text-fill: white;
+  -fx-font-weight: bold;
+  -fx-background-radius: 5;
+  -fx-padding: 8 15;
+}
 

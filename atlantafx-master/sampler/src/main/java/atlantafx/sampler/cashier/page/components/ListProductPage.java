@@ -54,7 +54,7 @@ public class ListProductPage extends OutlinePage {
     mainLayout.setPadding(new Insets(10));
     mainLayout.getStylesheets()
         .add(getClass().getResource("/css/coffeeMenuApp.css").toExternalForm());
-    mainLayout.getStyleClass().add("root"); // Apply background style from CSS
+    mainLayout.getStyleClass().add("root");
 
     // Search Bar
     TextField searchBar = new TextField();
@@ -63,7 +63,7 @@ public class ListProductPage extends OutlinePage {
     searchBar.getStyleClass().add("text-field");
 
     Button addNewProductButton = new Button("Thêm mới đồ uống");
-//    Button refresh = new Button("Làm mới");
+    addNewProductButton.getStyleClass().add("add-button");
 
     // ComboBox for filtering
     ComboBox<String> comboBox = CashierService.createPayCategoriesSelectionBox();
@@ -103,22 +103,21 @@ public class ListProductPage extends OutlinePage {
       Products newProduct = showNewProductDialog(primaryStage);
       if (newProduct != null) {
         CashierService.addNewProduct(newProduct);
-        System.out.println("them san pham thanh cong");
+        updateProductGrid(gridPane, filteredProducts);
+        AlertUtil.showErrorAlert("Thêm Thành Công");
       } else {
         System.out.println("khong thay doi");
       }
-
     });
     cf.createProductGrid(filteredProducts, gridPane);
 
     // ScrollPane for Product Grid Layout
     ScrollPane scrollPane = new ScrollPane();
     scrollPane.setContent(gridPane);
-    scrollPane.setFitToWidth(true); // Makes sure the content adjusts to the width of the ScrollPane
-    scrollPane.setPannable(true); // Allows panning
-    scrollPane.setVbarPolicy(
-        ScrollPane.ScrollBarPolicy.AS_NEEDED); // Show vertical scrollbar when needed
-    scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Hide horizontal scrollbar
+    scrollPane.setFitToWidth(true);
+    scrollPane.setPannable(true);
+    scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+    scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
     // Add components to the main layout, including the ScrollPane
     mainLayout.getChildren().addAll(topLayout, scrollPane, addNewProductButton);
@@ -126,71 +125,67 @@ public class ListProductPage extends OutlinePage {
   }
 
   private void updateProductGrid(GridPane gridPane, List<Products> productList) {
-    gridPane.getChildren().clear(); // Clear existing items in the grid
+    gridPane.getChildren().clear();
     cf.createProductGrid(productList, gridPane);
   }
 
   private static Products showNewProductDialog(Stage primaryStage) {
     Dialog<Products> dialog = new Dialog<>();
     dialog.setHeaderText(null);
+    dialog.getDialogPane().getStylesheets().add(
+        ListProductPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
+    );
+
     TextField imageLink = new TextField();
+    imageLink.getStyleClass().add("dialog-text-field");
+
     GridPane grid = new GridPane();
+    grid.getStyleClass().add("dialog-grid-pane");
     grid.setHgap(10);
     grid.setVgap(10);
     grid.setPadding(new Insets(20, 150, 10, 10));
+
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters()
         .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
 
     ImageView imageView = new ImageView();
-    imageView.setFitWidth(200); // Set width
-    imageView.setFitHeight(200); // Set height
-    imageView.setPreserveRatio(true); // Preserve aspect ratio
+    imageView.getStyleClass().add("dialog-image-view");
+    imageView.setFitWidth(200);
+    imageView.setFitHeight(200);
+    imageView.setPreserveRatio(true);
 
-//    Button uploadButton = getButton(fileChooser, imageView, imageLink,"Tải một ảnh lên",primaryStage);
     Button uploadButton = new Button("Upload Image");
+    uploadButton.getStyleClass().add("dialog-button");
     uploadButton.setOnAction(e -> {
       fileChooser.setTitle("Select Image");
       selectedFile = fileChooser.showOpenDialog(primaryStage);
       if (selectedFile != null) {
-        // Load image
         Image image = new Image(selectedFile.toURI().toString());
         imageView.setImage(image);
-        // Update the image link text field
-        imageLink.setText(selectedFile.getName()); // Only the file name, adjust as needed
+        imageLink.setText(selectedFile.getName());
       }
     });
+
     Button editButton = new Button("Edit Image");
+    editButton.getStyleClass().add("dialog-button");
     editButton.setOnAction(e -> {
       fileChooser.setTitle("Select New Image");
-      selectedFile = fileChooser.showOpenDialog(primaryStage);
-      if (selectedFile != null) {
-        // Load new image
-        Image image = new Image(selectedFile.toURI().toString());
+      File newFile = fileChooser.showOpenDialog(primaryStage);
+      if (newFile != null) {
+        Image image = new Image(newFile.toURI().toString());
         imageView.setImage(image);
       }
     });
-//    Button editButton = new Button("Chọn ảnh khác");
-//    editButton.setOnAction(e -> {
-//      if (selectedFile != null) {
-//        fileChooser.setTitle("Select New Image");
-//        File newFile = fileChooser.showOpenDialog(primaryStage);
-//        if (newFile != null) {
-//          // Load new image
-//          Image image = new Image(newFile.toURI().toString());
-//          imageView.setImage(image);
-//          imageLink.setText(newFile.getName());
-//        } else {
-//          AlertUtil.showErrorAlert("Vui lòng chọn ảnh");
-//        }
-//      } else {
-//        AlertUtil.showErrorAlert("Không có ảnh nào được chọn trước đó");
-//      }
-//    });
 
-    TextField category = new TextField("");
-    TextField name = new TextField("");
-    TextField price = new TextField("");
+    TextField category = new TextField();
+    category.getStyleClass().add("dialog-text-field");
+
+    TextField name = new TextField();
+    name.getStyleClass().add("dialog-text-field");
+
+    TextField price = new TextField();
+    price.getStyleClass().add("dialog-text-field");
 
     grid.add(new Label("Ảnh"), 0, 0);
     grid.add(imageView, 1, 0);
@@ -208,12 +203,9 @@ public class ListProductPage extends OutlinePage {
 
     dialog.setResultConverter(button -> {
       if (button == ButtonType.OK) {
-        // Save the image to the project folder
         try {
-          // Update the path according to your project structure
           File destinationFile = new File(
               "sampler/src/main/resources/images/products/" + selectedFile.getName());
-
           Files.copy(selectedFile.toPath(), destinationFile.toPath(),
               StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException ioException) {
@@ -221,37 +213,14 @@ public class ListProductPage extends OutlinePage {
         }
 
         return new Products(
-            "/images/products/" + selectedFile.getName(), // Update with the correct path
+            "/images/products/" + selectedFile.getName(),
             category.getText(),
             name.getText(),
             Double.parseDouble(price.getText())
         );
-      } else if (button == ButtonType.CANCEL) {
-        return null;
       }
       return null;
     });
     return dialog.showAndWait().orElse(null);
   }
-
-//  private static @NotNull Button getButton(FileChooser fileChooser, ImageView imageView,
-//      TextField imageLink, String title, Stage primaryStage) {
-//    Button uploadButton = new Button(title);
-//    uploadButton.setOnAction(e -> {
-//      fileChooser.setTitle("Select Image");
-//      File selectedFile = fileChooser.showOpenDialog(primaryStage);
-//      if (selectedFile != null) {
-//        // Load image
-//        Image image = new Image(selectedFile.toURI().toString());
-//        imageView.setImage(image);
-//        // Update the image link text field
-//        imageLink.setText(selectedFile.getName()); // Only the file name, adjust as needed
-//      } else {
-//        AlertUtil.showErrorAlert("Vui lòng chọn ảnh");
-//      }
-//    });
-//    return uploadButton;
-//  }
-
-
 }

@@ -8,11 +8,16 @@ import atlantafx.sampler.base.entity.common.Bill;
 import atlantafx.sampler.base.entity.common.PaymentMethod;
 import atlantafx.sampler.base.entity.common.Products;
 import atlantafx.sampler.base.enummethod.Payment;
+import atlantafx.sampler.base.util.AlertUtil;
+import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -380,20 +385,36 @@ public class CashierService {
           System.out.println("Edit button clicked for product: " + product.getName());
         });
         deleteButton.setOnAction(e -> {
-          Products productToDelete = CashierService.getProductsByProductName(product.getName());
-          String filePath = "sampler/src/main/resources/" + productToDelete.getImageLink();
-          File file = new File(filePath);
-          if (file.exists()) {
-            if (file.delete()) {
-              System.out.println("File deleted successfully");
+          // Tạo dialog xác nhận
+          Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
+          confirmationDialog.setTitle("Xác Nhận Xóa");
+          confirmationDialog.setHeaderText("Bạn có chắc chắn muốn xóa sản phẩm này?");
+          confirmationDialog.setContentText("Hành động này không thể hoàn tác.");
+          confirmationDialog.getDialogPane().getStylesheets().add(
+              getClass().getResource("/css/cssDiaLog.css").toExternalForm()
+          );
+          // Hiển thị dialog và xử lý lựa chọn của người dùng
+          Optional<ButtonType> result = confirmationDialog.showAndWait();
+          if (result.isPresent() && result.get() == ButtonType.OK) {
+            // Người dùng xác nhận xóa
+            Products productToDelete = CashierService.getProductsByProductName(product.getName());
+            String filePath = "sampler/src/main/resources/" + productToDelete.getImageLink();
+            File file = new File(filePath);
+            if (file.exists()) {
+              if (file.delete()) {
+                CashierService.deleteProductsByProductName(productToDelete.getName());
+                AlertUtil.showErrorAlert("Xóa Thành Công");
+              } else {
+                AlertUtil.showErrorAlert("Lỗi Hệ Thống");
+              }
             } else {
-              System.out.println("Failed to delete the file");
+              System.out.println("File does not exist");
             }
+            System.out.println("Delete button clicked for product: " + product.getName());
           } else {
-            System.out.println("File does not exist");
+            // Người dùng hủy bỏ xóa
+            System.out.println("Người dùng đã hủy thao tác xóa.");
           }
-          CashierService.deleteProductsByProductName(productToDelete.getName());
-          System.out.println("Delete button clicked for product: " + product.getName());
         });
         // VBox for each product item
         HBox buttonBox = new HBox(10, editButton, deleteButton);  // Align buttons horizontally
