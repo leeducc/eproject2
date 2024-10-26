@@ -25,7 +25,6 @@ public class OrderListPage {
 
   public static final String NAME = "Order List";
   static ListView<String> drinkList = new ListView<>();
-  static Bill bill = new Bill();
 
   void showCheckOrderDialog() {
     Dialog<VBox> dialog = new Dialog<>();

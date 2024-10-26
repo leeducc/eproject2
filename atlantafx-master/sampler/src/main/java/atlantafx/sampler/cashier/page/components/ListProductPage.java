@@ -203,24 +203,50 @@ public class ListProductPage extends OutlinePage {
 
     dialog.setResultConverter(button -> {
       if (button == ButtonType.OK) {
-        try {
-          File destinationFile = new File(
-              "sampler/src/main/resources/images/products/" + selectedFile.getName());
-          Files.copy(selectedFile.toPath(), destinationFile.toPath(),
-              StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException ioException) {
-          ioException.printStackTrace();
+        // Kiểm tra xem category, name và price có rỗng không
+        if (category.getText() == null || category.getText().isEmpty() ||
+            name.getText() == null || name.getText().isEmpty() ||
+            price.getText() == null || price.getText().isEmpty()) {
+          AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
+          return null; // Trả về null để giữ nguyên dialog
         }
 
-        return new Products(
-            "/images/products/" + selectedFile.getName(),
-            category.getText(),
-            name.getText(),
-            Double.parseDouble(price.getText())
-        );
+        try {
+          // Chuyển đổi giá từ String sang Double
+          double parsedPrice = Double.parseDouble(price.getText());
+
+          // Kiểm tra xem selectedFile có hợp lệ không
+          if (selectedFile != null && selectedFile.exists()) {
+            File destinationFile = new File(
+                "sampler/src/main/resources/images/products/" + selectedFile.getName());
+            // Sao chép tệp
+            Files.copy(selectedFile.toPath(), destinationFile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
+          } else {
+            AlertUtil.showErrorAlert("Tệp không hợp lệ.");
+            return null; // Trả về null để giữ nguyên dialog
+          }
+
+          // Trả về đối tượng Products mới
+          return new Products(
+              "/images/products/" + selectedFile.getName(),
+              category.getText(),
+              name.getText(),
+              parsedPrice
+          );
+
+        } catch (NumberFormatException e) {
+          AlertUtil.showErrorAlert("Giá không hợp lệ.");
+          return null; // Trả về null để giữ nguyên dialog
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
+          AlertUtil.showErrorAlert("Lỗi khi sao chép tệp.");
+          return null; // Trả về null để giữ nguyên dialog
+        }
       }
       return null;
     });
+
     return dialog.showAndWait().orElse(null);
   }
 }

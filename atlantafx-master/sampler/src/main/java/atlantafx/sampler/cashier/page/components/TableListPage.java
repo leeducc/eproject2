@@ -61,24 +61,44 @@ public final class TableListPage extends OutlinePage {
         // Thêm các bàn vào khu B (Tầng lầu)
         ArrayList<String> upstairTables = TableCoffeeService.getNameTable(2);
         addButtonsToGrid(upstairTable, upstairTables);
+
         Label labelFloorTables = new Label("Floor Tables");
         labelFloorTables.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
         Label labelUpstairTables = new Label("Upstair Tables");
         labelUpstairTables.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        // Chú thích trạng thái bàn
+        VBox statusBox = new VBox();
+        statusBox.setSpacing(10);
+
+        Label reservedLabel = new Label("Đã đặt");
+        reservedLabel.setStyle("-fx-background-color: green; -fx-text-fill: white; -fx-padding: 5px; -fx-pref-width: 150px; -fx-alignment: center;");
+
+//        Label unavailableLabel = new Label("Tạm dừng");
+//        unavailableLabel.setStyle("-fx-background-color: red; -fx-text-fill: white; -fx-padding: 5px; -fx-pref-width: 150px; -fx-alignment: center;");
+
+        Label availableLabel = new Label("Còn Chỗ");
+        availableLabel.setStyle("-fx-background-color: lightgray; -fx-text-fill: white; -fx-padding: 5px; -fx-pref-width: 150px; -fx-alignment: center;");
+
+// Đặt chiều rộng ưu tiên để các label bằng nhau
+        availableLabel.setMinWidth(150);
+//        unavailableLabel.setMinWidth(150);
+        reservedLabel.setMinWidth(150);
+
+        statusBox.getChildren().addAll(availableLabel, reservedLabel);
+
         // Đặt lưới vào bố cục chính
         VBox layout = new VBox();
         layout.setAlignment(Pos.CENTER);
 
-        layout.getChildren()
-            .addAll(labelFloorTables, floorTable, labelUpstairTables, upstairTable);
-        layout.getStylesheets()
-            .add(getClass().getResource("/css/listTable.css").toExternalForm());
+        layout.getChildren().addAll(labelFloorTables, floorTable, labelUpstairTables, upstairTable, statusBox);
+        layout.getStylesheets().add(getClass().getResource("/css/listTable.css").toExternalForm());
 
         // Thêm vào Scene graph
         getChildren().add(layout);
     }
+
 
     private static void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames ) {
         int count = 0;
