@@ -2,6 +2,7 @@ package atlantafx.sampler.cashier.page.components;
 
 import atlantafx.sampler.base.entity.common.Bill;
 import atlantafx.sampler.base.service.cashier.CashierService;
+import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.base.util.AlertUtil;
 import java.util.List;
 import java.util.Optional;
@@ -132,6 +133,7 @@ public class OrderListPage {
         AlertUtil.showErrorAlert("Bàn " + TableListPage.getTitle() + " chưa có đặt đồ uống");
       } else {
         updateAllBill(billContainer, totalField);
+        TableCoffeeService.updateStatusTable(2,TableListPage.getTitle());
         double totalAmount = Double.parseDouble(totalField.getText());
         if (totalAmount > 0) {
           String selectedMethod = methodComboBox.getValue();
@@ -291,4 +293,10 @@ public class OrderListPage {
   private static void updateTotalField(TextField totalField, double newTotal) {
     totalField.setText(String.valueOf(newTotal));
   }
+//  public static void updateStatusTableByOrder(String tableName) {
+//    List<Bill> newBill = CashierService.getBillByNameTable(tableName);
+//    if (newBill != null) {
+//      TableCoffeeService.updateStatusTable(1, tableName);
+//    }
+//  }
 }

@@ -5,19 +5,19 @@ import atlantafx.sampler.base.enummethod.StatusTable;
 
 public class TableStatus {
   private int tableId;
-  private StatusTable satatus;
+  private StatusTable status;
 
   public TableStatus(int tableId, StatusTable satatus) {
     this.tableId = tableId;
-    this.satatus = satatus;
+    this.status = satatus;
   }
 
   public StatusTable getSatatus() {
-    return satatus;
+    return status;
   }
 
   public void setSatatus(StatusTable satatus) {
-    this.satatus = satatus;
+    this.status = satatus;
   }
 
   public int getTableId() {

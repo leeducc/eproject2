@@ -3,7 +3,7 @@ package atlantafx.sampler.base.enummethod;
 public enum StatusTable {
   AVAILABLE("Có Chỗ"),
   CLEANING("Đang dọn"),
-  OCCUPIED("Hết Chỗ");
+  USING("Hết Chỗ");
   private final String status;
 
   StatusTable(String status) {
