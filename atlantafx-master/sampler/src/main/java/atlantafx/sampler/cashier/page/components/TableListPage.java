@@ -154,19 +154,6 @@ public final class TableListPage extends OutlinePage {
         }
     }
 
-//    private static void loadPage(NavTree.Item pageItem,Button button) {
-//        try {
-//            Class<? extends Page> pageClass = pageItem.getPageClass();
-//            Page newPage = pageClass.getDeclaredConstructor().newInstance();
-//
-//            Scene newScene = new Scene((Parent) newPage, 800, 600);
-//            Stage currentStage = (Stage) button.getScene().getWindow();
-//
-//            currentStage.setScene(newScene);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-//    }
 
 }
 
