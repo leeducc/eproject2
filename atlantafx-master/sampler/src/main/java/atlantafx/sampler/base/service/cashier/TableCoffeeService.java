@@ -4,6 +4,7 @@ package atlantafx.sampler.base.service.cashier;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.Tables;
 
+import atlantafx.sampler.base.util.AlertUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -91,4 +92,13 @@ public class TableCoffeeService {
     return tableNames;  // Now returning the List
   }
 
+
+  public static int getStatusByTableName(String tableName) {
+    Tables table = getTableByName(tableName);
+    if (table!= null) {
+      return table.getStatusId();
+    } else {
+      return -1; // Or throw an exception or handle the case differently
+    }
+  }
 }

@@ -129,11 +129,13 @@ public class OrderListPage {
     checkOut.setOnAction(e -> {
       List<Bill> newBill = CashierService.getBillByNameTable(TableListPage.getTitle());
       billContainer.getChildren().clear();
+
       if (newBill == null || newBill.isEmpty()) {
         AlertUtil.showErrorAlert("Bàn " + TableListPage.getTitle() + " chưa có đặt đồ uống");
       } else {
         updateAllBill(billContainer, totalField);
-        TableCoffeeService.updateStatusTable(2,TableListPage.getTitle());
+        TableCoffeeService.updateStatusTable(2, TableListPage.getTitle()); // Cập nhật trạng thái bàn thành "đã thanh toán"
+
         double totalAmount = Double.parseDouble(totalField.getText());
         if (totalAmount > 0) {
           String selectedMethod = methodComboBox.getValue();
@@ -142,6 +144,8 @@ public class OrderListPage {
                 "Thanh toán thành công!\n"
                     + "Tổng tiền: " + totalField.getText() + " VND\n"
                     + "Phương thức thanh toán: " + selectedMethod);
+
+            // Reset đơn hàng và làm sạch giao diện
             CashierService.resetOrderBill(TableListPage.getTitle());
             billContainer.getChildren().clear();
             updateTotalField(totalField, 0);
@@ -149,6 +153,8 @@ public class OrderListPage {
         }
       }
     });
+
+
 
 
 
@@ -172,6 +178,12 @@ public class OrderListPage {
         methodComboBox, checkOut);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
+    dialog.setResultConverter(button -> {
+      if (button == doneButtonType) {
+
+      }
+      return null; // Trả về null nếu không có hành động nào được thực hiện
+    });
 
     dialog.getDialogPane().setContent(orderLayout);
 
@@ -293,10 +305,5 @@ public class OrderListPage {
   private static void updateTotalField(TextField totalField, double newTotal) {
     totalField.setText(String.valueOf(newTotal));
   }
-//  public static void updateStatusTableByOrder(String tableName) {
-//    List<Bill> newBill = CashierService.getBillByNameTable(tableName);
-//    if (newBill != null) {
-//      TableCoffeeService.updateStatusTable(1, tableName);
-//    }
-//  }
+
 }

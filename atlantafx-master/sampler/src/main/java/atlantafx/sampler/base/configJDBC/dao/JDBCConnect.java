@@ -17,7 +17,6 @@ public class JDBCConnect {
             System.err.println("Where is your MySQL JDBC Driver?");
             return con;
         }
-        System.out.println("MySQL JDBC Driver Registered!");
         
         try {
             con = DriverManager.getConnection(connectionUrl, IDBConfig.USERNAME, IDBConfig.PASSWORD);
@@ -27,9 +26,9 @@ public class JDBCConnect {
         }
         return con;
     }
-    public static void main(String[] args) {
-        
-        System.out.println(JDBCConnect.getJDBCConnection());
-        
-    }
+//    public static void main(String[] args) {
+//
+//        System.out.println(JDBCConnect.getJDBCConnection());
+//
+//    }
 }
