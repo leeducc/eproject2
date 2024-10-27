@@ -1,54 +1,135 @@
-/* General styling for the layout */
-.root {
-  -fx-background-color: #f4f4f4; /* Light background */
+/* Container style to center content */
+.vbox {
   -fx-padding: 20px;
+  -fx-spacing: 15px;
+  -fx-background-color: #f4f6f8; /* Light background */
+  -fx-alignment: center;
+  -fx-background-radius: 12px;
 }
 
-/* Styling for the table labels */
-.label {
+/* Label for the title */
+.label-title {
   -fx-font-size: 18px;
   -fx-font-weight: bold;
-  -fx-text-fill: #333333; /* Dark gray color */
+  -fx-text-fill: #2c3e50; /* Darker shade for text */
   -fx-padding: 10px 0;
-  -fx-alignment: center;
 }
 
-/* Styling for the grid pane holding the tables */
-.grid-pane {
-  -fx-hgap: 15px; /* Horizontal gap between buttons */
-  -fx-vgap: 15px; /* Vertical gap between buttons */
-  -fx-alignment: center;
+/* TextField style for a modern search input */
+.text-field {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #ced4da;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-padding: 8px 12px;
+  -fx-font-size: 14px;
+  -fx-prompt-text-fill: #b0b8c1;
+  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 4, 0, 0, 2);
 }
 
-/* Styling for each table button */
+/* Button styling for pagination */
 .button {
-  -fx-background-color: #1a73e8; /* Blue background for the table buttons */
-  -fx-text-fill: white; /* White text color */
-  -fx-font-size: 16px; /* Increase font size */
+  -fx-background-color: #3498db; /* Modern blue shade */
+  -fx-text-fill: white;
+  -fx-font-size: 14px;
+  -fx-padding: 8px 16px;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
   -fx-font-weight: bold;
-  -fx-padding: 15px 30px; /* Increase padding */
-  -fx-border-radius: 5px;
-  -fx-background-radius: 5px;
-  -fx-border-color: #1a73e8;
-  -fx-border-width: 2px;
-  -fx-pref-width: 150px; /* Increase button width */
-  -fx-pref-height: 75px;  /* Increase button height */
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 6, 0, 0, 2);
 }
 
-/* Hover effect for buttons */
 .button:hover {
-  -fx-background-color: #0f5bb3; /* Darker blue on hover */
-  -fx-border-color: #0f5bb3;
+  -fx-background-color: #2980b9; /* Darker on hover */
+  -fx-cursor: hand;
 }
 
-/* Active button styling */
 .button:pressed {
-  -fx-background-color: #134a96; /* Even darker blue when pressed */
-  -fx-border-color: #134a96;
+  -fx-background-color: #1c6391; /* Slightly darker when clicked */
 }
 
-/* Styling for selected table buttons */
-.button.selected {
-  -fx-background-color: #34a853; /* Green background for selected tables */
-  -fx-border-color: #34a853;
+/* Styling for the grid containing buttons */
+.grid-pane {
+  -fx-padding: 20px;
+  -fx-hgap: 15px;
+  -fx-vgap: 15px;
+  -fx-alignment: center;
 }
+
+.button-grid {
+  -fx-background-color: #ffffff;
+  -fx-border-color: #e0e6ed;
+  -fx-border-radius: 8px;
+  -fx-background-radius: 8px;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 2);
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-text-fill: #2c3e50;
+  -fx-pref-width: 100px;
+  -fx-pref-height: 100px;
+}
+
+.button-grid.reserved {
+  -fx-background-color: #2ecc71; /* Green for reserved */
+  -fx-text-fill: white;
+}
+
+.button-grid.unavailable {
+  -fx-background-color: #f39c12; /* Orange for unavailable */
+  -fx-text-fill: white;
+}
+
+.button-grid.available {
+  -fx-background-color: #ecf0f1; /* Light gray for available */
+  -fx-text-fill: #2c3e50;
+}
+
+/* Status box styling for legend */
+.status-box {
+  -fx-spacing: 10px;
+}
+
+.label-status {
+  -fx-font-size: 14px;
+  -fx-padding: 8px 12px;
+  -fx-background-radius: 8px;
+  -fx-text-fill: #ffffff;
+  -fx-font-weight: bold;
+  -fx-alignment: center;
+  -fx-pref-width: 150px;
+}
+
+.label-status.reserved {
+  -fx-background-color: #27ae60; /* Slightly different green for consistency */
+}
+
+.label-status.unavailable {
+  -fx-background-color: #e67e22; /* Matching orange */
+}
+
+.label-status.available {
+  -fx-background-color: #bdc3c7; /* Soft gray for available */
+  -fx-text-fill: #2c3e50;
+}
+
+/* Pagination control alignment */
+.pagination {
+  -fx-alignment: center;
+  -fx-spacing: 10px;
+}
+
+/* ScrollPane and Grid styles */
+.scroll-pane {
+  -fx-background-color: #e9ecef;
+  -fx-border-color: transparent;
+}
+
+.scroll-bar {
+  -fx-background-color: #dee2e6;
+}
+
+.scroll-bar-thumb {
+  -fx-background-color: #adb5bd;
+  -fx-background-radius: 8px;
+}
+

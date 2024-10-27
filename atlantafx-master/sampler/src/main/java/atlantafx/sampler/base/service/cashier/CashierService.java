@@ -9,6 +9,9 @@ import atlantafx.sampler.base.entity.common.PaymentMethod;
 import atlantafx.sampler.base.entity.common.Products;
 import atlantafx.sampler.base.enummethod.Payment;
 import atlantafx.sampler.base.util.AlertUtil;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,10 +20,13 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -35,6 +41,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.stage.FileChooser;
 
 public class CashierService {
   public static List<Products> getAllProducts() {
@@ -44,7 +51,8 @@ public class CashierService {
          PreparedStatement preparedStatement = connection.prepareStatement(sql);
          ResultSet resultSet = preparedStatement.executeQuery()) {
       while (resultSet.next()) {
-        Products product = new Products(resultSet.getString("image_link"),
+        Products product = new Products( resultSet.getInt("id"),
+            resultSet.getString("image_link"),
             resultSet.getString("category"),
             resultSet.getString("name"),
             resultSet.getDouble("price")
@@ -359,16 +367,15 @@ public class CashierService {
   public void createProductGrid(List<Products> productList, GridPane gridPane) {
     int column = 0;
     int row = 0;
-    for (int i = 0; i < productList.size(); i++) {
-      Products product = productList.get(i);
+    gridPane.getChildren().clear();
+
+    for (Products product : productList) {
       String imagePath = product.getImageLink();
 
-      // Ensure the image path is valid
       if (imagePath != null && getClass().getResource(imagePath) != null) {
         Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175, false, false);
         ImageView imageView = new ImageView(productImage);
 
-        // Coffee name and price labels
         Label nameLabel = new Label(product.getName());
         nameLabel.setFont(new Font("Arial", 18));
         nameLabel.getStyleClass().add("label-bold");
@@ -377,70 +384,176 @@ public class CashierService {
         priceLabel.setFont(new Font("Arial", 14));
         priceLabel.getStyleClass().add("label-price");
 
-        // Edit Button
         Button editButton = new Button("Sửa");
         Button deleteButton = new Button("Xóa");
+
+        // Chức năng chỉnh sửa sản phẩm
         editButton.setOnAction(e -> {
-          // Handle edit product
-          System.out.println("Edit button clicked for product: " + product.getName());
+          Optional<Products> editedProduct = showEditProductDialog(product);
+          editedProduct.ifPresent(updatedProduct -> {
+            CashierService.updateProduct(updatedProduct);  // Lưu vào cơ sở dữ liệu
+            productList.set(productList.indexOf(product), updatedProduct); // Cập nhật danh sách
+            createProductGrid(productList, gridPane); // Tải lại lưới sau khi cập nhật
+            System.out.println("Sửa thành công");
+          });
         });
+
+        // Chức năng xóa sản phẩm
         deleteButton.setOnAction(e -> {
-          // Tạo dialog xác nhận
-          Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
+          Alert confirmationDialog = new Alert(Alert.AlertType.CONFIRMATION);
           confirmationDialog.setTitle("Xác Nhận Xóa");
           confirmationDialog.setHeaderText("Bạn có chắc chắn muốn xóa sản phẩm này?");
           confirmationDialog.setContentText("Hành động này không thể hoàn tác.");
           confirmationDialog.getDialogPane().getStylesheets().add(
               getClass().getResource("/css/cssDiaLog.css").toExternalForm()
           );
-          // Hiển thị dialog và xử lý lựa chọn của người dùng
+
           Optional<ButtonType> result = confirmationDialog.showAndWait();
           if (result.isPresent() && result.get() == ButtonType.OK) {
-            // Người dùng xác nhận xóa
-            Products productToDelete = CashierService.getProductsByProductName(product.getName());
-            String filePath = "sampler/src/main/resources/" + productToDelete.getImageLink();
+            String filePath = "sampler/src/main/resources" + product.getImageLink();
             File file = new File(filePath);
             if (file.exists()) {
               if (file.delete()) {
-                CashierService.deleteProductsByProductName(productToDelete.getName());
+                CashierService.deleteProductsByProductName(product.getName());
+                productList.remove(product);  // Cập nhật danh sách
+                createProductGrid(productList, gridPane); // Tải lại lưới sau khi xóa
                 AlertUtil.showErrorAlert("Xóa Thành Công");
               } else {
                 AlertUtil.showErrorAlert("Lỗi Hệ Thống");
               }
             } else {
-              System.out.println("File does not exist");
+              System.out.println("File không tồn tại.");
             }
-            System.out.println("Delete button clicked for product: " + product.getName());
           } else {
-            // Người dùng hủy bỏ xóa
             System.out.println("Người dùng đã hủy thao tác xóa.");
           }
         });
-        // VBox for each product item
-        HBox buttonBox = new HBox(10, editButton, deleteButton);  // Align buttons horizontally
-        buttonBox.setAlignment(Pos.CENTER);  // Center the buttons in the HBox
 
-        // VBox for each product item
+        HBox buttonBox = new HBox(10, editButton, deleteButton);
+        buttonBox.setAlignment(Pos.CENTER);
+
         VBox productBox = new VBox(10, imageView, nameLabel, priceLabel, buttonBox);
         productBox.setPadding(new Insets(10));
         productBox.setAlignment(Pos.CENTER);
         productBox.getStyleClass().add("product-box");
-        productBox.setOnMouseEntered(e -> productBox.setStyle("-fx-background-color: #f0f0f0;"));
-        productBox.setOnMouseExited(e -> productBox.setStyle("-fx-background-color: #f9f9f9;"));
-        // Add to grid
-        gridPane.add(productBox, column, row);
+        productBox.setOnMouseEntered(ev -> productBox.setStyle("-fx-background-color: #f0f0f0;"));
+        productBox.setOnMouseExited(ev -> productBox.setStyle("-fx-background-color: #f9f9f9;"));
 
-        // Adjust column/row for next product
+        gridPane.add(productBox, column, row);
         column++;
-        if (column == 3) {  // 3 products per row
+        if (column == 3) {
           column = 0;
           row++;
         }
       } else {
-        System.out.println("Invalid image path for product: " + product.getName());
+        System.out.println("Đường dẫn ảnh không hợp lệ cho sản phẩm: " + product.getName());
       }
     }
   }
+
+  // Dialog chỉnh sửa sản phẩm
+  public Optional<Products> showEditProductDialog(Products product) {
+    Dialog<Products> dialog = new Dialog<>();
+    dialog.setTitle("Chỉnh sửa sản phẩm");
+    dialog.setHeaderText("Chỉnh sửa thông tin sản phẩm");
+    TextField productId = new TextField(String.valueOf(product.getId()));
+    TextField categoryField = new TextField(product.getCategory());
+    TextField nameField = new TextField(product.getName());
+    TextField priceField = new TextField(String.valueOf(product.getPrice()));
+    Button chooseImageButton = new Button("Chọn ảnh mới");
+    Label imageLabel = new Label(product.getImageLink());
+
+    File[] selectedFile = {null}; // Biến lưu trữ file mới được chọn
+
+    chooseImageButton.setOnAction(e -> {
+      FileChooser fileChooser = new FileChooser();
+      fileChooser.setTitle("Chọn ảnh sản phẩm");
+      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+      selectedFile[0] = fileChooser.showOpenDialog(dialog.getOwner());
+      if (selectedFile[0] != null) {
+        imageLabel.setText(selectedFile[0].getName());
+      }
+    });
+
+    GridPane grid = new GridPane();
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.add(new Label("Danh mục:"), 0, 0);
+    grid.add(categoryField, 1, 0);
+    grid.add(new Label("Tên sản phẩm:"), 0, 1);
+    grid.add(nameField, 1, 1);
+    grid.add(new Label("Giá:"), 0, 2);
+    grid.add(priceField, 1, 2);
+    grid.add(new Label("Ảnh:"), 0, 3);
+    grid.add(chooseImageButton, 1, 3);
+    grid.add(imageLabel, 2, 3);
+
+    dialog.getDialogPane().setContent(grid);
+    ButtonType saveButtonType = new ButtonType("Lưu", ButtonBar.ButtonData.OK_DONE);
+    dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+
+    dialog.setResultConverter(button -> {
+      if (button == saveButtonType) {
+        if (categoryField.getText().isEmpty() || nameField.getText().isEmpty() || priceField.getText().isEmpty()) {
+          AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
+          return null;
+        }
+
+        try {
+          double parsedPrice = Double.parseDouble(priceField.getText());
+          String imagePath = product.getImageLink();
+
+          // Kiểm tra và xóa ảnh cũ nếu đã chọn ảnh mới
+          if (selectedFile[0] != null && selectedFile[0].exists()) {
+            // Xóa ảnh cũ
+            File oldFile = new File("sampler/src/main/resources" + product.getImageLink());
+            if (oldFile.exists()) {
+              oldFile.delete();
+            }
+
+            // Sao chép ảnh mới vào thư mục
+            File destinationFile = new File("sampler/src/main/resources/images/products/" + selectedFile[0].getName());
+            Files.copy(selectedFile[0].toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            // Cập nhật đường dẫn ảnh mới
+            imagePath = "/images/products/" + selectedFile[0].getName();
+          }
+
+          // Tạo đối tượng sản phẩm đã chỉnh sửa
+          Products updatedProduct = new Products(Integer.parseInt(productId.getText()),imagePath, categoryField.getText(), nameField.getText(), parsedPrice);
+          CashierService.updateProduct(updatedProduct); // Lưu sản phẩm đã chỉnh sửa
+
+          return updatedProduct;
+
+        } catch (NumberFormatException e) {
+          AlertUtil.showErrorAlert("Giá không hợp lệ.");
+        } catch (IOException ioException) {
+          ioException.printStackTrace();
+          AlertUtil.showErrorAlert("Lỗi khi sao chép tệp.");
+        }
+      }
+      return null;
+    });
+
+    return dialog.showAndWait();
+  }
+
+
+
+  private static boolean updateProduct(Products product) {
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement statement = connection.prepareStatement("UPDATE products SET name=?, price=?, image_link=? WHERE id=?")) {
+      statement.setString(1, product.getName());
+      statement.setDouble(2, product.getPrice());
+      statement.setString(3, product.getImageLink());
+      statement.setInt(4, product.getId());
+      statement.executeUpdate();
+      System.out.println("Product updated successfully.");
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return true;
+  }
+
   public static ComboBox createPayMethodSelectionBox() {
     List<PaymentMethod> Payments = new ArrayList<>();
     ComboBox<String> payComboBox = new ComboBox<>();
@@ -452,4 +565,101 @@ public class CashierService {
     }
     return payComboBox;
   }
+//  public Optional<Products> showEditProductDialog(Products product) {
+//    // Tạo dialog để chỉnh sửa sản phẩm
+//    Dialog<Products> dialog = new Dialog<>();
+//    dialog.setTitle("Chỉnh sửa sản phẩm");
+//    dialog.setHeaderText("Chỉnh sửa thông tin sản phẩm");
+//
+//    // Các trường nhập liệu cho sản phẩm
+//    TextField categoryField = new TextField(product.getCategory());
+//    TextField nameField = new TextField(product.getName());
+//    TextField priceField = new TextField(String.valueOf(product.getPrice()));
+//    Button chooseImageButton = new Button("Chọn ảnh mới");
+//    Label imageLabel = new Label(product.getImageLink());
+//
+//    File[] selectedFile = {null}; // Lưu file được chọn
+//
+//    // Nút chọn ảnh
+//    chooseImageButton.setOnAction(e -> {
+//      FileChooser fileChooser = new FileChooser();
+//      fileChooser.setTitle("Chọn ảnh sản phẩm");
+//      fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+//      selectedFile[0] = fileChooser.showOpenDialog(dialog.getOwner());
+//      if (selectedFile[0] != null) {
+//        imageLabel.setText(selectedFile[0].getName());
+//      }
+//    });
+//
+//    // Tạo lưới hiển thị thông tin trong dialog
+//    GridPane grid = new GridPane();
+//    grid.setHgap(10);
+//    grid.setVgap(10);
+//    grid.add(new Label("Danh mục:"), 0, 0);
+//    grid.add(categoryField, 1, 0);
+//    grid.add(new Label("Tên sản phẩm:"), 0, 1);
+//    grid.add(nameField, 1, 1);
+//    grid.add(new Label("Giá:"), 0, 2);
+//    grid.add(priceField, 1, 2);
+//    grid.add(new Label("Ảnh:"), 0, 3);
+//    grid.add(chooseImageButton, 1, 3);
+//    grid.add(imageLabel, 2, 3);
+//
+//    dialog.getDialogPane().setContent(grid);
+//
+//    // Thêm các nút lưu và hủy
+//    ButtonType saveButtonType = new ButtonType("Lưu", ButtonBar.ButtonData.OK_DONE);
+//    dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+//
+//    // Logic khi nhấn nút "Lưu"
+//    dialog.setResultConverter(button -> {
+//      if (button == saveButtonType) {
+//        // Kiểm tra xem các trường có trống không
+//        if (categoryField.getText() == null || categoryField.getText().isEmpty() ||
+//            nameField.getText() == null || nameField.getText().isEmpty() ||
+//            priceField.getText() == null || priceField.getText().isEmpty()) {
+//          AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
+//          return null;
+//        }
+//
+//        try {
+//          // Chuyển đổi giá từ String sang Double
+//          double parsedPrice = Double.parseDouble(priceField.getText());
+//
+//          // Xử lý file ảnh mới (nếu có)
+//          String imagePath = product.getImageLink(); // Giữ nguyên ảnh cũ nếu không thay đổi
+//          if (selectedFile[0] != null && selectedFile[0].exists()) {
+//            // Xóa ảnh cũ
+//            File oldFile = new File("sampler/src/main/resources" + product.getImageLink());
+//            if (oldFile.exists()) oldFile.delete();
+//
+//            // Sao chép ảnh mới
+//            File destinationFile = new File("sampler/src/main/resources/images/products/" + selectedFile[0].getName());
+//            Files.copy(selectedFile[0].toPath(), destinationFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+//
+//            // Cập nhật đường dẫn ảnh mới
+//            imagePath = "/images/products/" + selectedFile[0].getName();
+//          }
+//
+//          // Trả về đối tượng sản phẩm đã chỉnh sửa
+//          return new Products(
+//              imagePath,
+//              categoryField.getText(),
+//              nameField.getText(),
+//              parsedPrice
+//          );
+//
+//        } catch (NumberFormatException e) {
+//          AlertUtil.showErrorAlert("Giá không hợp lệ.");
+//        } catch (IOException ioException) {
+//          ioException.printStackTrace();
+//          AlertUtil.showErrorAlert("Lỗi khi sao chép tệp.");
+//        }
+//      }
+//      return null;
+//    });
+//
+//    return dialog.showAndWait();
+//  }
+
 }

@@ -3,13 +3,13 @@ package atlantafx.sampler.base.service.cashier;
 
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.Tables;
-
-import atlantafx.sampler.base.util.AlertUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TableCoffeeService {
@@ -58,41 +58,54 @@ public class TableCoffeeService {
     }
     return table;
   }
+  // Method to get the count of tables matching the search keyword
+  public static int getFilteredTableCount(int currentPage, int itemsPerPage, String currentKeyword) {
+    // Get all tables without pagination to count them accurately
+    List<Tables> allTables = TableCoffeeService.getAllTable();
 
-  public static ArrayList<String> getNameTable(int number) {
-    tablesList = TableCoffeeService.getAllTable();
-    ArrayList<String> tableNames = new ArrayList<>();
+    if (currentKeyword.isEmpty()) {
+      return allTables.size(); // Return the total count if no keyword is provided
+    }
 
-    if (tablesList.size() > 12) {
-      int index = 12;
-      switch (number) {
-        case 1:
-          for (int i = 0; i < index; i++) {
-            tableNames.add(tablesList.get(i).getName());
-          }
-          break;
+    // Filter tables by keyword and count the matches
+    return (int) allTables.stream()
+        .filter(table -> table.getName().toLowerCase().contains(currentKeyword.toLowerCase()))
+        .count();
+  }
 
-        case 2:
-          for (int i = 12; i < tablesList.size(); i++) { // Fetch from 12 to end if size > 12
-            tableNames.add(tablesList.get(i).getName());
-          }
-          break;
 
-        default:
-          // Handle other cases if necessary
-          break;
+
+  // Method to retrieve table names based on current keyword, page, and page size
+  public static ArrayList<String> getNameTable(int page, int pageSize, String keyword) {
+    List<Tables> allTables = TableCoffeeService.getAllTable();
+    ArrayList<String> filteredTables = new ArrayList<>();
+
+    // Filter tables by keyword if it's not empty
+    if (!keyword.isEmpty()) {
+      for (Tables table : allTables) {
+        if (table.getName().toLowerCase().contains(keyword.toLowerCase())) {
+          filteredTables.add(table.getName());
+        }
       }
     } else {
-      int index = tablesList.size(); // Use full list size if <= 12 tables
-      if (number == 1) {
-        for (int i = 0; i < index; i++) {
-          tableNames.add(tablesList.get(i).getName());
-        }
-      } else if (number == 2) {
-      }
+      for (Tables table : allTables) {
+        filteredTables.add(table.getName());
+      } // No filtering needed
     }
-    return tableNames;
+
+    // Sort the filtered tables in ascending order
+    Collections.sort(filteredTables, Comparator.naturalOrder());
+
+    // Calculate start and end indices for pagination
+    int start = (page - 1) * pageSize;
+    int end = Math.min(start + pageSize, filteredTables.size());
+
+    // Return the paginated list of tables
+    return new ArrayList<>(filteredTables.subList(start, end));
   }
+
+
+
 
 
 
@@ -102,6 +115,29 @@ public class TableCoffeeService {
       return table.getStatusId();
     } else {
       return -1; // Or throw an exception or handle the case differently
+    }
+  }
+  public static boolean deleteTableByName(String tableName){
+    String sql = "DELETE FROM tables WHERE name =?";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, tableName);
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  public static boolean addNewTable(String tableName) {
+    String sql = "INSERT INTO tables (name, status_id) VALUES (?, 2)";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, tableName);
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
     }
   }
 }

@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -28,7 +26,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.jetbrains.annotations.NotNull;
 
 public class ListProductPage extends OutlinePage {
 
@@ -58,7 +55,7 @@ public class ListProductPage extends OutlinePage {
 
     // Search Bar
     TextField searchBar = new TextField();
-    searchBar.setPromptText("Nhập mã/Tên món cần tìm");
+    searchBar.setPromptText("Nhập tên món cần tìm");
     searchBar.setPrefWidth(300);
     searchBar.getStyleClass().add("text-field");
 
@@ -195,7 +192,7 @@ public class ListProductPage extends OutlinePage {
     grid.add(category, 1, 1);
     grid.add(new Label("Tên Đồ Uống"), 0, 2);
     grid.add(name, 1, 2);
-    grid.add(new Label("Gía"), 0, 3);
+    grid.add(new Label("Giá"), 0, 3);
     grid.add(price, 1, 3);
 
     dialog.getDialogPane().setContent(grid);

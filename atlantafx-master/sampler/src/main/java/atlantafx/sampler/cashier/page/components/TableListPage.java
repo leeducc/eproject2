@@ -5,6 +5,7 @@ import atlantafx.sampler.base.entity.common.Tables;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.cashier.page.OutlinePage;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +13,9 @@ import javafx.geometry.Insets;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Button;
 import javafx.geometry.Pos;
@@ -24,6 +27,10 @@ public final class TableListPage extends OutlinePage {
   private static Label selectedTableLabel;
   private GridPane grid;
   private static String title;
+  private int currentPage = 1;
+  private final int itemsPerPage = 20;
+  private String currentKeyword = ""; // Store the current search keyword
+  private TextField searchField; // Text field for keyword search
   static OrderListPage orderListPage = new OrderListPage();
 
   public static String getTitle() {
@@ -44,120 +51,157 @@ public final class TableListPage extends OutlinePage {
     createGrid();
   }
 
-  // Tạo lưới 5x5 và thêm sự kiện nhấp chuột cho các ô
+  // Creates the grid, search field, and pagination controls
   private void createGrid() {
-    GridPane floorTable = new GridPane();
-    floorTable.setPadding(new Insets(10));
-    floorTable.setHgap(20);
-    floorTable.setVgap(20);
-    floorTable.setAlignment(Pos.CENTER);
-
-    GridPane upstairTable = new GridPane();
-    upstairTable.setPadding(new Insets(10));
-    upstairTable.setHgap(20);
-    upstairTable.setVgap(20);
-    upstairTable.setAlignment(Pos.CENTER);
-
-    ArrayList<String> floorTables = TableCoffeeService.getNameTable(1);
-    addButtonsToGrid(floorTable, floorTables);
-
-    // Thêm các bàn vào khu B (Tầng lầu)
-    ArrayList<String> upstairTables = TableCoffeeService.getNameTable(2);
-    addButtonsToGrid(upstairTable, upstairTables);
-
-    Label labelFloorTables = new Label("Floor Tables");
-    labelFloorTables.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-    Label labelUpstairTables = new Label("Upstair Tables");
-    labelUpstairTables.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
-
-    // Chú thích trạng thái bàn
-    VBox statusBox = new VBox();
-    statusBox.setSpacing(10);
-
-    Label reservedLabel = new Label("Đã đặt");
-    reservedLabel.setStyle(
-        "-fx-background-color: green; -fx-text-fill: white; -fx-padding: 5px; -fx-pref-width: 150px; -fx-alignment: center;");
-
-    Label unavailableLabel = new Label("Đang dọn");
-    unavailableLabel.setStyle(
-        "-fx-background-color: orange; -fx-text-fill: white; -fx-padding: 5px; -fx-pref-width: 150px; -fx-alignment: center;");
-
-    Label availableLabel = new Label("Còn Chỗ");
-    availableLabel.setStyle(
-        "-fx-background-color: lightgray; -fx-text-fill: white; -fx-padding: 5px; -fx-pref-width: 150px; -fx-alignment: center;");
-
-// Đặt chiều rộng ưu tiên để các label bằng nhau
-    availableLabel.setMinWidth(150);
-//        unavailableLabel.setMinWidth(150);
-    reservedLabel.setMinWidth(150);
-
-    statusBox.getChildren().addAll(availableLabel, unavailableLabel, reservedLabel);
-    // Đặt lưới vào bố cục chính
     VBox layout = new VBox();
-    layout.setAlignment(Pos.CENTER);
+    layout.getStyleClass().add("vbox");
 
-    layout.getChildren()
-        .addAll(labelFloorTables, floorTable, labelUpstairTables, upstairTable, statusBox);
+    Label labelFloorTables = new Label("List Tables");
+    labelFloorTables.getStyleClass().add("label-title");
+
+    // Search TextField for filtering
+    searchField = new TextField();
+    searchField.setPromptText("Search by table name...");
+    searchField.getStyleClass().add("text-field");
+    searchField.setOnKeyReleased(this::handleSearch);
+
+    // Create GridPane for tables
+    grid = new GridPane();
+    grid.getStyleClass().add("grid-pane");
+
+    // Load initial table data based on the current page and search keyword
+    ArrayList<String> floorTables = TableCoffeeService.getNameTable(currentPage, itemsPerPage, currentKeyword);
+    addButtonsToGrid(grid, floorTables);
+
+    // Pagination controls
+    Button prevButton = new Button("Previous");
+    Button nextButton = new Button("Next");
+    prevButton.getStyleClass().add("button");
+    nextButton.getStyleClass().add("button");
+
+    prevButton.setOnAction(e -> {
+      if (currentPage > 1) {
+        currentPage--;
+        refreshGrid();
+      }
+    });
+
+    nextButton.setOnAction(e -> {
+      if ((currentPage - 1) * itemsPerPage + floorTables.size() < TableCoffeeService.getFilteredTableCount(currentPage, itemsPerPage,currentKeyword)) {
+        currentPage++;
+        refreshGrid();
+      }
+    });
+
+    HBox paginationControls = new HBox(10, prevButton, nextButton);
+    paginationControls.getStyleClass().add("pagination");
+
+    // Add status legend
+    VBox statusBox = new VBox();
+    statusBox.getStyleClass().add("status-box");
+    setupStatusLegend(statusBox);
+
+    layout.getChildren().addAll(labelFloorTables, searchField, grid, statusBox, paginationControls);
     layout.getStylesheets().add(getClass().getResource("/css/listTable.css").toExternalForm());
 
-    // Thêm vào Scene graph
+    getChildren().clear();
     getChildren().add(layout);
   }
 
+
+  private void handleSearch(javafx.scene.input.KeyEvent keyEvent) {
+    currentKeyword = searchField.getText().trim();
+    currentPage = 1; // Reset to first page after search
+    refreshGrid();
+  }
+
+  // Event handler for search field
+
   private void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames) {
     int count = 0;
-    int rows = 6;
-    int cols = 6;
+    int rows = 5;
+    int cols = 4;
 
-    // Xóa các nút cũ để tránh trùng lặp
-    grid.getChildren().clear();
+    grid.getChildren().clear(); // Clear previous buttons
 
     for (int row = 0; row < rows; row++) {
       for (int col = 0; col < cols; col++) {
-        if (count >= tableNames.size()) {
-          break;
-        }
+        if (count >= tableNames.size()) break;
 
-        // Tạo một nút cho mỗi bàn
+        // Create button for each table
         String tableName = tableNames.get(count);
         Button tableButton = new Button(tableName);
-        tableButton.setPrefSize(90, 90);
+        tableButton.setPrefSize(200, 200);
 
-        // Lấy thông tin trạng thái của bàn
+        // Get table status and set button color
         Tables table = TableCoffeeService.getTableByName(tableName);
-
-        // Cập nhật màu ban đầu của nút dựa trên trạng thái của bàn
         updateTableButtonColor(tableButton, table);
 
-        // Xử lý sự kiện khi nhấn nút
-        tableButton.setOnAction(e -> {
-          handleTableButtonClick(tableButton, table);
-        });
+        // Set click event
+        tableButton.setOnAction(e -> handleTableButtonClick(tableButton, table));
 
-        // Thêm nút vào grid
         grid.add(tableButton, col, row);
         count++;
       }
     }
   }
 
-  // Phương thức để xử lý khi nhấn vào một nút bàn
+  private void refreshGrid() {
+    ArrayList<String> floorTables = TableCoffeeService.getNameTable(currentPage, itemsPerPage, currentKeyword);
+    addButtonsToGrid(grid, floorTables);
+  }
+
+  private void setupStatusLegend(VBox statusBox) {
+    Label reservedLabel = new Label("Đã đặt");
+    reservedLabel.setStyle(
+        "-fx-background-color: #28a745; " +  // A green color for a reserved state
+            "-fx-text-fill: #ffffff; " +         // White text for good contrast
+            "-fx-padding: 8px 16px; " +          // Padding for a spacious look
+            "-fx-pref-width: 150px; " +
+            "-fx-alignment: center; " +
+            "-fx-background-radius: 8px;"       // Rounded corners for a modern look
+    );
+
+    Label unavailableLabel = new Label("Đang dọn");
+    unavailableLabel.setStyle(
+        "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
+            "-fx-text-fill: #ffffff; " +         // White text for contrast
+            "-fx-padding: 8px 16px; " +
+            "-fx-pref-width: 150px; " +
+            "-fx-alignment: center; " +
+            "-fx-background-radius: 8px;"
+    );
+
+    Label availableLabel = new Label("Còn Chỗ");
+    availableLabel.setStyle(
+        "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
+            "-fx-text-fill: #000000; " +         // Black text for better readability
+            "-fx-padding: 8px 16px; " +
+            "-fx-pref-width: 150px; " +
+            "-fx-alignment: center; " +
+            "-fx-background-radius: 8px;"
+    );
+
+    // Adjusting the widths to keep uniformity.
+    availableLabel.setMinWidth(150);
+    reservedLabel.setMinWidth(150);
+
+    statusBox.getChildren().addAll(availableLabel, unavailableLabel, reservedLabel);
+  }
+
+
   private void handleTableButtonClick(Button tableButton, Tables table) {
     int status = table.getStatusId();
     if (status == 2) {
-      // Tạo và hiển thị dialog xác nhận
       Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
       confirmationDialog.setTitle("Xác nhận bàn đã dọn xong");
-      confirmationDialog.setHeaderText("Bạn có chắc chắn là bàn này đã dọn xong");
-      confirmationDialog.getDialogPane().getStylesheets().add(
-          getClass().getResource("/css/cssDiaLog.css").toExternalForm()
-      );
+      confirmationDialog.setHeaderText("Bạn có chắc chắn là bàn này khách đã dời đi và đã dọn xong");
+      confirmationDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/cssDiaLog.css").toExternalForm());
 
       Optional<ButtonType> result = confirmationDialog.showAndWait();
       if (result.isPresent() && result.get() == ButtonType.OK) {
         TableCoffeeService.updateStatusTable(3, table.getName());
-        table.setStatusId(3); // Cập nhật trạng thái của đối tượng bàn
+        table.setStatusId(3);
         updateTableButtonColor(tableButton, table);
       }
     } else {
@@ -171,34 +215,28 @@ public final class TableListPage extends OutlinePage {
     }
   }
 
-  // Phương thức để cập nhật màu sắc của nút bàn dựa trên trạng thái bàn
   private void updateTableButtonColor(Button tableButton, Tables table) {
     int statusId = table.getStatusId();
     switch (statusId) {
-      case 1:
-        tableButton.setStyle("-fx-background-color: green;");
-        break;
-      case 2:
-        tableButton.setStyle("-fx-background-color: orange;");
-        break;
-      default:
-        tableButton.setStyle("-fx-background-color: lightgray;");
-        break;
+      case 1 -> tableButton.setStyle("-fx-background-color: green;");
+      case 2 -> tableButton.setStyle("-fx-background-color: orange;");
+      default -> tableButton.setStyle("-fx-background-color: lightgray;");
     }
   }
 
-    public static void updateStatusTableByOrder(String tableName) {
+  public static void updateStatusTableByOrder(String tableName) {
     List<Bill> newBill = CashierService.getBillByNameTable(tableName);
-      Tables table = TableCoffeeService.getTableByName(tableName);
-      int statusId = table.getStatusId();
-    if ( !newBill.isEmpty()) {
+    Tables table = TableCoffeeService.getTableByName(tableName);
+    int statusId = table.getStatusId();
+    if (!newBill.isEmpty()) {
       TableCoffeeService.updateStatusTable(1, tableName);
-    }else{
-      if(statusId != 2){
+    } else {
+      if (statusId != 2) {
         TableCoffeeService.updateStatusTable(3, tableName);
       }
     }
   }
+
 }
 
 

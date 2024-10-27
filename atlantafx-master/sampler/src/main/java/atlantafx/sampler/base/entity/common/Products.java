@@ -14,6 +14,14 @@ public class Products {
     this.price = price;
   }
 
+  public Products(int id, String imageLink, String category, String name, double price) {
+    this.id = id;
+    this.imageLink = imageLink;
+    this.category = category;
+    this.name = name;
+    this.price = price;
+  }
+
   public int getId() {
     return id;
   }

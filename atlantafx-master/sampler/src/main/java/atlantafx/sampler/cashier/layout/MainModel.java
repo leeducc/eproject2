@@ -73,8 +73,8 @@ public class MainModel {
     // Bàn group
     var tables = NavTree.Item.group("Bàn", new FontIcon(Material2OutlinedMZ.TABLET));
     tables.getChildren().setAll(
-        NAV_TREE.get(TableListPage.class)
-//        NAV_TREE.get(OrderListPage.class)// Danh sách các bàn
+        NAV_TREE.get(TableListPage.class),
+        NAV_TREE.get(EditTableList.class)// Danh sách các bàn
     );
     var viewProduct = NavTree.Item.group("Menu đồ uống", new FontIcon(Material2OutlinedMZ.TABLET));
     viewProduct.getChildren().setAll(
@@ -107,8 +107,7 @@ public class MainModel {
 
     // Bàn
     map.put(TableListPage.class, NavTree.Item.page("Danh sách các bàn", TableListPage.class));
-//    map.put(OrderListPage.class, NavTree.Item.page("Hóa đơn", OrderListPage.class));
-
+    map.put(EditTableList.class, NavTree.Item.page("Cài Đặt danh sách bàn", EditTableList.class));
     map.put(ListProductPage.class, NavTree.Item.page("Danh sách các đồ uống", ListProductPage.class));
     return map;
   }
