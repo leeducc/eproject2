@@ -93,7 +93,6 @@ public final class TableListPage extends OutlinePage {
     reservedLabel.setMinWidth(150);
 
     statusBox.getChildren().addAll(availableLabel, unavailableLabel, reservedLabel);
-
     // Đặt lưới vào bố cục chính
     VBox layout = new VBox();
     layout.setAlignment(Pos.CENTER);

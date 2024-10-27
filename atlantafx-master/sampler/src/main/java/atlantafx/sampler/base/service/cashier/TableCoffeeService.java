@@ -62,6 +62,7 @@ public class TableCoffeeService {
   public static ArrayList<String> getNameTable(int number) {
     tablesList = TableCoffeeService.getAllTable();
     ArrayList<String> tableNames = new ArrayList<>();
+
     if (tablesList.size() > 12) {
       int index = 12;
       switch (number) {
@@ -72,25 +73,27 @@ public class TableCoffeeService {
           break;
 
         case 2:
-          for (int i = 12; i < tablesList.size(); i++) { // Fixed
+          for (int i = 12; i < tablesList.size(); i++) { // Fetch from 12 to end if size > 12
             tableNames.add(tablesList.get(i).getName());
           }
           break;
 
         default:
-          // Optionally handle other cases or do nothing
+          // Handle other cases if necessary
           break;
       }
     } else {
-      int index = tablesList.size();
+      int index = tablesList.size(); // Use full list size if <= 12 tables
       if (number == 1) {
         for (int i = 0; i < index; i++) {
           tableNames.add(tablesList.get(i).getName());
         }
+      } else if (number == 2) {
       }
     }
-    return tableNames;  // Now returning the List
+    return tableNames;
   }
+
 
 
   public static int getStatusByTableName(String tableName) {
