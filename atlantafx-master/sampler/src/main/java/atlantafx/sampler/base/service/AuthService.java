@@ -39,7 +39,8 @@ public class AuthService {
             // Authenticate password
             if (storedPasswordHash != null) {
                 if (isPasswordValid(password, storedPasswordHash)) {
-                    showAlert("Success", "Authentication successful", AlertType.INFORMATION);
+
+
                     return true;
                 } else {
                     showAlert("Error", "Invalid password", AlertType.ERROR);

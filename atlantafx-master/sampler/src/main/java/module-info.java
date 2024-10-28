@@ -27,14 +27,16 @@ module atlantafx.sampler {
     exports atlantafx.sampler;
 
 
+    exports atlantafx.sampler.base.util;
+
     exports atlantafx.sampler.admin.layout;
     exports atlantafx.sampler.admin.page;
     exports atlantafx.sampler.admin.entity;
-
+    exports atlantafx.sampler.admin.event;
     exports atlantafx.sampler.admin.page.components;
 
 
-    exports atlantafx.sampler.base.util;
+
 
 
 
@@ -42,7 +44,11 @@ module atlantafx.sampler {
     opens atlantafx.sampler;
     opens atlantafx.sampler.assets.highlightjs;
     opens atlantafx.sampler.assets.styles;
+    opens atlantafx.sampler.assets.styles.scss;
     opens atlantafx.sampler.images;
     opens atlantafx.sampler.admin.entity;
-    requires org.scenicview.scenicview;
+    opens atlantafx.sampler.admin.layout;
+    opens atlantafx.sampler.admin.page;
+    opens atlantafx.sampler.admin.page.components;
+
 }

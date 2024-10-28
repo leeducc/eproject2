@@ -84,8 +84,9 @@ public class MainModel {
 // Work Shift (Công ca) group
         var workShift = NavTree.Item.group("Công ca", new FontIcon(Material2OutlinedMZ.SCHEDULE));
         workShift.getChildren().setAll(
-                NAV_TREE.get(LeaveApprovalPage.class),        // Leave Approval (Phê duyệt nghỉ phép)
-                NAV_TREE.get(WorkExplanationApprovalPage.class) // Work Explanation Approval (Phê duyệt giải trình công)
+                NAV_TREE.get(MakeSchedulePage.class)          // Work Schedule (Phân Lịch làm việc)
+//                NAV_TREE.get(LeaveApprovalPage.class),        // Leave Approval (Phê duyệt nghỉ phép)
+//                NAV_TREE.get(WorkExplanationApprovalPage.class) // Work Explanation Approval (Phê duyệt giải trình công)
         );
 
 // Orders (Đơn hàng) group
@@ -157,6 +158,7 @@ public class MainModel {
         map.put(ProductListPage.class, NavTree.Item.page("Danh sách sản phẩm", ProductListPage.class));
 
         // Công ca (Work Shift)
+        map.put(MakeSchedulePage.class , NavTree.Item.page("Tạo lịch làm việc", MakeSchedulePage.class));
         map.put(LeaveApprovalPage.class, NavTree.Item.page("Phê duyệt nghỉ phép", LeaveApprovalPage.class));
         map.put(WorkExplanationApprovalPage.class, NavTree.Item.page("Phê duyệt giải trình công", WorkExplanationApprovalPage.class));
 

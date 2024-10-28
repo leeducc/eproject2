@@ -3,7 +3,6 @@
 package atlantafx.sampler;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-
 import fr.brouillard.oss.cssfx.CSSFX;
 import fr.brouillard.oss.cssfx.api.URIToPathConverter;
 import fr.brouillard.oss.cssfx.impl.log.CSSFXLogger;
@@ -17,7 +16,6 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import org.scenicview.ScenicView;
 
 public class Launcher extends Application {
 
@@ -34,14 +32,18 @@ public class Launcher extends Application {
 
         // Show the login page first
         var loginPage = new LoginPage(stage);
-        var loginScene = new Scene(loginPage, 400, 300);
-        loginScene.getStylesheets().addAll(Resources.resolve("assets/styles/index.css"));
+        var loginScene = new Scene(loginPage, 900, 500);
+        loginScene.getStylesheets().addAll(Resources.resolve("assets/styles/loginpage.css"));
+
 
         stage.setScene(loginScene);
-        stage.setTitle("Login");
-        stage.setResizable(false);
+        stage.setTitle("BlueOPS");
+        stage.setResizable(true);
         stage.show();
-        ScenicView.show(loginScene);
+
+
+
+
     }
 
 

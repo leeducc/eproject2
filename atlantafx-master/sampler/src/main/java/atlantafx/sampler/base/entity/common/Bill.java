@@ -74,7 +74,6 @@ public class Bill {
   @Override
   public String toString() {
     return "Bill [id=" + id + ", nameTable=" + nameTable + ", productName=" + productName +
-        ", quantity=" + quantity + ", price=" + price + ", totalPrice=" + calculateTotalPrice() + "]";
+            ", quantity=" + quantity + ", price=" + price + ", totalPrice=" + calculateTotalPrice() + "]";
   }
 }
-

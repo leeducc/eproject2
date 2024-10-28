@@ -78,10 +78,10 @@ public class MainModel {
         // Công Và Lương group
         var salary = NavTree.Item.group("Công Và Lương", new FontIcon(Material2OutlinedMZ.PAYMENTS));
         salary.getChildren().setAll(
-                NAV_TREE.get(WorkSchedulePage.class),        // Lịch làm việc
-                NAV_TREE.get(TimeAttendancePage.class),      // Chấm công
-                NAV_TREE.get(WorkExplanationPage.class),     // Giai trình công
-                NAV_TREE.get(LeaveRequestPage.class),        // Xin nghỉ phép
+//                NAV_TREE.get(WorkSchedulePage.class),        // Lịch làm việc
+               NAV_TREE.get(TimeAttendancePage.class),      // Chấm công
+//                NAV_TREE.get(WorkExplanationPage.class),     // Giai trình công
+//                NAV_TREE.get(LeaveRequestPage.class),        // Xin nghỉ phép
                 NAV_TREE.get(SalaryReportPage.class)         // Phiếu báo lương
         );
 
@@ -115,10 +115,10 @@ public class MainModel {
         map.put(TableListPage.class, NavTree.Item.page("Danh sách các bàn", TableListPage.class));
 
         // Công Và Lương
-        map.put(WorkSchedulePage.class, NavTree.Item.page("Lịch làm việc", WorkSchedulePage.class));
-        map.put(TimeAttendancePage.class, NavTree.Item.page("Chấm công", TimeAttendancePage.class));
-        map.put(WorkExplanationPage.class, NavTree.Item.page("Giai trình công", WorkExplanationPage.class));
-        map.put(LeaveRequestPage.class, NavTree.Item.page("Xin nghỉ phép", LeaveRequestPage.class));
+//        map.put(WorkSchedulePage.class, NavTree.Item.page("Lịch làm việc", WorkSchedulePage.class));
+      map.put(TimeAttendancePage.class, NavTree.Item.page("Chấm công", TimeAttendancePage.class));
+//        map.put(WorkExplanationPage.class, NavTree.Item.page("Giai trình công", WorkExplanationPage.class));
+//        map.put(LeaveRequestPage.class, NavTree.Item.page("Xin nghỉ phép", LeaveRequestPage.class));
         map.put(SalaryReportPage.class, NavTree.Item.page("Phiếu báo lương", SalaryReportPage.class));
 
         // Thông tin cá nhân

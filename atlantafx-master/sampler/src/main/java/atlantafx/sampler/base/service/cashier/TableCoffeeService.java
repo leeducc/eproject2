@@ -20,10 +20,10 @@ public class TableCoffeeService {
     List<Tables> tables = new ArrayList<>();
     String sql = "SELECT * FROM tables";
     try (Connection connection = JDBCConnect.getJDBCConnection(); PreparedStatement preparedStatement = connection.prepareStatement(
-        sql); ResultSet resultSet = preparedStatement.executeQuery()) {
+            sql); ResultSet resultSet = preparedStatement.executeQuery()) {
       while (resultSet.next()) {
 
-        Tables table = new Tables(resultSet.getString("name"), resultSet.getInt("status_id"));
+        Tables table = new Tables(resultSet.getString("name"), resultSet.getString("status"));
         tables.add(table);
       }
     } catch (SQLException e) {
