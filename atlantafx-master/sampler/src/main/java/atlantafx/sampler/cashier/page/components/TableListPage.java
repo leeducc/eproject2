@@ -50,8 +50,8 @@ public final class TableListPage extends OutlinePage {
         createGrid();
     }
 
-    private void openTableDialog() {
-        var dialog = tableDialog.get();
+    private void openTableDialog(String tableName) {
+        TableDialog dialog = new TableDialog(tableName); // Create a new instance for each table
         dialog.show(getScene());
         Platform.runLater(dialog::requestFocus);
     }
@@ -119,31 +119,19 @@ public final class TableListPage extends OutlinePage {
     }
 
     private void addButtonsToGrid(GridPane grid, ArrayList<String> tableNames) {
-        int count = 0;
-        int rows = 5;
-        int cols = 4;
-
         grid.getChildren().clear(); // Clear previous buttons
 
-        for (int row = 0; row < rows; row++) {
-            for (int col = 0; col < cols; col++) {
-                if (count >= tableNames.size()) break;
+        for (int i = 0; i < tableNames.size(); i++) {
+            String tableName = tableNames.get(i);
+            Button tableButton = new Button(tableName);
+            tableButton.setPrefSize(200, 200);
 
-                // Create button for each table
-                String tableName = tableNames.get(count);
-                Button tableButton = new Button(tableName);
-                tableButton.setPrefSize(200, 200);
+            checkAndSetTableStatus(tableButton, tableName); // Set initial status based on temporary orders
 
-                // Get table status and set button color
-                Tables table = TableCoffeeService.getTableByName(tableName);
-                updateTableButtonColor(tableButton, table);
+            // Set click event for handling table actions
+            tableButton.setOnAction(e -> handleTableButtonClick(tableButton, TableCoffeeService.getTableByName(tableName)));
 
-                // Set click event
-                tableButton.setOnAction(e -> handleTableButtonClick(tableButton, table));
-
-                grid.add(tableButton, col, row);
-                count++;
-            }
+            grid.add(tableButton, i % 4, i / 4); // Adjusts layout to 4 columns per row
         }
     }
 
@@ -190,26 +178,41 @@ public final class TableListPage extends OutlinePage {
         statusBox.getChildren().addAll(availableLabel, unavailableLabel, reservedLabel);
     }
 
+    // Checks if a table has items in temporary_order and sets its status to Reserved if so
+    private void checkAndSetTableStatus(Button tableButton, String tableName) {
+        boolean hasTemporaryOrder = TableCoffeeService.hasTemporaryOrder(tableName);
+        Tables table = TableCoffeeService.getTableByName(tableName);
+
+        if (hasTemporaryOrder) {
+            table.setStatusId(1); // Reserved
+            TableCoffeeService.updateStatusTable(1, tableName);
+            tableButton.setStyle("-fx-background-color: green;"); // Reserved color
+        } else {
+            table.setStatusId(3); // Available
+            TableCoffeeService.updateStatusTable(3, tableName);
+            tableButton.setStyle("-fx-background-color: lightgray;"); // Available color
+        }
+    }
+
     private void handleTableButtonClick(Button tableButton, Tables table) {
         int status = table.getStatusId();
-        if (status == 2) {
+
+        if (status == 2) { // Cleaning status
             Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
             confirmationDialog.setTitle("Xác nhận bàn đã dọn xong");
             confirmationDialog.setHeaderText("Bạn có chắc chắn là bàn này khách đã dời đi và đã dọn xong");
 
             Optional<ButtonType> result = confirmationDialog.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                TableCoffeeService.updateStatusTable(3, table.getName());
+                TableCoffeeService.updateStatusTable(3, table.getName()); // Set to Available
                 table.setStatusId(3);
-                updateTableButtonColor(tableButton, table);
+                tableButton.setStyle("-fx-background-color: lightgray;"); // Available color
             }
         } else {
             selectedTableLabel = new Label(tableButton.getText());
             TableListPage.setTitle(tableButton.getText());
-
-            openTableDialog();
+            openTableDialog(selectedTableLabel.getText()); // Open the table dialog for ordering
         }
-
     }
 
 

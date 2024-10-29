@@ -8,10 +8,89 @@ import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CashierService {
+  public static Map<Product, Integer> loadTemporaryOrderForTable(String tableName) {
+    Map<Product, Integer> order = new HashMap<>();
 
+    String query = "SELECT product_id, quantity FROM temporary_order WHERE table_name = ?";
+    try (Connection conn = JDBCConnect.getJDBCConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+      stmt.setString(1, tableName);
+      ResultSet rs = stmt.executeQuery();
+
+      while (rs.next()) {
+        int productId = rs.getInt("product_id");
+        int quantity = rs.getInt("quantity");
+
+        Product product = loadProductById(productId); // Add a method to load product by ID
+        if (product != null) {
+          order.put(product, quantity);
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return order;
+  }
+  public static Product loadProductById(int productId) {
+    String query = "SELECT id, name, price, category_id FROM products WHERE id = ?";
+    Product product = null;
+
+    try (Connection conn = JDBCConnect.getJDBCConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+      stmt.setInt(1, productId);
+      ResultSet rs = stmt.executeQuery();
+
+      if (rs.next()) {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        double price = rs.getDouble("price");
+        int categoryId = rs.getInt("category_id");
+
+        product = new Product(id, name, price, categoryId);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    return product;
+  }
+
+  public static void saveProductToTemporaryOrder(String tableName, Product product, int quantity) {
+    String query = """
+            INSERT INTO temporary_order (table_name, product_id, quantity)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+        """;
+
+    try (Connection conn = JDBCConnect.getJDBCConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+      stmt.setString(1, tableName);
+      stmt.setInt(2, product.getId());
+      stmt.setInt(3, quantity);
+      stmt.executeUpdate();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void removeProductFromTemporaryOrder(String tableName, Product product) {
+    String query = "DELETE FROM temporary_order WHERE table_name = ? AND product_id = ?";
+
+    try (Connection conn = JDBCConnect.getJDBCConnection();
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+      stmt.setString(1, tableName);
+      stmt.setInt(2, product.getId());
+      stmt.executeUpdate();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
   public static List<Category> loadCategories() {
     List<Category> categories = new ArrayList<>();

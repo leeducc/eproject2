@@ -140,4 +140,35 @@ public class TableCoffeeService {
       return false;
     }
   }
+
+  public static boolean hasTemporaryOrder(String tableName) {
+    boolean hasOrder = false;
+
+    String checkOrderQuery = "SELECT COUNT(*) FROM temporary_order WHERE table_name = ?";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(checkOrderQuery)) {
+
+      preparedStatement.setString(1, tableName);
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+      if (resultSet.next()) {
+        hasOrder = resultSet.getInt(1) > 0;
+      }
+
+      // Update table status based on presence of order
+      String updateStatusQuery = "UPDATE tables SET status_id = ? WHERE name = ?";
+      try (PreparedStatement updateStatement = connection.prepareStatement(updateStatusQuery)) {
+        int statusId = hasOrder ? 1 : 3; // 1 for USING, 3 for AVAILABLE
+        updateStatement.setInt(1, statusId);
+        updateStatement.setString(2, tableName);
+        updateStatement.executeUpdate();
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return hasOrder;
+  }
 }

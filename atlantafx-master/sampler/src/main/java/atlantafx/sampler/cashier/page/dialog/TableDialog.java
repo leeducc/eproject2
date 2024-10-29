@@ -27,15 +27,16 @@ public class TableDialog extends ModalDialog {
     private Text totalPriceText; // Text for total price
     private Map<Product, Integer> productQuantityMap = new HashMap<>(); // To track quantities
 
+    private String tableName; // Lưu tên bàn
+
 
     public TableDialog(String tableName) {
         super();
-
-        setId("table-dialog");
-        header.setTitle("Table: " );
-
+        this.tableName = tableName; // Lưu tên bàn
+        header.setTitle("Table: " + tableName);
         content.setBody(createContent());
         content.setPrefSize(1200, 800);
+        loadOrderFromDatabase();
     }
 
 
@@ -138,15 +139,26 @@ public class TableDialog extends ModalDialog {
         return productBox;
     }
 
+
+
+
+
+    private void loadOrderFromDatabase() {
+        productQuantityMap = CashierService.loadTemporaryOrderForTable(tableName);
+        updateOrderList(); // Display loaded order
+    }
+
     private void addProductToOrder(Product product, int quantity) {
-        addedProducts.add(product);
+        // Update the quantity or add the product if not present
         productQuantityMap.put(product, productQuantityMap.getOrDefault(product, 0) + quantity);
+        CashierService.saveProductToTemporaryOrder(tableName, product, quantity);
         updateOrderList();
     }
 
     private void removeProductFromOrder(Product product) {
-        if (addedProducts.remove(product)) {
+        if (productQuantityMap.containsKey(product)) {
             productQuantityMap.remove(product);
+            CashierService.removeProductFromTemporaryOrder(tableName, product);
             updateOrderList();
         }
     }
@@ -156,8 +168,9 @@ public class TableDialog extends ModalDialog {
         int totalQuantity = 0;
         double totalPrice = 0.0;
 
-        for (Product product : addedProducts) {
-            int quantity = productQuantityMap.get(product);
+        for (Map.Entry<Product, Integer> entry : productQuantityMap.entrySet()) {
+            Product product = entry.getKey();
+            int quantity = entry.getValue();
             orderList.getItems().add(product.getName() + " - $" + product.getDiscountedPrice() + " x " + quantity);
             totalQuantity += quantity;
             totalPrice += product.getDiscountedPrice() * quantity;

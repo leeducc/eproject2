@@ -705,3 +705,14 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2024-10-29 19:12:53
+
+
+CREATE TABLE `temporary_order` (
+                                   `id` INT NOT NULL AUTO_INCREMENT,
+                                   `table_name` VARCHAR(50) NOT NULL,
+                                   `product_id` INT NOT NULL,
+                                   `quantity` INT NOT NULL DEFAULT 1,
+                                   PRIMARY KEY (`id`),
+                                   UNIQUE KEY `table_product_unique` (`table_name`, `product_id`),
+                                   FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
