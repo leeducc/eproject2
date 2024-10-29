@@ -9,28 +9,14 @@ public class Product {
   private String imageLink;
   private int categoryId;
   private int quantity;
-  private Discount discount;
+  private double  discountPercentage;
 
-  public Product(int id, String name, double price, String imageLink, int categoryId, int quantity, Discount discount) {
-    this.id = id;
-    this.name = name;
-    this.price = price;
-    this.imageLink = imageLink;
-    this.categoryId = categoryId;
-    this.quantity = quantity;
-    this.discount = discount;
-  }
+
 
   public Product() {
   }
 
-  public Product(int id, String name, double price, String imageLink, int categoryId) {
-    this.id = id;
-    this.name = name;
-    this.price = price;
-    this.imageLink = imageLink;
-    this.categoryId = categoryId;
-  }
+
 
   public Product(int id, String name, double price, int categoryId, String imageLink) {
     this.id = id;
@@ -49,7 +35,15 @@ public class Product {
     this.categoryId = i;
   }
 
-  public int getId() {
+    public Product(int id, String imageLink, String name, double price, double discountedPrice, int categoryId) {
+        this.id = id;
+        this.imageLink = imageLink;
+        this.name = name;
+        this.price = price;
+        this.categoryId = categoryId;
+    }
+
+    public int getId() {
     return id;
   }
 
@@ -97,12 +91,15 @@ public class Product {
     this.quantity = quantity;
   }
 
-  public Discount getDiscount() {
-    return discount;
+  public double getDiscountPercentage() {
+    return discountPercentage;
   }
 
-  public void setDiscount(Discount discount) {
-    this.discount = discount;
+  public void setDiscountPercentage(double discountPercentage) {
+    this.discountPercentage = discountPercentage;
+  }
+  public double getDiscountedPrice() {
+    return price - (price * (discountPercentage / 100));
   }
 
   @Override
@@ -114,7 +111,7 @@ public class Product {
             ", imageLink='" + imageLink + '\'' +
             ", categoryId=" + categoryId +
             ", quantity=" + quantity +
-            ", discount=" + discount +
+            ", discountPercentage=" + discountPercentage +
             '}';
   }
 }

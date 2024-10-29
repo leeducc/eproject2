@@ -83,4 +83,7 @@ public abstract class ModalDialog extends ModalBox {
 
         return footer;
     }
+
 }
+
+

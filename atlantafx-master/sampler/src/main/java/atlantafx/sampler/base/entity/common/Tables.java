@@ -4,20 +4,20 @@ public class Tables {
 
   private int id;
   private String name;
-  private String statusId;
+  private int statusId;
 
 
-  public Tables(String name, String statusId) {
+  public Tables(String name, int statusId) {
 
     this.name = name;
     this.statusId = statusId;
   }
 
-  public String getStatusId() {
+  public int getStatusId() {
     return statusId;
   }
 
-  public void setStatusId(String statusId) {
+  public void setStatusId(int statusId) {
     this.statusId = statusId;
   }
 

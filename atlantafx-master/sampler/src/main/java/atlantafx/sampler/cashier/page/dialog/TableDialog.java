@@ -1,257 +1,211 @@
 package atlantafx.sampler.cashier.page.dialog;
 
-import atlantafx.base.controls.CustomTextField;
 import atlantafx.sampler.base.entity.common.Category;
-import atlantafx.sampler.base.entity.common.Discount;
 import atlantafx.sampler.base.entity.common.Product;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.cashier.layout.ModalDialog;
-import atlantafx.sampler.cashier.page.components.TableListPage;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
+import javafx.stage.Modality;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.Map;
 
 public class TableDialog extends ModalDialog {
+    private TilePane productGrid; // Grid for displaying products
+    private ObservableList<Product> addedProducts = FXCollections.observableArrayList(); // List of added products
+    private ListView<String> orderList; // List view to show added products
+    private Text totalQuantityText; // Text for total quantity
+    private Text totalPriceText; // Text for total price
+    private Map<Product, Integer> productQuantityMap = new HashMap<>(); // To track quantities
 
-    private final TableView<Product> productTableView; // TableView for displaying selected products
-    private final CashierService cashierService;
-    private final int tableNumber; // Store the table number
-    private final CustomTextField quantityInput; // Input field for quantity
 
-    public TableDialog(String tableTitle, CashierService cashierService, int tableNumber) {
+    public TableDialog(String tableName) {
         super();
-        this.cashierService = cashierService;
-        this.tableNumber = tableNumber; // Initialize table number
 
-        this.productTableView = createProductTableView(); // Initialize productTableView
-        this.quantityInput = new CustomTextField();
         setId("table-dialog");
-        header.setTitle("Table: " + tableTitle);
+        header.setTitle("Table: " );
 
         content.setBody(createContent());
         content.setPrefSize(1200, 800);
     }
 
 
-
     private VBox createContent() {
-        VBox mainLayout = new VBox(10);
-        mainLayout.setPadding(new Insets(20));
-        mainLayout.setAlignment(Pos.CENTER); // Center align all content
+        // Create main layout
+        HBox mainLayout = new HBox(10);
+        mainLayout.setPadding(new Insets(10));
 
-        Label quantityLabel = new Label("Enter Quantity:");
-        quantityInput.setPromptText("Quantity");
-        quantityInput.setPrefWidth(200);
+        // Left side layout
+        VBox leftSide = new VBox(10);
 
-        VBox leftPane = new VBox(10);
-        leftPane.setAlignment(Pos.TOP_LEFT);
-        leftPane.getChildren().addAll(quantityLabel, quantityInput, productTableView);
+        // Search Field
+        TextField searchField = new TextField();
+        searchField.setPromptText("Search products...");
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            loadProductsBySearch(newValue);
+        });
 
-        VBox rightPane = createCategoryButtons();
-        HBox mainContent = new HBox(20, leftPane, rightPane);
-        HBox.setHgrow(leftPane, Priority.ALWAYS);
-        leftPane.setPrefWidth(800);
-        rightPane.setPrefWidth(200);
-        mainLayout.getChildren().add(mainContent);
+        // Category Row
+        HBox categoryRow = new HBox(10);
+        List<Category> categories = CashierService.loadCategories();
+        Button allCategoryButton = new Button("All");
+        allCategoryButton.setOnAction(e -> loadProducts(null));
+        categoryRow.getChildren().add(allCategoryButton);
 
-        HBox footer = createFooter();
-        mainLayout.getChildren().add(footer);
+        // Create buttons for each category
+        for (Category category : categories) {
+            Button categoryButton = new Button(category.getName());
+            categoryButton.setOnAction(e -> loadProducts(category.getId()));
+            categoryRow.getChildren().add(categoryButton);
+        }
 
-        return mainLayout;
+        // Product Grid
+        productGrid = createProductGrid();
+        loadProducts(null); // Load all products initially
+
+        // Add components to left side
+        leftSide.getChildren().addAll(searchField, categoryRow, productGrid);
+
+        // Right side layout
+        VBox rightSide = createOrderSummary();
+
+        // Add both sides to main layout
+        mainLayout.getChildren().addAll(leftSide, rightSide);
+
+        // Set the main layout into the dialog's content area
+      return new VBox(mainLayout);
     }
 
-    private HBox createFooter() {
-        HBox footer = new HBox(10);
-        footer.setAlignment(Pos.CENTER);
-        footer.setPadding(new Insets(20, 0, 0, 0));
+    private VBox createOrderSummary() {
+        VBox orderSummary = new VBox(10);
+        orderSummary.setPadding(new Insets(10));
 
-        Label totalQuantityLabel = new Label("Total Quantity: " + getTotalQuantity());
-        Label totalDiscountLabel = new Label("Total Discount: " + getTotalDiscount());
-        Label totalPriceLabel = new Label("Total Price: " + getTotalPrice());
-
-        footer.getChildren().addAll(totalQuantityLabel, totalDiscountLabel, totalPriceLabel);
+        Label orderTitle = new Label("Order Summary");
+        orderList = new ListView<>();
+        totalQuantityText = new Text("Total Quantity: 0");
+        totalPriceText = new Text("Total Price: $0.00");
 
         Button backButton = new Button("Back");
-        Button cancelLastButton = new Button("Cancel Last Line");
-        Button quantityButton = new Button("Quantity");
-        Button calculateButton = new Button("Calculate");
-
         backButton.setOnAction(e -> close());
-        cancelLastButton.setOnAction(e -> cancelLastProduct());
-        quantityButton.setOnAction(e -> updateQuantity());
-        calculateButton.setOnAction(e -> openCalculateDialog());
 
-        footer.getChildren().addAll(backButton, cancelLastButton, quantityButton, calculateButton);
-        return footer;
+        Button payButton = new Button("Pay");
+        payButton.setOnAction(e -> handlePayment()); // Handle payment process
+
+        orderSummary.getChildren().addAll(orderTitle, orderList, totalQuantityText, totalPriceText, backButton, payButton);
+        return orderSummary;
     }
 
-    private void cancelLastProduct() {
-        if (!productTableView.getItems().isEmpty()) {
-            productTableView.getItems().remove(productTableView.getItems().size() - 1);
-        }
-    }
+    private VBox createProductBox(Product product) {
+        VBox productBox = new VBox(5);
+        productBox.setAlignment(Pos.CENTER);
 
-    private void updateQuantity() {
-        if (!productTableView.getItems().isEmpty() && !quantityInput.getText().isEmpty()) {
-            int quantity = Integer.parseInt(quantityInput.getText());
-            Product lastProduct = productTableView.getItems().get(productTableView.getItems().size() - 1);
-            lastProduct.setQuantity(quantity);
-            productTableView.refresh();
-        }
-    }
+        // Set image for product
+        ImageView productImage = new ImageView(new Image(getClass().getResourceAsStream(product.getImageLink())));
+        productImage.setFitWidth(100);
+        productImage.setFitHeight(100);
 
-    private void calculateTotal() {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Calculation");
-        alert.setHeaderText(null);
-        alert.setContentText("Total calculation logic goes here.");
-        alert.showAndWait();
-    }
+        // Product details
+        Label productName = new Label(product.getName());
+        Label productPrice = new Label(String.format("Price: $%.2f", product.getDiscountedPrice()));
 
-    private TableView<Product> createProductTableView() {
-        TableView<Product> tableView = new TableView<>();
-        tableView.setPrefHeight(400);
-        tableView.setPrefWidth(800);
-        tableView.setRowFactory(tv -> new TableRow<>() {
-            @Override
-            protected void updateItem(Product product, boolean empty) {
-                super.updateItem(product, empty);
-                if (product != null) {
-                    // Check for valid discount for the current product
-                    Discount validDiscount = CashierService.getValidDiscountForProduct(product.getId());
+        // Quantity input
+        TextField quantityField = new TextField("1");
+        quantityField.setPrefWidth(50);
 
-                    // If there is a valid discount, calculate the discount amount and final price
-                    if (validDiscount != null) {
-                        BigDecimal discountAmount = BigDecimal.valueOf(product.getPrice())
-                                .multiply(validDiscount.getDiscountPercentage().divide(BigDecimal.valueOf(100)))
-                                .setScale(2, RoundingMode.HALF_UP);
-                        BigDecimal finalPrice = BigDecimal.valueOf(product.getPrice()).subtract(discountAmount).setScale(2, RoundingMode.HALF_UP);
-
-                        // Create the discount label with formatted values
-                        Label discountLabel = new Label(String.format("Discount: %s - %s%% (Final Price: %s)",
-                                validDiscount.getDiscountName(),
-                                validDiscount.getDiscountPercentage().toString(),
-                                finalPrice.toString()));
-
-                        setGraphic(discountLabel);
-                    } else {
-                        // If no valid discount, clear the graphic
-                        setGraphic(null);
-                    }
-
-                    // Set product name or other properties as text
-                    setText(product.getName());
-                } else {
-                    setText(null);
-                    setGraphic(null);
-                }
-            }
-
-
-
+        // Add Product button
+        Button addButton = new Button("Add Product");
+        addButton.setOnAction(e -> {
+            int quantity = Integer.parseInt(quantityField.getText());
+            addProductToOrder(product, quantity);
         });
 
-        TableColumn<Product, String> nameColumn = new TableColumn<>("Product Name");
-        nameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getName()));
-        nameColumn.setMinWidth(300);
-
-        TableColumn<Product, Integer> quantityColumn = new TableColumn<>("Quantity");
-        quantityColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
-        quantityColumn.setMinWidth(100);
-
-        TableColumn<Product, Double> priceColumn = new TableColumn<>("Price");
-        priceColumn.setCellValueFactory(cellData -> new SimpleDoubleProperty(cellData.getValue().getPrice()).asObject());
-        priceColumn.setMinWidth(100);
-
-        TableColumn<Product, Double> totalColumn = new TableColumn<>("Total Amount");
-        totalColumn.setCellValueFactory(cellData -> {
-            BigDecimal price = BigDecimal.valueOf(cellData.getValue().getPrice());
-            int quantity = cellData.getValue().getQuantity();
-            BigDecimal total = price.multiply(BigDecimal.valueOf(quantity));
-            return new SimpleDoubleProperty(total.doubleValue()).asObject();
+        // Delete button
+        Button deleteButton = new Button("Remove");
+        deleteButton.setOnAction(e -> {
+            removeProductFromOrder(product);
         });
-        totalColumn.setMinWidth(200);
 
-        tableView.getColumns().addAll(nameColumn, quantityColumn, priceColumn, totalColumn);
-        return tableView;
+        productBox.getChildren().addAll(productImage, productName, productPrice, quantityField, addButton, deleteButton);
+        return productBox;
     }
 
-    private int getTotalQuantity() {
-        return productTableView.getItems().stream().mapToInt(Product::getQuantity).sum();
+    private void addProductToOrder(Product product, int quantity) {
+        addedProducts.add(product);
+        productQuantityMap.put(product, productQuantityMap.getOrDefault(product, 0) + quantity);
+        updateOrderList();
     }
 
-    private double getTotalDiscount() {
-        return productTableView.getItems().stream()
-                .filter(p -> p.getDiscount() != null)
-                .mapToDouble(p -> p.getDiscount().getDiscountPercentage()
-                        .multiply(BigDecimal.valueOf(p.getPrice()))
-                        .divide(BigDecimal.valueOf(100))
-                        .doubleValue()).sum();
+    private void removeProductFromOrder(Product product) {
+        if (addedProducts.remove(product)) {
+            productQuantityMap.remove(product);
+            updateOrderList();
+        }
     }
 
-    private double getTotalPrice() {
-        return productTableView.getItems().stream()
-                .mapToDouble(p -> {
-                    if (p.getDiscount() != null) {
-                        BigDecimal discountAmount = p.getDiscount().getDiscountPercentage()
-                                .multiply(BigDecimal.valueOf(p.getPrice()))
-                                .divide(BigDecimal.valueOf(100));
-                        return BigDecimal.valueOf(p.getPrice()).subtract(discountAmount).doubleValue() * p.getQuantity();
-                    }
-                    return p.getPrice() * p.getQuantity();
-                }).sum();
+    private void updateOrderList() {
+        orderList.getItems().clear(); // Clear existing items
+        int totalQuantity = 0;
+        double totalPrice = 0.0;
+
+        for (Product product : addedProducts) {
+            int quantity = productQuantityMap.get(product);
+            orderList.getItems().add(product.getName() + " - $" + product.getDiscountedPrice() + " x " + quantity);
+            totalQuantity += quantity;
+            totalPrice += product.getDiscountedPrice() * quantity;
+        }
+
+        totalQuantityText.setText("Total Quantity: " + totalQuantity);
+        totalPriceText.setText(String.format("Total Price: $%.2f", totalPrice));
     }
 
-    public void addProductToTable(Product product) {
-        for (Product existingProduct : productTableView.getItems()) {
-            if (existingProduct.getId() == product.getId()) {
-                existingProduct.setQuantity(existingProduct.getQuantity() + 1);
-                productTableView.refresh();
-                return;
+    private TilePane createProductGrid() {
+        TilePane productGrid = new TilePane();
+        productGrid.setHgap(10);
+        productGrid.setVgap(10);
+        productGrid.setPadding(new Insets(10));
+        return productGrid;
+    }
+
+    private void loadProducts(Integer categoryId) {
+        productGrid.getChildren().clear();
+
+        // Load products based on category from CashierService
+        List<Product> products = CashierService.loadProducts();
+        for (Product product : products) {
+            if (categoryId == null || product.getCategoryId() == categoryId) {
+                VBox productBox = createProductBox(product);
+                productGrid.getChildren().add(productBox);
             }
         }
-        product.setQuantity(1);
-        productTableView.getItems().add(product);
     }
 
-    private VBox createCategoryButtons() {
-        VBox categoryBox = new VBox(10);
-        categoryBox.setAlignment(Pos.TOP_LEFT);
+    private void loadProductsBySearch(String query) {
+        productGrid.getChildren().clear();
 
-        Label categoryLabel = new Label("Select a Category:");
-        categoryBox.getChildren().add(categoryLabel);
-
-        for (Category category : cashierService.getAllCategories()) {
-            Button categoryButton = new Button(category.getName());
-            categoryButton.setMinSize(150, 50);
-            categoryButton.setOnAction(e -> openCategorySelectionDialog(category, tableNumber));
-            categoryBox.getChildren().add(categoryButton);
+        List<Product> products = CashierService.loadProducts();
+        for (Product product : products) {
+            if (product.getName().toLowerCase().contains(query.toLowerCase())) {
+                VBox productBox = createProductBox(product);
+                productGrid.getChildren().add(productBox);
+            }
         }
-
-        return categoryBox;
     }
 
-
-    private void openCategorySelectionDialog(Category category, int tableNumber) {
-        CategorySelectionDialog dialog = new CategorySelectionDialog(productTableView, category.getId(), new ArrayList<>(), this, tableNumber);
-        dialog.showModalAndWait(getScene());
+    private void handlePayment() {
+        // Implement payment handling logic here
+        Alert paymentAlert = new Alert(Alert.AlertType.INFORMATION);
+        paymentAlert.setTitle("Payment");
+        paymentAlert.setHeaderText("Payment Successful");
+        paymentAlert.setContentText("Thank you for your order!");
+        paymentAlert.showAndWait();
     }
-
-    private void openCalculateDialog() {
-    double totalAmount = getTotalPrice();
-    CalculateDialog calculateDialog = new CalculateDialog(totalAmount, this);
-    calculateDialog.showModalAndWait(getScene());
-}
-
-
 }
