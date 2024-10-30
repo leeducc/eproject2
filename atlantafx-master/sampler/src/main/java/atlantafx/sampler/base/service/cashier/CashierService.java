@@ -146,4 +146,90 @@ public class CashierService {
     return products;
   }
 
+
+  // Fetch all products from the database
+  public List<Product> getAllProducts() {
+    List<Product> products = new ArrayList<>();
+    String sql = "SELECT id, image_link, name, price, category_id FROM products";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         Statement statement = connection.createStatement();
+         ResultSet resultSet = statement.executeQuery(sql)) {
+
+      while (resultSet.next()) {
+        Product product = new Product(
+                resultSet.getInt("id"),
+                resultSet.getString("image_link"),
+                resultSet.getString("name"),
+                resultSet.getDouble("price"),
+                resultSet.getInt("category_id")
+        );
+        products.add(product);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return products;
+  }
+
+  // Add a new product to the database
+  public boolean addProduct(Product product) {
+    String sql = "INSERT INTO products (image_link, name, price, category_id) VALUES (?, ?, ?, ?)";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      preparedStatement.setString(1, product.getImageLink());
+      preparedStatement.setString(2, product.getName());
+      preparedStatement.setBigDecimal(3, BigDecimal.valueOf(product.getPrice()));
+      preparedStatement.setInt(4, product.getCategoryId());
+
+      int rowsAffected = preparedStatement.executeUpdate();
+      return rowsAffected > 0;
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  // Update an existing product in the database
+  public boolean updateProduct(Product product) {
+    String sql = "UPDATE products SET image_link = ?, name = ?, price = ?, category_id = ? WHERE id = ?";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      preparedStatement.setString(1, product.getImageLink());
+      preparedStatement.setString(2, product.getName());
+      preparedStatement.setBigDecimal(3, BigDecimal.valueOf(product.getPrice()));
+      preparedStatement.setInt(4, product.getCategoryId());
+      preparedStatement.setInt(5, product.getId());
+
+      int rowsAffected = preparedStatement.executeUpdate();
+      return rowsAffected > 0;
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  // Delete a product from the database
+  public boolean deleteProduct(int productId) {
+    String sql = "DELETE FROM products WHERE id = ?";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      preparedStatement.setInt(1, productId);
+      int rowsAffected = preparedStatement.executeUpdate();
+      return rowsAffected > 0;
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
 }

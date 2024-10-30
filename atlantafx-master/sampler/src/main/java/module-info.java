@@ -35,6 +35,8 @@ module atlantafx.sampler {
     exports atlantafx.sampler.admin.event;
     exports atlantafx.sampler.admin.page.components;
 
+    opens atlantafx.sampler.base.entity.common;
+
 
 
 
