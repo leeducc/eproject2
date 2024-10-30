@@ -1,80 +1,75 @@
 package atlantafx.sampler.base.entity.common;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 public class Bill {
-  private int id;
-  private String nameTable;
-  private String productName;
-  private int quantity;
-  private double price;
+    private int id;
+    private int tableId;
+    private double totalAmount;
+    private int paymentMethodId;
+    private Timestamp createdAt;
+    private List<BillDetail> billDetails;
 
-  public Bill() {
-  }
+    public Bill(int id, int tableId, double totalAmount, int paymentMethodId, Timestamp createdAt, List<BillDetail> billDetails) {
+        this.id = id;
+        this.tableId = tableId;
+        this.totalAmount = totalAmount;
+        this.paymentMethodId = paymentMethodId;
+        this.createdAt = createdAt;
+        this.billDetails = billDetails;
+    }
 
-  // Constructor
-  public Bill(String nameTable, String productName, int quantity, double price) {
-    this.nameTable = nameTable;
-    this.productName = productName;
-    this.quantity = quantity;
-    this.price = price;
-  }
+    public Bill() {
+    }
 
-  public Bill(String nameTable, String productName, int quantity) {
-    this.nameTable = nameTable;
-    this.productName = productName;
-    this.quantity = quantity;
-  }
+    public int getId() {
+        return id;
+    }
 
-  // Getter and Setter methods
-  public int getId() {
-    return id;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public int getTableId() {
+        return tableId;
+    }
 
-  public String getNameTable() {
-    return nameTable;
-  }
+    public void setTableId(int tableId) {
+        this.tableId = tableId;
+    }
 
-  public void setNameTable(String nameTable) {
-    this.nameTable = nameTable;
-  }
+    public double getTotalAmount() {
+        return totalAmount;
+    }
 
-  public String getProductName() {
-    return productName;
-  }
+    public void setTotalAmount(double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 
-  public void setProductName(String productName) {
-    this.productName = productName;
-  }
+    public int getPaymentMethodId() {
+        return paymentMethodId;
+    }
 
-  public int getQuantity() {
-    return quantity;
-  }
+    public void setPaymentMethodId(int paymentMethodId) {
+        this.paymentMethodId = paymentMethodId;
+    }
 
-  public void setQuantity(int quantity) {
-    this.quantity = quantity;
-  }
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
 
-  public double getPrice() {
-    return price;
-  }
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
 
-  public void setPrice(double price) {
-    this.price = price;
-  }
+    public List<BillDetail> getBillDetails() {
+        return billDetails;
+    }
 
-  // Method to calculate the total price
-  public double calculateTotalPrice() {
-    return quantity * price;
-  }
-
-  // toString method for easy printing
-  @Override
-  public String toString() {
-    return "Bill [id=" + id + ", nameTable=" + nameTable + ", productName=" + productName +
-        ", quantity=" + quantity + ", price=" + price + ", totalPrice=" + calculateTotalPrice() + "]";
-  }
+    public void setBillDetails(List<BillDetail> billDetails) {
+        this.billDetails = billDetails;
+    }
 }
+
 
