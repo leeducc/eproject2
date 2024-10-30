@@ -1,5 +1,4 @@
 package atlantafx.sampler.cashier.page.components;
-
 import atlantafx.sampler.base.entity.common.Bill;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
@@ -27,7 +26,7 @@ public class OrderListPage {
   public static final String NAME = "Order List";
   static ListView<String> drinkList = new ListView<>();
 
-  void showCheckOrderDialog() {
+  public void showCheckOrderDialog() {
     Dialog<VBox> dialog = new Dialog<>();
     dialog.setTitle("Quản lý hóa đơn");
     dialog.setHeaderText("Xem và quản lý hóa đơn của bàn: " + TableListPage.getTitle());
@@ -60,7 +59,8 @@ public class OrderListPage {
       if ("All".equals(selectedFilter)) {
         drinkList.setItems(CashierService.InitializeProductName1());
       } else {
-        drinkList.setItems(CashierService.InitializeProductNameCategory(selectedFilter));
+        drinkList.setItems(CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
+            selectedFilter)));
       }
     });
 
@@ -99,7 +99,8 @@ public class OrderListPage {
       if ("All".equals(selectedFilter)) {
         drinkList.setItems(CashierService.InitializeProductName1());
       } else {
-        drinkList.setItems(CashierService.InitializeProductNameCategory(selectedFilter));
+        drinkList.setItems(CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
+            (selectedFilter))));
       }
 
       // Check for empty list state after setting items

@@ -127,14 +127,6 @@
                 <targetPath>atlantafx/sampler/page</targetPath>
                 <filtering>false</filtering>
             </resource>
-            <resource>
-                <directory>src/main/resources/images/products</directory>
-                <includes>
-                    <include>**/*.png</include>
-                    <include>**/*.jpg</include>
-                    <include>**/*.jpeg</include>
-                </includes>
-            </resource>
             <!-- copy icons -->
             <resource>
                 <directory>icons</directory>

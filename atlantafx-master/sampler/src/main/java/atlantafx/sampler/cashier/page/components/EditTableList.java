@@ -24,14 +24,13 @@ import javafx.stage.Modality;
 public class EditTableList extends OutlinePage {
 
   public static final String NAME = "Edit List Tables";
-  private static Label selectedTableLabel;
   private GridPane grid;
   private static String title;
   private int currentPage = 1;
   private final int itemsPerPage = 12;
   private String currentKeyword = ""; // Store the current search keyword
   private TextField searchField; // Text field for keyword search
-  static OrderListPage orderListPage = new OrderListPage();
+
 
   @Override
   public String getName() {

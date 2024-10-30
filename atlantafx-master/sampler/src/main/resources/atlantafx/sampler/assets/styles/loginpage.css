@@ -1,42 +1,53 @@
-/* styles.css */
-.root {
-    display: flex;
-    height: 100vh;
+/* loginpage.css */
+.image-pane {
+  background-color: #2d2d2d;
+  -fx-alignment: center;
 }
 
-.left-pane {
-    flex: 1;
-    background-image: url('atlantafx/sampler/images/login.svg'); /* Update with your image path */
-    background-size: cover;
-    background-position: center;
+.login-form {
+  -fx-padding: 40px;
+  -fx-spacing: 20px;
+  -fx-alignment: center;
+  -fx-background-color: #ffffff;
 }
 
-.right-pane {
-    flex: 1;
-    padding: 40px;
-    background-color: #f8f8f8;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.login-form .text-field, .login-form .password-field {
+  -fx-font-size: 14px;
+  -fx-padding: 10px;
+  -fx-background-radius: 8px;
+  -fx-border-radius: 8px;
+  -fx-border-color: #ccc;
+  -fx-border-width: 1px;
+  -fx-prompt-text-fill: #888;
 }
 
-.right-pane label {
-    font-weight: bold;
+.login-form .button {
+  -fx-background-color: #3b5998;
+  -fx-text-fill: #ffffff;
+  -fx-font-weight: bold;
+  -fx-background-radius: 8px;
+  -fx-padding: 10px 20px;
+  -fx-cursor: hand;
 }
 
-.right-pane input, .right-pane button, .right-pane select {
-    margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
+.login-form .button:hover {
+  -fx-background-color: #314e8c;
 }
 
-.right-pane button {
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
+.login-form .text-field, .login-form .password-field {
+  -fx-max-width: 250px;
 }
 
-.right-pane button:hover {
-    background-color: #0056b3;
+.login-form .button {
+  -fx-max-width: 250px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 600px) {
+  .image-pane {
+    -fx-pref-width: 0;
+  }
+  .login-form {
+    -fx-padding: 20px;
+  }
 }

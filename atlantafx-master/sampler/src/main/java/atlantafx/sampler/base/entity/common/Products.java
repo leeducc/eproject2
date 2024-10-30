@@ -1,64 +1,67 @@
 package atlantafx.sampler.base.entity.common;
 
 public class Products {
-  private int id;
-  private String imageLink;
-  private String category;
-  private String name;
-  private double price;
+    private int id;
+    private String imageLink;
+    private String name;
+    private double price;
+    private int categoryId;
 
-  public Products(String imageLink, String category, String name, double price) {
-    this.imageLink = imageLink;
-    this.category = category;
-    this.name = name;
-    this.price = price;
-  }
+    public Products(int id, String imageLink, String name, double price, int categoryId) {
+        this.id = id;
+        this.imageLink = imageLink;
+        this.name = name;
+        this.price = price;
+        this.categoryId = categoryId;
+    }
 
-  public Products(int id, String imageLink, String category, String name, double price) {
-    this.id = id;
-    this.imageLink = imageLink;
-    this.category = category;
-    this.name = name;
-    this.price = price;
-  }
+    public Products(String imageLink, String name, double price, int categoryId) {
+        this.imageLink = imageLink;
+        this.name = name;
+        this.price = price;
+        this.categoryId = categoryId;
+    }
 
-  public int getId() {
-    return id;
-  }
+    public Products() {
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public double getPrice() {
-    return price;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setPrice(double price) {
-    this.price = price;
-  }
+    public String getImageLink() {
+        return imageLink;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getCategory() {
-    return category;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setCategory(String category) {
-    this.category = category;
-  }
+    public double getPrice() {
+        return price;
+    }
 
-  public String getImageLink() {
-    return imageLink;
-  }
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
-  public void setImageLink(String imageLink) {
-    this.imageLink = imageLink;
-  }
+    public int getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 }

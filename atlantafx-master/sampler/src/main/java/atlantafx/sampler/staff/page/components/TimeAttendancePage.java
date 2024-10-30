@@ -1,13 +1,14 @@
 package atlantafx.sampler.staff.page.components;
 
-
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.service.UserSession;
+import atlantafx.sampler.staff.entity.AttendanceRecord;
 import atlantafx.sampler.staff.page.OutlinePage;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
@@ -61,13 +62,21 @@ public class TimeAttendancePage extends OutlinePage {
         attendanceTable = new TableView<>();
         setupTable();
 
-        VBox mainLayout = new VBox(20, datePickers, checkInButton, checkInStatus, checkOutButton, checkOutStatus, viewAttendanceButton, attendanceTable);
-        mainLayout.setPadding(new Insets(20));
+        // Sử dụng GridPane để tổ chức các phần tử UI
+        GridPane layout = new GridPane();
+        layout.setPadding(new Insets(20));
+        layout.setVgap(20);
+        layout.setHgap(10);
+        layout.add(datePickers, 0, 0, 4, 1);
+        layout.add(checkInButton, 0, 1);
+        layout.add(checkInStatus, 1, 1);
+        layout.add(checkOutButton, 2, 1);
+        layout.add(checkOutStatus, 3, 1);
+        layout.add(viewAttendanceButton, 0, 2);
+        layout.add(attendanceTable, 0, 3, 4, 1);
 
-        BorderPane root = new BorderPane();
-        root.setCenter(mainLayout); // Đặt giao diện chính vào giữa trang
-
-        addNode(root); // Thêm root vào giao diện của OutlinePage
+        // Thêm vào Scene graph
+        getChildren().add(layout); // Thay vì sử dụng BorderPane, trực tiếp thêm layout vào Scene graph
     }
 
     private void setupTable() {
@@ -183,27 +192,5 @@ public class TimeAttendancePage extends OutlinePage {
         }
     }
 
-    public static class AttendanceRecord {
-        private final SimpleStringProperty date;
-        private final SimpleStringProperty checkIn;
-        private final SimpleStringProperty checkOut;
 
-        public AttendanceRecord(String date, String checkIn, String checkOut) {
-            this.date = new SimpleStringProperty(date);
-            this.checkIn = new SimpleStringProperty(checkIn);
-            this.checkOut = new SimpleStringProperty(checkOut);
-        }
-
-        public SimpleStringProperty dateProperty() {
-            return date;
-        }
-
-        public SimpleStringProperty checkInProperty() {
-            return checkIn;
-        }
-
-        public SimpleStringProperty checkOutProperty() {
-            return checkOut;
-        }
-    }
 }

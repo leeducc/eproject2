@@ -1,5 +1,3 @@
-/* SPDX-License-Identifier: MIT */
-
 package atlantafx.sampler.cashier.layout;
 
 import atlantafx.base.controls.Card;
@@ -20,10 +18,33 @@ public abstract class ModalDialog extends ModalBox {
 
     protected final Card content = new Card();
     protected final Tile header = new Tile();
+    private boolean isShown = false;
 
     public ModalDialog() {
         super("#" + CashierApp.MAIN_MODAL_ID);
         createView();
+    }
+
+    // Custom method to show the dialog and wait until it closes
+    public void showModalAndWait(Scene scene) {
+        var modalPane = (ModalPane) scene.lookup("#" + CashierApp.MAIN_MODAL_ID);
+        if (modalPane != null) {
+            modalPane.show(this);
+            isShown = true;
+
+            // Wait until the dialog is closed
+            modalPane.visibleProperty().addListener((observable, oldValue, newValue) -> {
+                if (!newValue) {
+                    isShown = false;
+                    onDialogClosed();
+                }
+            });
+        }
+    }
+
+    // Override this method in child classes to handle actions after closing
+    protected void onDialogClosed() {
+        // Custom actions when the dialog closes, if any.
     }
 
     public void show(Scene scene) {
@@ -35,7 +56,6 @@ public abstract class ModalDialog extends ModalBox {
         content.setHeader(header);
         content.getStyleClass().add(Tweaks.EDGE_TO_EDGE);
 
-        // IMPORTANT: this guarantees client will use correct width and height
         setMinWidth(USE_PREF_SIZE);
         setMaxWidth(USE_PREF_SIZE);
         setMinHeight(USE_PREF_SIZE);
@@ -63,4 +83,7 @@ public abstract class ModalDialog extends ModalBox {
 
         return footer;
     }
+
 }
+
+

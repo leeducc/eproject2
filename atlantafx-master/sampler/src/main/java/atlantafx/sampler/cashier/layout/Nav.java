@@ -37,9 +37,7 @@ record Nav(String title,
             || (searchKeywords != null && searchKeywords.stream().anyMatch(keyword -> contains(keyword, filter)));
     }
 
-    public boolean isTagged() {
-        return pageClass != null && TAGGED_PAGES.contains(pageClass);
-    }
+
 
     private boolean contains(String text, String filter) {
         return text.toLowerCase().contains(filter.toLowerCase());

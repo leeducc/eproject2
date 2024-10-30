@@ -1,5 +1,6 @@
 package atlantafx.sampler.base.util;
 
+import java.util.Objects;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Pos;
@@ -11,8 +12,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
-import java.util.Objects;
 
 public class AlertUtil {
 

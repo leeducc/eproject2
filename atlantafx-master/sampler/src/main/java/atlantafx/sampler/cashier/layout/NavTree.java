@@ -53,7 +53,7 @@ public final class NavTree extends TreeView<Nav> {
         private final HBox root;
         private final Label titleLabel;
         private final Node arrowIcon;
-        private final Label tagLabel;
+
 
         public NavTreeCell() {
             super();
@@ -65,12 +65,11 @@ public final class NavTree extends TreeView<Nav> {
             arrowIcon = new FontIcon();
             arrowIcon.getStyleClass().add("arrow");
 
-            tagLabel = new Label("new");
-            tagLabel.getStyleClass().add("tag");
+
 
             root = new HBox();
             root.setAlignment(Pos.CENTER_LEFT);
-            root.getChildren().setAll(titleLabel, new Spacer(), arrowIcon, tagLabel);
+            root.getChildren().setAll(titleLabel, new Spacer(), arrowIcon);
             root.setCursor(Cursor.HAND);
             root.getStyleClass().add("container");
             root.setMaxWidth(CashierApp.SIDEBAR_WIDTH - 10);
@@ -106,7 +105,7 @@ public final class NavTree extends TreeView<Nav> {
 
                 pseudoClassStateChanged(GROUP, nav.isGroup());
                 NodeUtils.toggleVisibility(arrowIcon, nav.isGroup());
-                NodeUtils.toggleVisibility(tagLabel, nav.isTagged());
+
             }
         }
     }
@@ -147,10 +146,6 @@ public final class NavTree extends TreeView<Nav> {
                                 String... searchKeywords) {
             Objects.requireNonNull(pageClass, "pageClass");
             return new Item(new Nav(title, null, pageClass, List.of(searchKeywords)));
-        }
-
-        public Class<? extends Page> getPageClass() {
-            return nav.pageClass();
         }
     }
 }

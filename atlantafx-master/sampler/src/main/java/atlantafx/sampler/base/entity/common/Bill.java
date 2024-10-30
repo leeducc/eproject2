@@ -6,7 +6,6 @@ public class Bill {
   private String productName;
   private int quantity;
   private double price;
-
   public Bill() {
   }
 
@@ -77,4 +76,3 @@ public class Bill {
         ", quantity=" + quantity + ", price=" + price + ", totalPrice=" + calculateTotalPrice() + "]";
   }
 }
-

@@ -3,6 +3,7 @@
 package atlantafx.sampler.cashier.layout;
 
 import atlantafx.base.controls.ModalPane;
+import atlantafx.sampler.Resources;
 import atlantafx.sampler.base.util.NodeUtils;
 import javafx.geometry.Insets;
 import javafx.scene.layout.AnchorPane;
@@ -19,7 +20,9 @@ public final class CashierApp extends AnchorPane {
         // this is the place to apply user custom CSS,
         // one level below the ':root'
         var body = new StackPane();
+        body.getStylesheets().addAll(Resources.resolve("assets/styles/index.css"));
         body.getStyleClass().add("body");
+        body.setStyle("-fx-font-size: 16px;");
 
         var modalPane = new ModalPane();
         modalPane.setId(MAIN_MODAL_ID);

@@ -5,7 +5,7 @@ package atlantafx.sampler.admin.layout;
 import atlantafx.base.controls.Spacer;
 import atlantafx.base.theme.Tweaks;
 import atlantafx.sampler.admin.page.Page;
-import atlantafx.sampler.admin.page.components.ListDeliveryOrderPage;
+import atlantafx.sampler.admin.page.components.MakeSchedulePage;
 import atlantafx.sampler.base.util.NodeUtils;
 import java.util.Collections;
 import java.util.List;
@@ -137,7 +137,7 @@ public final class NavTree extends TreeView<Nav> {
         }
 
         public static Item page(String title,
-                                Class<ListDeliveryOrderPage> pageClass) {
+                                Class<MakeSchedulePage> pageClass) {
             Objects.requireNonNull(pageClass, "pageClass");
             return new Item(new Nav(title, null, pageClass, Collections.emptyList()));
         }

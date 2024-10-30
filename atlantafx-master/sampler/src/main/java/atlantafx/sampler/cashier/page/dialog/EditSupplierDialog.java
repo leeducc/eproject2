@@ -2,6 +2,9 @@ package atlantafx.sampler.cashier.page.dialog;
 
 import atlantafx.sampler.admin.entity.Supplier;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,10 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class EditSupplierDialog extends Stage {
     private final Supplier supplier;
