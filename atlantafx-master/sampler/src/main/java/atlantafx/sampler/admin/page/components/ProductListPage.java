@@ -7,20 +7,21 @@ import atlantafx.sampler.base.util.AlertUtil;
 import atlantafx.sampler.cashier.page.components.ListProductPage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -34,21 +35,21 @@ import javafx.stage.Stage;
 
 public class ProductListPage extends OutlinePage {
 
-    public static final String NAME = "Product List Page";
+  public static final String NAME = "Product List Page";
   List<Products> filteredProducts = new ArrayList<>();
   CashierService cf = new CashierService();
   public static File selectedFile;
   Stage primaryStage;
 
-    @Override
-    public String getName() {
-        return NAME;
-    }
+  @Override
+  public String getName() {
+    return NAME;
+  }
 
-    public ProductListPage() {
-        super();
-      viewProduct();
-    }
+  public ProductListPage() {
+    super();
+    viewProduct();
+  }
 
   public void viewProduct() {
     // Main layout
@@ -66,6 +67,8 @@ public class ProductListPage extends OutlinePage {
 
     Button addNewProductButton = new Button("Thêm mới đồ uống");
     addNewProductButton.getStyleClass().add("add-button");
+    Button addNewCategoryProductButton = new Button("Thêm mới loại đồ uống");
+    addNewCategoryProductButton.getStyleClass().add("add-button");
 
     // ComboBox for filtering
     ComboBox<String> comboBox = CashierService.createPayCategoriesSelectionBox();
@@ -112,6 +115,20 @@ public class ProductListPage extends OutlinePage {
         System.out.println("khong thay doi");
       }
     });
+    addNewCategoryProductButton.setOnAction(e -> {
+      String categoryName = showNewCategoryDialog(primaryStage);
+      if (categoryName != null) {
+        if (CashierService.getIdByCategoryName(categoryName) > 0) {
+          AlertUtil.showErrorAlert("Danh mục đã tồn tại");
+        } else {
+          CashierService.addNewCategory(categoryName);
+          updateProductGrid(gridPane, filteredProducts);
+          AlertUtil.showErrorAlert("Thêm Thành Công");
+        }
+      } else {
+        System.out.println("khong thay doi");
+      }
+    });
     cf.createProductGrid(filteredProducts, gridPane);
 
     // ScrollPane for Product Grid Layout
@@ -123,9 +140,56 @@ public class ProductListPage extends OutlinePage {
     scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
     // Add components to the main layout, including the ScrollPane
-    mainLayout.getChildren().addAll(topLayout, scrollPane, addNewProductButton);
+    mainLayout.getChildren()
+        .addAll(topLayout, scrollPane, addNewProductButton, addNewCategoryProductButton);
     getChildren().add(mainLayout);
   }
+
+  private static String showNewCategoryDialog(Stage primaryStage) {
+    Dialog<String> dialog = new Dialog<>();
+    AtomicReference<String> categoryNameText = new AtomicReference<>("");
+    dialog.setHeaderText(null);
+
+    URL cssFile = ProductListPage.class.getResource("/css/cssDiaLog.css");
+    if (cssFile != null) {
+      dialog.getDialogPane().getStylesheets().add(cssFile.toExternalForm());
+    } else {
+      System.out.println("File CSS không tồn tại tại đường dẫn: /css/cssDiaLogAddCategory.css");
+    }
+
+    TextField categoryName = new TextField();
+    categoryName.getStyleClass().add("dialog-text-field");
+
+    GridPane grid = new GridPane();
+    grid.getStyleClass().add("dialog-grid-pane");
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPadding(new Insets(20, 150, 10, 10));
+
+    grid.add(new Label("Tên loại đồ uống:"), 0, 0);
+    grid.add(categoryName, 1, 0);
+
+    dialog.getDialogPane().setContent(grid);
+
+    // Thêm ButtonType.OK và ButtonType.CANCEL để tránh NullPointerException
+    dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    dialog.setResultConverter(button -> {
+      if (button == ButtonType.OK) {
+        String getCategoryNameText = categoryName.getText().trim();
+        if (!getCategoryNameText.isEmpty()) {
+          return getCategoryNameText;
+        } else {
+          AlertUtil.showErrorAlert("Vui lòng nhập tên loại đồ uống");
+        }
+      }
+      return null;
+    });
+
+    return dialog.showAndWait().orElse(null);
+  }
+
+
+
 
   private void updateProductGrid(GridPane gridPane, List<Products> productList) {
     gridPane.getChildren().clear();
@@ -136,7 +200,7 @@ public class ProductListPage extends OutlinePage {
     Dialog<Products> dialog = new Dialog<>();
     dialog.setHeaderText(null);
     dialog.getDialogPane().getStylesheets().add(
-        ListProductPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
+        ProductListPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
     );
 
     TextField imageLink = new TextField();

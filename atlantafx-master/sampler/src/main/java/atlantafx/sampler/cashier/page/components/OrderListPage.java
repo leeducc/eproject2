@@ -1,5 +1,7 @@
 package atlantafx.sampler.cashier.page.components;
+
 import atlantafx.sampler.base.entity.common.Bill;
+import atlantafx.sampler.base.entity.common.Voucher;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.base.util.AlertUtil;
@@ -44,7 +46,6 @@ public class OrderListPage {
     searchBar.setPrefWidth(300);
     searchBar.getStyleClass().add("text-field");
 
-
     Button checkOut = new Button("Thanh Toán");
 
     ComboBox<String> comboBox = CashierService.createPayCategoriesSelectionBox();
@@ -59,8 +60,9 @@ public class OrderListPage {
       if ("All".equals(selectedFilter)) {
         drinkList.setItems(CashierService.InitializeProductName1());
       } else {
-        drinkList.setItems(CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
-            selectedFilter)));
+        drinkList.setItems(
+            CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
+                selectedFilter)));
       }
     });
 
@@ -82,25 +84,41 @@ public class OrderListPage {
       drinkList = CashierService.InitializeProductName();
     }
 
-
     Label quantityLabel = new Label("Số lượng:");
     Spinner<Integer> quantitySpinner = new Spinner<>(1, 20, 1);
     Button addButton = new Button("Thêm vào hóa đơn");
 
     VBox billContainer = new VBox(10);
 
+    Label voucher = new Label("Giảm Tổng Đơn:");
+    ComboBox<String> comboBoxVoucherTotal = CashierService.createVoucherSelectionBox();
+    comboBoxVoucherTotal.getItems().add("Không");
+    comboBoxVoucherTotal.setValue("Giảm giá");
+    comboBoxVoucherTotal.getStyleClass().add("combo-box");
+
+
     Label totalLabel = new Label("Tổng cộng:");
     TextField totalField = new TextField("0");
     totalField.setEditable(false);
 
     ComboBox<String> methodComboBox = CashierService.createPayMethodSelectionBox();
+
+    comboBoxVoucherTotal.setOnAction(e ->{
+      if(!comboBoxVoucherTotal.getValue().equals("Không")) {
+        voucherAllBill(billContainer, totalField,
+            Integer.valueOf(removeLastChar(comboBoxVoucherTotal.getValue())));
+      }else {
+        updateAllBill(billContainer, totalField);
+      }
+    });
     comboBox.setOnAction(e -> {
       String selectedFilter = comboBox.getValue();
       if ("All".equals(selectedFilter)) {
         drinkList.setItems(CashierService.InitializeProductName1());
       } else {
-        drinkList.setItems(CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
-            (selectedFilter))));
+        drinkList.setItems(
+            CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
+                (selectedFilter))));
       }
 
       // Check for empty list state after setting items
@@ -109,23 +127,15 @@ public class OrderListPage {
       }
     });
     updateAllBill(billContainer, totalField);
-//    listHasOrdered.setOnAction(e -> updateAllBill(billContainer, totalField));
     addButton.setOnAction(e -> {
       String selectedDrink = drinkList.getSelectionModel().getSelectedItem();
       if (selectedDrink == null) {
         AlertUtil.showErrorAlert("Vui lòng chọn món để thêm vào hóa đơn");
-      }else {
+      } else {
         int quantity = quantitySpinner.getValue();
         handleAddToBill(selectedDrink, quantity, billContainer, totalField);
-      }});
-//    drinkList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-//      if (drinkList.getItems() == null || drinkList.getItems().isEmpty() || newValue == null) {
-//        return;
-//      }
-//      int quantity = quantitySpinner.getValue();
-//      handleAddToBill(newValue, quantity, billContainer, totalField);
-//      drinkList.getSelectionModel().clearSelection();
-//    });
+      }
+    });
 
     checkOut.setOnAction(e -> {
       List<Bill> newBill = CashierService.getBillByNameTable(TableListPage.getTitle());
@@ -135,7 +145,8 @@ public class OrderListPage {
         AlertUtil.showErrorAlert("Bàn " + TableListPage.getTitle() + " chưa có đặt đồ uống");
       } else {
         updateAllBill(billContainer, totalField);
-        TableCoffeeService.updateStatusTable(2, TableListPage.getTitle()); // Cập nhật trạng thái bàn thành "đã thanh toán"
+        TableCoffeeService.updateStatusTable(2,
+            TableListPage.getTitle()); // Cập nhật trạng thái bàn thành "đã thanh toán"
 
         double totalAmount = Double.parseDouble(totalField.getText());
         if (totalAmount > 0) {
@@ -155,10 +166,6 @@ public class OrderListPage {
       }
     });
 
-
-
-
-
     ScrollPane billScrollPane = new ScrollPane(billContainer);
     billScrollPane.setFitToWidth(true);
     billScrollPane.setPrefHeight(300);
@@ -175,7 +182,7 @@ public class OrderListPage {
     HBox containersHBox = new HBox(10, drinkListContainer, billContainerContainer);
 
     VBox orderLayout = new VBox(10, selectedTableLabel, searchBar, comboBox, quantityLabel,
-        quantitySpinner, addButton, containersHBox, totalLabel, totalField,
+        quantitySpinner, addButton, containersHBox, totalLabel, totalField,voucher, comboBoxVoucherTotal,
         methodComboBox, checkOut);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
@@ -204,7 +211,7 @@ public class OrderListPage {
       Bill bill = new Bill(TableListPage.getTitle(), selectedDrink, quantity, price);
       CashierService.addOrderBill(bill);
 
-      HBox billRow = createBillRow(bill, billContainer, totalField, subTotal);
+      HBox billRow = createBillRow(bill, billContainer, totalField, subTotal, bill.getVoucher());
       billContainer.getChildren().add(billRow);
 
       updateTotalField(totalField, subTotal);
@@ -212,7 +219,8 @@ public class OrderListPage {
     }
   }
 
-  private HBox createBillRow(Bill bill, VBox billContainer, TextField totalField, double subTotal) {
+  private HBox createBillRow(Bill bill, VBox billContainer, TextField totalField, double subTotal,
+      int valueVoucher) {
     HBox billRow = new HBox(10);
     Label billInfo = new Label(bill.getProductName() + " - Số lượng: " + bill.getQuantity()
         + " - Giá: " + bill.getPrice() * bill.getQuantity() + " VND");
@@ -228,11 +236,76 @@ public class OrderListPage {
       CashierService.removeOrderBill(bill);
       billContainer.getChildren().remove(billRow);
       updateTotalField(totalField, -subTotal);
+      updateAllBill(billContainer, totalField);
     });
 
-    billRow.getChildren().addAll(billInfo, editButton, deleteButton);
+    ComboBox<String> comboBoxVoucher = CashierService.createVoucherSelectionBox();
+    comboBoxVoucher.getItems().add("Không");
+    if (bill.getVoucher() != 0) {
+      comboBoxVoucher.setValue(valueVoucher + "%");
+    } else {
+      comboBoxVoucher.setValue("Giảm giá");
+    }
+    comboBoxVoucher.getStyleClass().add("combo-box");
+    comboBoxVoucher.setOnAction(e -> {
+      String selectedVoucher = comboBoxVoucher.getValue();
+      if(!selectedVoucher.equals("Không")) {
+        int discountValue = Integer.parseInt(removeLastChar(selectedVoucher));
+
+        // Apply the voucher and update the bill display
+        handleVoucher(bill, billContainer, totalField, discountValue);
+      }else {
+        handleVoucher(bill, billContainer, totalField, 0);
+      }
+    });
+
+    billRow.getChildren().addAll(billInfo, editButton, deleteButton, comboBoxVoucher);
     return billRow;
   }
+
+  private void handleVoucher(Bill bill, VBox billContainer, TextField totalField,
+      int valueVoucher) {
+    double originPrice = CashierService.getProductByName(bill.getProductName()).getPrice();
+    double discount = originPrice * ((double) valueVoucher / 100);
+    double discountedPrice = originPrice - discount;
+    bill.setPrice(discountedPrice); // Cập nhật giá đã giảm vào Bill
+    bill.setVoucher(valueVoucher);
+    CashierService.updateOrderBill(bill);
+    updateAllBill(billContainer, totalField);
+  }
+
+
+  public static String removeLastChar(String str) {
+    if (str == null || str.isEmpty()) {
+      return str; // Trả về chuỗi ban đầu nếu null hoặc rỗng
+    }
+    return str.substring(0, str.length() - 1);
+  }
+
+//  private void handleVoucher(Bill bill, VBox billContainer, TextField totalField) {
+//
+//
+//
+//
+//      // Tìm và lấy chi tiết của phiếu giảm giá dựa trên mã phiếu
+//      Voucher voucher = CashierService.getVoucherByCode(voucherCode);
+//      if (voucher != null) {
+//        // Tính toán giảm giá
+//        double discount = voucher.getVoucherPercentage();
+//        double originalPrice = bill.getPrice() * bill.getQuantity();
+//        double discountedPrice = originalPrice - (originalPrice * (discount / 100));
+//
+//        // Cập nhật lại Bill và lưu vào database
+//        bill.setDiscount(discount);
+//        bill.setDiscountedPrice(discountedPrice);
+//        CashierService.updateOrderBill(bill);
+//
+//        // Cập nhật lại hiển thị trong billContainer và tổng tiền
+//        updateAllBill(billContainer, totalField);
+//      } else {
+//        AlertUtil.showErrorAlert("Phiếu giảm giá không hợp lệ hoặc đã hết hạn!");
+//      }
+//  }
 
   private void handleEditBill(Bill bill, VBox billContainer, TextField totalField) {
     Dialog<Bill> editDialog = new Dialog<>();
@@ -282,6 +355,7 @@ public class OrderListPage {
           }
         }
       }
+      updateAllBill(billContainer, totalField);
     });
   }
 
@@ -292,16 +366,39 @@ public class OrderListPage {
 
     if (bills == null || bills.isEmpty()) {
       AlertUtil.showErrorAlert("Đặt đồ uống cho Bàn " + TableListPage.getTitle());
+      // Reset các ComboBox nếu không có hóa đơn
     } else {
       for (Bill bill : bills) {
         double subTotal = bill.getQuantity() * bill.getPrice();
-        HBox billRow = createBillRow(bill, billContainer, totalField, subTotal);
+        HBox billRow = createBillRow(bill, billContainer, totalField, subTotal, bill.getVoucher());
         billContainer.getChildren().add(billRow);
         total += subTotal;
       }
       updateTotalField(totalField, total);
+      // Cập nhật các ComboBox dựa trên các hóa đơn hiện có
     }
   }
+  private void voucherAllBill(VBox billContainer, TextField totalField,int voucher) {
+    List<Bill> bills = CashierService.getBillByNameTable(TableListPage.getTitle());
+    billContainer.getChildren().clear();
+    double total = 0;
+
+    if (bills == null || bills.isEmpty()) {
+      AlertUtil.showErrorAlert("Đặt đồ uống cho Bàn " + TableListPage.getTitle());
+      // Reset các ComboBox nếu không có hóa đơn
+    } else {
+      for (Bill bill : bills) {
+        double subTotal = bill.getQuantity() * bill.getPrice();
+        HBox billRow = createBillRow(bill, billContainer, totalField, subTotal, bill.getVoucher());
+        billContainer.getChildren().add(billRow);
+        total += subTotal;
+      }
+      total = total * (100 - voucher)/100;
+      updateTotalField(totalField, total);
+    }
+  }
+
+
 
   private static void updateTotalField(TextField totalField, double newTotal) {
     totalField.setText(String.valueOf(newTotal));

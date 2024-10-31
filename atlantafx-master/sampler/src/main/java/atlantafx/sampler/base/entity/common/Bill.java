@@ -6,6 +6,16 @@ public class Bill {
   private String productName;
   private int quantity;
   private double price;
+  private int voucher;
+
+  public int getVoucher() {
+    return voucher;
+  }
+
+  public void setVoucher(int voucher) {
+    this.voucher = voucher;
+  }
+
   public Bill() {
   }
 
@@ -15,6 +25,16 @@ public class Bill {
     this.productName = productName;
     this.quantity = quantity;
     this.price = price;
+  }
+
+  public Bill(String nameTable, String productName, int quantity, double price,
+      int voucher) {
+    this.id = id;
+    this.nameTable = nameTable;
+    this.productName = productName;
+    this.quantity = quantity;
+    this.price = price;
+    this.voucher = voucher;
   }
 
   public Bill(String nameTable, String productName, int quantity) {
@@ -70,9 +90,16 @@ public class Bill {
   }
 
   // toString method for easy printing
+
   @Override
   public String toString() {
-    return "Bill [id=" + id + ", nameTable=" + nameTable + ", productName=" + productName +
-        ", quantity=" + quantity + ", price=" + price + ", totalPrice=" + calculateTotalPrice() + "]";
+    return "Bill{" +
+        "id=" + id +
+        ", nameTable='" + nameTable + '\'' +
+        ", productName='" + productName + '\'' +
+        ", quantity=" + quantity +
+        ", price=" + price +
+        ", voucher=" + voucher +
+        '}';
   }
 }
