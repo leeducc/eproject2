@@ -1,11 +1,11 @@
 package atlantafx.sampler.cashier.layout;
 
-import atlantafx.sampler.cashier.page.components.OrderListPage;
-import atlantafx.sampler.cashier.page.components.TableListPage;
 import atlantafx.sampler.cashier.event.DefaultEventBus;
 import atlantafx.sampler.cashier.event.NavEvent;
 import atlantafx.sampler.cashier.page.Page;
-import atlantafx.sampler.cashier.page.components.*;
+import atlantafx.sampler.cashier.page.components.EditTableList;
+import atlantafx.sampler.cashier.page.components.ListProductPage;
+import atlantafx.sampler.cashier.page.components.TableListPage;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -36,8 +36,8 @@ public class MainModel {
 
     List<NavTree.Item> findPages(String filter) {
         return NAV_TREE.values().stream()
-                .filter(item -> item.getValue() != null && item.getValue().matches(filter))
-                .toList();
+            .filter(item -> item.getValue() != null && item.getValue().matches(filter))
+            .toList();
     }
 
     public MainModel() {
@@ -64,20 +64,36 @@ public class MainModel {
 
     // ~
     private final ReadOnlyObjectWrapper<NavTree.Item> navTree = new ReadOnlyObjectWrapper<>(
-            createTree());
+        createTree());
 
     public ReadOnlyObjectProperty<NavTree.Item> navTreeProperty() {
         return navTree.getReadOnlyProperty();
     }
 
     private NavTree.Item createTree() {
-        // Create the root item for the navigation tree
-        var root = NavTree.Item.root();
+        // Bàn group
+        var tables = NavTree.Item.group("Bàn", new FontIcon(Material2OutlinedMZ.TABLET));
+        tables.getChildren().setAll(
+            NAV_TREE.get(TableListPage.class),
+            NAV_TREE.get(EditTableList.class)// Danh sách các bàn
+        );
+        var viewProduct = NavTree.Item.group("Menu đồ uống", new FontIcon(Material2OutlinedMZ.TABLET));
+        viewProduct.getChildren().setAll(
+            NAV_TREE.get(ListProductPage.class) // Danh sách các bàn
+        );
 
-        // Directly add each page to the root without grouping
+        // Thông tin cá nhân group
+//    var personalInfo = NavTree.Item.group("Chức năng khác",
+//        new FontIcon(Material2OutlinedMZ.PEOPLE));
+//    personalInfo.getChildren().setAll(
+//        NAV_TREE.get(OrderListPages.class)
+//    );
+
+        // Add all categories to the root navigation tree
+        var root = NavTree.Item.root();
         root.getChildren().setAll(
-                NAV_TREE.get(TableListPage.class),
-                NAV_TREE.get(OrderListPage.class)
+            tables,
+            viewProduct
         );
 
         return root;
@@ -92,8 +108,8 @@ public class MainModel {
 
         // Bàn
         map.put(TableListPage.class, NavTree.Item.page("Danh sách các bàn", TableListPage.class));
-
-        map.put(OrderListPage.class, NavTree.Item.page("Danh sách hóa đơn", OrderListPage.class));
+        map.put(EditTableList.class, NavTree.Item.page("Cài Đặt danh sách bàn", EditTableList.class));
+        map.put(ListProductPage.class, NavTree.Item.page("Danh sách các đồ uống", ListProductPage.class));
         return map;
     }
 

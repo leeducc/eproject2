@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 import java.util.regex.Pattern;
 
 public final class AddStaffPage extends OutlinePage {
@@ -50,15 +51,7 @@ public final class AddStaffPage extends OutlinePage {
         messageLabel = new Label();
         messageLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: red;");
 
-        // Form fields
-        TextField staffIdField = new TextField();
-        staffIdField.setPromptText("Staff ID");
-        staffIdField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-border-color: #00796b; -fx-border-radius: 5; -fx-pref-width: 300px;");
-
-        PasswordField passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
-        passwordField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-border-color: #00796b; -fx-border-radius: 5; -fx-pref-width: 300px;");
-
+        // Form fields (excluding staffId and password fields)
         TextField nameField = new TextField();
         nameField.setPromptText("Name");
         nameField.setStyle("-fx-font-size: 16px; -fx-padding: 10px; -fx-border-color: #00796b; -fx-border-radius: 5; -fx-pref-width: 300px;");
@@ -83,12 +76,11 @@ public final class AddStaffPage extends OutlinePage {
 
         // Submit button
         Button submitButton = new Button("Create User");
-        submitButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 10px 20px; -fx-font-size: 16px;");
+        submitButton.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 10px 20px; -fx-font-size: 16px;");
+
 
         // Button action
         submitButton.setOnAction(event -> {
-            String staffId = staffIdField.getText();
-            String password = passwordField.getText();
             String name = nameField.getText();
             String contactNumber = contactNumberField.getText();
             String email = emailField.getText();
@@ -96,18 +88,16 @@ public final class AddStaffPage extends OutlinePage {
             String role = roleComboBox.getValue();
 
             // Validation logic
-            if (staffId.isEmpty() || password.isEmpty() || name.isEmpty() || contactNumber.isEmpty() || email.isEmpty() || gender == null || role == null) {
+            if (name.isEmpty() || contactNumber.isEmpty() || email.isEmpty() || gender == null || role == null) {
                 showMessage("Please fill in all fields."); // Show error message
             } else if (!PHONE_PATTERN.matcher(contactNumber).matches()) {
                 showMessage("Invalid contact number. Must be 10 to 15 digits.");
             } else if (!EMAIL_PATTERN.matcher(email).matches()) {
                 showMessage("Invalid email format.");
             } else {
-                if (insertNewUser(staffId, password, name, contactNumber, email, gender, role)) {
-                    showMessage("User created: " + staffId + ", " + name + ", " + role);
+                if (insertNewUser(name, contactNumber, email, gender, role)) {
+                    showMessage("User created successfully!");
                     // Clear fields after submission
-                    staffIdField.clear();
-                    passwordField.clear();
                     nameField.clear();
                     contactNumberField.clear();
                     emailField.clear();
@@ -126,14 +116,12 @@ public final class AddStaffPage extends OutlinePage {
         formLayout.setAlignment(Pos.CENTER);
         formLayout.add(titleLabel, 0, 0, 2, 1); // Title spans two columns
         formLayout.add(messageLabel, 0, 1, 2, 1); // Message label spans two columns
-        formLayout.add(staffIdField, 0, 2);
-        formLayout.add(passwordField, 0, 3);
-        formLayout.add(nameField, 0, 4);
-        formLayout.add(contactNumberField, 0, 5);
-        formLayout.add(emailField, 0, 6);
-        formLayout.add(genderComboBox, 0, 7);
-        formLayout.add(roleComboBox, 0, 8);
-        formLayout.add(submitButton, 0, 9);
+        formLayout.add(nameField, 0, 2);
+        formLayout.add(contactNumberField, 0, 3);
+        formLayout.add(emailField, 0, 4);
+        formLayout.add(genderComboBox, 0, 5);
+        formLayout.add(roleComboBox, 0, 6);
+        formLayout.add(submitButton, 0, 7);
 
         // Set the center of the layout to the form
         layout.setCenter(formLayout);
@@ -170,31 +158,42 @@ public final class AddStaffPage extends OutlinePage {
         }
     }
 
-    private boolean insertNewUser(String staffId, String password, String name, String contactNumber, String email, String gender, String role) {
+    private boolean insertNewUser(String name, String contactNumber, String email, String gender, String role) {
         Connection conn = JDBCConnect.getJDBCConnection();
         if (conn == null) {
             showAlert("Error", "Database connection failed");
             return false;
         }
 
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt()); // Hashing the password
-        String query = "INSERT INTO staff (staff_id, password_hash, name, contact_number, email, gender, role_id) VALUES (?, ?, ?, ?, ?, ?, (SELECT id FROM role WHERE role_name = ?))";
+        String defaultPassword = "0000";
+        String hashedPassword = BCrypt.hashpw(defaultPassword, BCrypt.gensalt()); // Hash the default password
+        String staffId = generateUniqueStaffId(conn);
+
+        if (staffId == null) {
+            showAlert("Error", "Failed to generate a unique staff ID.");
+            return false;
+        }
+
+        String query = "INSERT INTO staff (staff_id, password_hash, name, contact_number, email, gender, role_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, (SELECT id FROM role WHERE role_name = ?))";
 
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, staffId);
-            stmt.setString(2, hashedPassword); // Use hashed password
+            stmt.setString(2, hashedPassword);  // Insert the hashed default password
             stmt.setString(3, name);
             stmt.setString(4, contactNumber);
             stmt.setString(5, email);
-            stmt.setString(6, gender); // Set gender
+            stmt.setString(6, gender);
             stmt.setString(7, role);
 
             int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
+            return rowsAffected > 0; // Return true if the user was successfully created
 
         } catch (SQLException e) {
             e.printStackTrace();
+            showAlert("Error", "Failed to create user.");
             return false;
+
         } finally {
             try {
                 conn.close();
@@ -202,6 +201,29 @@ public final class AddStaffPage extends OutlinePage {
                 e.printStackTrace();
             }
         }
+    }
+
+    private String generateUniqueStaffId(Connection conn) {
+        String staffId = "";
+        Random random = new Random();
+        boolean unique = false;
+
+        while (!unique) {
+            staffId = "6" + String.format("%07d", random.nextInt(10000000)); // Generate an 8-digit ID starting with 6
+            String query = "SELECT COUNT(*) FROM staff WHERE staff_id = ?";
+
+            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+                stmt.setString(1, staffId);
+                ResultSet rs = stmt.executeQuery();
+                if (rs.next() && rs.getInt(1) == 0) {
+                    unique = true;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return staffId;
     }
 
     private void showMessage(String message) {

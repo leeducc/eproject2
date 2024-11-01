@@ -1,9 +1,27 @@
 package atlantafx.sampler.admin.page.components;
 
 import atlantafx.sampler.admin.page.OutlinePage;
+import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
+import atlantafx.sampler.base.entity.common.BillOrder;
+import javafx.application.Platform;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public final class OrderListPage extends OutlinePage {
     public static final String NAME = "Order List";
+
+    private DatePicker datePicker;
+    private TableView<BillOrder> billOrderTable;
 
     @Override
     public String getName() {
@@ -12,5 +30,81 @@ public final class OrderListPage extends OutlinePage {
 
     public OrderListPage() {
         super();
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        datePicker = new DatePicker();
+        datePicker.setOnAction(event -> loadBillOrders());
+
+        billOrderTable = new TableView<>();
+        setupTableColumns();
+
+        VBox vbox = new VBox(10, datePicker, billOrderTable);
+        BorderPane borderPane = new BorderPane(vbox);
+        getChildren().add(borderPane);
+    }
+
+    private void setupTableColumns() {
+        TableColumn<BillOrder, Integer> idColumn = new TableColumn<>("ID");
+        idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+
+        TableColumn<BillOrder, LocalDateTime> dateColumn = new TableColumn<>("Date");
+dateColumn.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty());
+
+        TableColumn<BillOrder, Double> totalColumn = new TableColumn<>("Total Amount");
+        totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalAmountProperty().asObject());
+
+        TableColumn<BillOrder, String> actionColumn = new TableColumn<>("Action");
+        actionColumn.setCellFactory(col -> new TableCell<BillOrder, String>() {
+            private final Button viewButton = new Button("View");
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(viewButton);
+                    viewButton.setOnAction(event -> viewBillOrder(getTableRow().getItem()));
+                }
+            }
+        });
+
+        billOrderTable.getColumns().addAll(idColumn, dateColumn, totalColumn, actionColumn);
+    }
+
+    private void loadBillOrders() {
+        LocalDate selectedDate = datePicker.getValue();
+        if (selectedDate != null) {
+            String query = "SELECT * FROM bill_order WHERE DATE(created_at) = ?";
+
+            try (Connection connection = JDBCConnect.getJDBCConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
+                statement.setString(1, selectedDate.format(DateTimeFormatter.ISO_DATE));
+                ResultSet resultSet = statement.executeQuery();
+                billOrderTable.getItems().clear();
+
+                while (resultSet.next()) {
+                    BillOrder billOrder = new BillOrder(
+                            resultSet.getInt("id"),
+                            resultSet.getDouble("total_amount"),
+                            resultSet.getTimestamp("created_at").toLocalDateTime()
+                    );
+                    billOrderTable.getItems().add(billOrder);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void viewBillOrder(BillOrder billOrder) {
+        // Logic to view details of the selected bill order
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Bill Order Details");
+        alert.setHeaderText("Details for Bill Order ID: " + billOrder.getId());
+        alert.setContentText("Total Amount: " + billOrder.getTotalAmount());
+        alert.showAndWait();
     }
 }

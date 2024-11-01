@@ -5,11 +5,11 @@ package atlantafx.sampler.cashier.page;
 import atlantafx.base.theme.Styles;
 import atlantafx.base.theme.Tweaks;
 import atlantafx.base.util.BBCodeParser;
-import atlantafx.sampler.cashier.event.NavEvent;
-import atlantafx.sampler.cashier.layout.CashierApp;
 import atlantafx.sampler.cashier.event.BrowseEvent;
 import atlantafx.sampler.cashier.event.DefaultEventBus;
+import atlantafx.sampler.cashier.event.NavEvent;
 import atlantafx.sampler.cashier.event.PageEvent;
+import atlantafx.sampler.cashier.layout.CashierApp;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -78,15 +78,15 @@ public interface Page {
             node.addEventFilter(ActionEvent.ACTION, e -> {
                 if (e.getTarget() instanceof Hyperlink link && link.getUserData() instanceof String url) {
                     if (url.startsWith("https://") || url.startsWith("http://")) {
-                        atlantafx.sampler.cashier.event.DefaultEventBus.getInstance().publish(new atlantafx.sampler.cashier.event.BrowseEvent(URI.create(url)));
+                        DefaultEventBus.getInstance().publish(new BrowseEvent(URI.create(url)));
                     }
 
                     if (url.startsWith("local://")) {
                         try {
                             var rootPackage = "atlantafx.sampler.page.";
                             var c = Class.forName(rootPackage + url.substring(8));
-                            if (atlantafx.sampler.cashier.page.Page.class.isAssignableFrom(c)) {
-                                atlantafx.sampler.cashier.event.DefaultEventBus.getInstance().publish(new NavEvent((Class<? extends Page>) c));
+                            if (Page.class.isAssignableFrom(c)) {
+                                DefaultEventBus.getInstance().publish(new NavEvent((Class<? extends Page>) c));
                             } else {
                                 throw new IllegalArgumentException();
                             }

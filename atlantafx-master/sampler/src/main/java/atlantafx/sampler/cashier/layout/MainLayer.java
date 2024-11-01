@@ -2,10 +2,10 @@
 
 package atlantafx.sampler.cashier.layout;
 
-import atlantafx.sampler.cashier.page.Page;
 import atlantafx.sampler.cashier.event.DefaultEventBus;
 import atlantafx.sampler.cashier.event.HotkeyEvent;
 import atlantafx.sampler.cashier.event.PageEvent;
+import atlantafx.sampler.cashier.page.Page;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;

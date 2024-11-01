@@ -1,10 +1,10 @@
-package atlantafx.sampler.cashier.page.components;
+package atlantafx.sampler.admin.page.components;
 
 import atlantafx.sampler.base.entity.common.Bill;
 import atlantafx.sampler.base.entity.common.Tables;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
-import atlantafx.sampler.cashier.page.OutlinePage;
+import atlantafx.sampler.admin.page.OutlinePage;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
@@ -25,7 +25,6 @@ public final class TableListPage extends OutlinePage {
   private final int itemsPerPage = 20;
   private String currentKeyword = ""; // Store the current search keyword
   private TextField searchField; // Text field for keyword search
-  static OrderListPage orderListPage = new OrderListPage();
 
   public static String getTitle() {
     return title;
@@ -131,8 +130,7 @@ public final class TableListPage extends OutlinePage {
         Tables table = TableCoffeeService.getTableByName(tableName);
         updateTableButtonColor(tableButton, table);
 
-        // Set click event
-        tableButton.setOnAction(e -> handleTableButtonClick(tableButton, table));
+
 
         grid.add(tableButton, col, row);
         count++;
@@ -184,30 +182,7 @@ public final class TableListPage extends OutlinePage {
   }
 
 
-  private void handleTableButtonClick(Button tableButton, Tables table) {
-    int status = table.getStatusId();
-    if (status == 2) {
-      Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
-      confirmationDialog.setTitle("Xác nhận bàn đã dọn xong");
-      confirmationDialog.setHeaderText("Bạn có chắc chắn là bàn này khách đã dời đi và đã dọn xong");
-      confirmationDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/cssDiaLog.css").toExternalForm());
 
-      Optional<ButtonType> result = confirmationDialog.showAndWait();
-      if (result.isPresent() && result.get() == ButtonType.OK) {
-        TableCoffeeService.updateStatusTable(3, table.getName());
-        table.setStatusId(3);
-        updateTableButtonColor(tableButton, table);
-      }
-    } else {
-      selectedTableLabel = new Label(tableButton.getText());
-      TableListPage.setTitle(tableButton.getText());
-      orderListPage.showCheckOrderDialog();
-
-      updateStatusTableByOrder(tableButton.getText());
-      table.setStatusId(TableCoffeeService.getStatusByTableName(table.getName()));
-      updateTableButtonColor(tableButton, table);
-    }
-  }
 
   private void updateTableButtonColor(Button tableButton, Tables table) {
     int statusId = table.getStatusId();

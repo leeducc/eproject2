@@ -3,6 +3,7 @@ package atlantafx.sampler.base.service.cashier;
 
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.Tables;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,11 +21,11 @@ public class TableCoffeeService {
     List<Tables> tables = new ArrayList<>();
     String sql = "SELECT * FROM tables";
     try (Connection connection = JDBCConnect.getJDBCConnection(); PreparedStatement preparedStatement = connection.prepareStatement(
-            sql); ResultSet resultSet = preparedStatement.executeQuery()) {
+        sql); ResultSet resultSet = preparedStatement.executeQuery()) {
       while (resultSet.next()) {
 
         Tables table = new Tables(resultSet.getString("name"),
-                resultSet.getInt("status_id"));
+            resultSet.getInt("status_id"));
         tables.add(table);
       }
     } catch (SQLException e) {
@@ -69,8 +70,8 @@ public class TableCoffeeService {
 
     // Filter tables by keyword and count the matches
     return (int) allTables.stream()
-            .filter(table -> table.getName().toLowerCase().contains(currentKeyword.toLowerCase()))
-            .count();
+        .filter(table -> table.getName().toLowerCase().contains(currentKeyword.toLowerCase()))
+        .count();
   }
 
 
@@ -139,36 +140,5 @@ public class TableCoffeeService {
       e.printStackTrace();
       return false;
     }
-  }
-
-  public static boolean hasTemporaryOrder(String tableName) {
-    boolean hasOrder = false;
-
-    String checkOrderQuery = "SELECT COUNT(*) FROM temporary_order WHERE table_name = ?";
-
-    try (Connection connection = JDBCConnect.getJDBCConnection();
-         PreparedStatement preparedStatement = connection.prepareStatement(checkOrderQuery)) {
-
-      preparedStatement.setString(1, tableName);
-      ResultSet resultSet = preparedStatement.executeQuery();
-
-      if (resultSet.next()) {
-        hasOrder = resultSet.getInt(1) > 0;
-      }
-
-      // Update table status based on presence of order
-      String updateStatusQuery = "UPDATE tables SET status_id = ? WHERE name = ?";
-      try (PreparedStatement updateStatement = connection.prepareStatement(updateStatusQuery)) {
-        int statusId = hasOrder ? 1 : 3; // 1 for USING, 3 for AVAILABLE
-        updateStatement.setInt(1, statusId);
-        updateStatement.setString(2, tableName);
-        updateStatement.executeUpdate();
-      }
-
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
-
-    return hasOrder;
   }
 }

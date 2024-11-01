@@ -1,14 +1,20 @@
 package atlantafx.sampler.staff.page.components;
 
+import atlantafx.sampler.base.service.UserSession;
 import atlantafx.sampler.staff.page.OutlinePage;
+import atlantafx.sampler.base.util.PasswordUtils; // Import PasswordUtils
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import atlantafx.sampler.base.configJDBC.dao.JDBCConnect; // Ensure to import the JDBC connection class
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public final class ChangePasswordPage extends OutlinePage {
     public static final String NAME = "Change Password Page";
@@ -73,10 +79,66 @@ public final class ChangePasswordPage extends OutlinePage {
             return;
         }
 
-        // Here you would typically check the current password and update it
-        // For this example, we just show a success alert
-        showAlert("Success", "Password changed successfully!");
-        clearFields();
+        // Validate the new password
+        if (!validatePassword(newPassword)) {
+            showAlert("Error", "Password must start with an uppercase letter, contain a special character, and include at least one number.");
+            return;
+        }
+
+        // Get staff ID from session
+        String staffId = UserSession.getInstance().getStaffId(); // Retrieve staff ID from session
+
+        // Check current password and update it in the database
+        if (updatePassword(staffId, currentPassword, newPassword)) {
+            showAlert("Success", "Password changed successfully!");
+            clearFields();
+        } else {
+            showAlert("Error", "Failed to change password. Please check your current password.");
+        }
+    }
+
+    private boolean updatePassword(String staffId, String currentPassword, String newPassword) {
+        String query = "UPDATE staff SET password_hash = ? WHERE staff_id = ? AND password_hash = ?";
+        try (Connection conn = JDBCConnect.getJDBCConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Fetch the existing password hash for verification
+            String existingPasswordHash = getCurrentPasswordHash(staffId);
+            if (existingPasswordHash == null || !PasswordUtils.checkPassword(currentPassword, existingPasswordHash)) {
+                return false; // Current password is incorrect
+            }
+
+            // Hash the new password
+            String hashedNewPassword = PasswordUtils.hashPassword(newPassword);
+            stmt.setString(1, hashedNewPassword);
+            stmt.setString(2, staffId);
+            stmt.setString(3, existingPasswordHash); // Use the existing hashed password for verification
+
+            return stmt.executeUpdate() > 0; // Return true if update was successful
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private String getCurrentPasswordHash(String staffId) {
+        String query = "SELECT password_hash FROM staff WHERE staff_id = ?";
+        try (Connection conn = JDBCConnect.getJDBCConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, staffId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("password_hash");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Return null if not found
+    }
+
+    private boolean validatePassword(String password) {
+        String passwordRegex = "^(?=.*[0-9])(?=.*[!@#$%^&*])(?=.*[A-Z]).+$";
+        return password.matches(passwordRegex);
     }
 
     private void clearFields() {

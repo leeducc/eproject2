@@ -1,24 +1,12 @@
-package atlantafx.sampler.admin.page.components;
+package atlantafx.sampler.cashier.page.components;
 
 import atlantafx.sampler.base.entity.common.Products;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.util.AlertUtil;
-import atlantafx.sampler.admin.page.OutlinePage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
+import atlantafx.sampler.cashier.page.OutlinePage;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -27,7 +15,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-public class ProductListPage extends OutlinePage {
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ListProductPage extends OutlinePage {
 
     public static final String NAME = "List Product";
     List<Products> filteredProducts = new ArrayList<>();
@@ -40,7 +35,7 @@ public class ProductListPage extends OutlinePage {
         return NAME;
     }
 
-    public ProductListPage() {
+    public ListProductPage() {
         super();
         viewProduct();
     }
@@ -50,7 +45,7 @@ public class ProductListPage extends OutlinePage {
         VBox mainLayout = new VBox(10);
         mainLayout.setPadding(new Insets(10));
         mainLayout.getStylesheets()
-                .add(getClass().getResource("/css/coffeeMenuApp.css").toExternalForm());
+            .add(getClass().getResource("/css/coffeeMenuApp.css").toExternalForm());
         mainLayout.getStyleClass().add("root");
 
         // Search Bar
@@ -92,7 +87,7 @@ public class ProductListPage extends OutlinePage {
                 filteredProducts = CashierService.getAllProducts();
             } else {
                 filteredProducts = CashierService.getProductsByCategory(CashierService.getIdByCategoryName(
-                        selectFilter));
+                    selectFilter));
             }
             updateProductGrid(gridPane, filteredProducts);
         });
@@ -131,7 +126,7 @@ public class ProductListPage extends OutlinePage {
         Dialog<Products> dialog = new Dialog<>();
         dialog.setHeaderText(null);
         dialog.getDialogPane().getStylesheets().add(
-                ProductListPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
+            ListProductPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
         );
 
         TextField imageLink = new TextField();
@@ -145,7 +140,7 @@ public class ProductListPage extends OutlinePage {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters()
-                .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+            .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
 
         ImageView imageView = new ImageView();
         imageView.getStyleClass().add("dialog-image-view");
@@ -202,7 +197,7 @@ public class ProductListPage extends OutlinePage {
             if (button == ButtonType.OK) {
                 // Kiểm tra xem category, name và price có rỗng không
                 if (name.getText() == null || name.getText().isEmpty() ||
-                        price.getText() == null || price.getText().isEmpty()) {
+                    price.getText() == null || price.getText().isEmpty()) {
                     AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
                     return null; // Trả về null để giữ nguyên dialog
                 }
@@ -214,10 +209,10 @@ public class ProductListPage extends OutlinePage {
                     // Kiểm tra xem selectedFile có hợp lệ không
                     if (selectedFile != null && selectedFile.exists()) {
                         File destinationFile = new File(
-                                "sampler/src/main/resources/images/products/" + selectedFile.getName());
+                            "sampler/src/main/resources/images/products/" + selectedFile.getName());
                         // Sao chép tệp
                         Files.copy(selectedFile.toPath(), destinationFile.toPath(),
-                                StandardCopyOption.REPLACE_EXISTING);
+                            StandardCopyOption.REPLACE_EXISTING);
                     } else {
                         AlertUtil.showErrorAlert("Tệp không hợp lệ.");
                         return null; // Trả về null để giữ nguyên dialog
@@ -225,10 +220,10 @@ public class ProductListPage extends OutlinePage {
 
                     // Trả về đối tượng Products mới
                     return new Products(
-                            "/images/products/" + selectedFile.getName(),
-                            name.getText(),
-                            parsedPrice,
-                            CashierService.getIdByCategoryName(categoryField.getValue())
+                        "/images/products/" + selectedFile.getName(),
+                        name.getText(),
+                        parsedPrice,
+                        CashierService.getIdByCategoryName(categoryField.getValue())
                     );
 
                 } catch (NumberFormatException e) {
