@@ -1,8 +1,10 @@
 package atlantafx.sampler.admin.page.components;
 
 import atlantafx.sampler.admin.page.OutlinePage;
+import atlantafx.sampler.admin.page.dialog.BillDetailDialog;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.BillOrder;
+import atlantafx.sampler.base.util.Lazy;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,6 +24,7 @@ public final class OrderListPage extends OutlinePage {
 
     private DatePicker datePicker;
     private TableView<BillOrder> billOrderTable;
+    private final Lazy<BillDetailDialog> billDetailDialog;
 
     @Override
     public String getName() {
@@ -31,6 +34,13 @@ public final class OrderListPage extends OutlinePage {
     public OrderListPage() {
         super();
         initializeUI();
+
+        billDetailDialog = new Lazy<>(()-> {
+            var dialog = new BillDetailDialog();
+            dialog.setClearOnClose(true);
+            return dialog;
+        });
+
     }
 
     private void initializeUI() {
@@ -50,13 +60,13 @@ public final class OrderListPage extends OutlinePage {
         idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
 
         TableColumn<BillOrder, LocalDateTime> dateColumn = new TableColumn<>("Date");
-dateColumn.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty());
+        dateColumn.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty());
 
         TableColumn<BillOrder, Double> totalColumn = new TableColumn<>("Total Amount");
         totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalAmountProperty().asObject());
 
         TableColumn<BillOrder, String> actionColumn = new TableColumn<>("Action");
-        actionColumn.setCellFactory(col -> new TableCell<BillOrder, String>() {
+        actionColumn.setCellFactory(col -> new TableCell<>() {
             private final Button viewButton = new Button("View");
 
             @Override
@@ -66,7 +76,7 @@ dateColumn.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty
                     setGraphic(null);
                 } else {
                     setGraphic(viewButton);
-                    viewButton.setOnAction(event -> viewBillOrder(getTableRow().getItem()));
+                    viewButton.setOnAction(e -> openBillDetailDialog(getTableRow().getItem()));
                 }
             }
         });
@@ -98,13 +108,12 @@ dateColumn.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty
             }
         }
     }
-
-    private void viewBillOrder(BillOrder billOrder) {
-        // Logic to view details of the selected bill order
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Bill Order Details");
-        alert.setHeaderText("Details for Bill Order ID: " + billOrder.getId());
-        alert.setContentText("Total Amount: " + billOrder.getTotalAmount());
-        alert.showAndWait();
+    private void openBillDetailDialog(BillOrder billOrder) {
+        if (billOrder != null) {
+            BillDetailDialog dialog = billDetailDialog.get();
+            dialog.getBillDetails(billOrder);  // Set the bill details
+            dialog.show(getScene());  // Show the dialog
+        }
     }
+
 }

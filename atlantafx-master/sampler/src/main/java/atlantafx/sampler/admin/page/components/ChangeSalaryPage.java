@@ -1,19 +1,17 @@
 package atlantafx.sampler.admin.page.components;
 
 import atlantafx.sampler.admin.page.OutlinePage;
-
+import atlantafx.sampler.admin.page.dialog.ChangeSalaryDialog;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.staff.Role;
+import atlantafx.sampler.base.util.Lazy;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.util.converter.DoubleStringConverter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,17 +22,22 @@ public final class ChangeSalaryPage extends OutlinePage {
     public static final String NAME = "Change Salary";
 
     private TableView<Role> tableView;
-    private ObservableList<Role> roleData;
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
+    private final Lazy<ChangeSalaryDialog> changeSalaryDialog;
 
     public ChangeSalaryPage() {
         super();
         initializeUI();
         loadData();
+        changeSalaryDialog = new Lazy<>(() -> {
+            var dialog = new ChangeSalaryDialog();
+            dialog.setClearOnClose(true);
+            return dialog;
+        });
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 
     private void initializeUI() {
@@ -52,7 +55,7 @@ public final class ChangeSalaryPage extends OutlinePage {
         tableView.setEditable(true);
 
         TableColumn<Role, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id")); // Match the property name in Role class
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<Role, String> roleNameColumn = new TableColumn<>("Role Name");
         roleNameColumn.setCellValueFactory(new PropertyValueFactory<>("roleName"));
@@ -63,17 +66,29 @@ public final class ChangeSalaryPage extends OutlinePage {
         TableColumn<Role, Double> allowanceColumn = new TableColumn<>("Allowance");
         allowanceColumn.setCellValueFactory(new PropertyValueFactory<>("allowance"));
 
-        tableView.getColumns().addAll(idColumn, roleNameColumn, basicSalaryColumn, allowanceColumn);
+        // Action Column with "Change Salary" button
+        TableColumn<Role, Void> actionColumn = new TableColumn<>("Action");
+        actionColumn.setCellFactory(param -> new TableCell<>() {
+            private final Button changeSalaryButton = new Button("Change Salary");
 
+            {
+                changeSalaryButton.setOnAction(event -> {
+                    Role role = getTableView().getItems().get(getIndex());
+                    openChangeSalaryDialog(role);
+                });
+            }
 
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : changeSalaryButton);
+            }
+        });
 
-        // Save Changes Button
-        Button saveButton = new Button("Save Changes");
-        saveButton.setStyle("-fx-background-color: #007bff; -fx-text-fill: white; -fx-padding: 10px 20px;");
-        saveButton.setOnAction(e -> saveChanges());
+        tableView.getColumns().addAll(idColumn, roleNameColumn, basicSalaryColumn, allowanceColumn, actionColumn);
 
-        // Layout for the Table and Button
-        VBox vbox = new VBox(10, tableView, saveButton);
+        // Layout for the Table
+        VBox vbox = new VBox(10, tableView);
         vbox.setAlignment(Pos.CENTER);
         layout.setCenter(vbox);
 
@@ -82,12 +97,12 @@ public final class ChangeSalaryPage extends OutlinePage {
     }
 
     private void loadData() {
-        roleData = FXCollections.observableArrayList(); // Initialize the observable list
-
         String query = "SELECT id, role_name, basic_salary, allowance FROM role";
         try (Connection connection = JDBCConnect.getJDBCConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            tableView.setItems(FXCollections.observableArrayList()); // Clear current data
 
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
@@ -95,43 +110,21 @@ public final class ChangeSalaryPage extends OutlinePage {
                 double basicSalary = resultSet.getDouble("basic_salary");
                 double allowance = resultSet.getDouble("allowance");
 
-                // Create a new Role object and add it to the list
-                roleData.add(new Role(id, roleName, basicSalary, allowance));
+                Role role = new Role(id, roleName, basicSalary, allowance);
+                tableView.getItems().add(role); // Add new role to table
             }
         } catch (SQLException e) {
             e.printStackTrace(); // Handle exceptions appropriately
         }
-
-        tableView.setItems(roleData); // Set the items in the table view
     }
 
-
-
-    private void saveChanges() {
-        String updateQuery = "UPDATE role SET basic_salary = ?, allowance = ? WHERE id = ?";
-        try (Connection connection = JDBCConnect.getJDBCConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-
-            for (Role role : roleData) {
-                // Set parameters for the update statement
-                preparedStatement.setDouble(1, role.getBasicSalary());
-                preparedStatement.setDouble(2, role.getAllowance());
-                preparedStatement.setInt(3, role.getId());
-
-                // Execute the update
-                preparedStatement.executeUpdate();
-            }
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION, "Changes saved successfully!");
-            alert.showAndWait();
-
-        } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions appropriately
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Error saving changes: " + e.getMessage());
-            alert.showAndWait();
-        }
+    private void openChangeSalaryDialog(Role role) {
+        var dialog = changeSalaryDialog.get(); // Get the dialog instance
+        dialog.setRoleDetails(role.getId(), role.getRoleName()); // Set the role details using the correct method
+        dialog.show(getScene()); // Show the dialog
     }
 
-
-
+    private void refreshTable() {
+        loadData(); // Reload the data in the table after salary changes
+    }
 }

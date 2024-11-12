@@ -6,15 +6,17 @@ public class Staff {
     private String contactNumber;
     private String email;
     private String gender;
-    private String role; // Add this line for role
+    private String role;   // Role of the staff
+    private String status; // Status of the staff (Active, Dropout, Fire)
 
-    public Staff(String staffId, String name, String contactNumber, String email, String gender, String role) {
+    public Staff(String staffId, String name, String contactNumber, String email, String gender, String role, String status) {
         this.staffId = staffId;
         this.name = name;
         this.contactNumber = contactNumber;
         this.email = email;
         this.gender = gender;
-        this.role = role; // Set role
+        this.role = role;
+        this.status = status;
     }
 
     // Getters
@@ -38,7 +40,16 @@ public class Staff {
         return gender;
     }
 
-    public String getRole() { // Add this method
+    public String getRole() {
         return role;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    // Setters for updating status if needed
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

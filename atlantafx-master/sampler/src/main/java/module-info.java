@@ -3,8 +3,6 @@
 module atlantafx.sampler {
 
     requires atlantafx.base;
-
-    requires java.desktop;
     requires java.prefs;
     requires javafx.swing;
     requires javafx.media;
@@ -23,6 +21,8 @@ module atlantafx.sampler {
     requires java.sql;
     requires jbcrypt;
     requires mysql.connector.j;
+    requires org.apache.poi.ooxml;
+    requires java.mail;
 
     exports atlantafx.sampler;
 
@@ -52,5 +52,6 @@ module atlantafx.sampler {
     opens atlantafx.sampler.admin.layout;
     opens atlantafx.sampler.admin.page;
     opens atlantafx.sampler.admin.page.components;
+    opens atlantafx.sampler.base.entity.staff to javafx.base;
 
 }

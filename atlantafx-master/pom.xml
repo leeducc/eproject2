@@ -80,6 +80,11 @@
 
         <dependencies>
             <dependency>
+                <groupId>com.sun.mail</groupId>
+                <artifactId>javax.mail</artifactId>
+                <version>1.6.2</version>
+            </dependency>
+            <dependency>
                 <groupId>io.github.mkpaz</groupId>
                 <artifactId>devtoolsfx-gui</artifactId>
                 <version>TBD</version>
@@ -179,6 +184,16 @@
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${test.junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>5.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi</artifactId>
+                <version>5.2.3</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

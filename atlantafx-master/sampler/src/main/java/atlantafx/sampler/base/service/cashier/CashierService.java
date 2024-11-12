@@ -326,7 +326,7 @@ public class CashierService {
             resultSet.getInt("voucher_percentage"),
             resultSet.getDate("start_date").toLocalDate(),
             resultSet.getDate("end_date").toLocalDate(),
-            resultSet.getInt("status_id")
+            resultSet.getString("status")
         );
         vouchers.add(voucher);
       }

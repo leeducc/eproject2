@@ -74,7 +74,9 @@ public class MainModel {
         var orders = NavTree.Item.group("Đơn hàng", new FontIcon(Material2OutlinedMZ.SHOPPING_CART));
         orders.getChildren().setAll(
                 NAV_TREE.get(RevenuePage.class),
-                NAV_TREE.get(OrderListPage.class)
+                NAV_TREE.get(OrderListPage.class),
+                NAV_TREE.get(VoucherManager.class),
+                NAV_TREE.get(DiscountManager.class)
 
         );
 
@@ -89,13 +91,6 @@ public class MainModel {
                 NAV_TREE.get(ProductListPage.class)           // Product List (Danh sách sản phẩm)
         );
 
-// Work Shift (Công ca) group
-        var workShift = NavTree.Item.group("Công ca", new FontIcon(Material2OutlinedMZ.SCHEDULE));
-        workShift.getChildren().setAll(
-                NAV_TREE.get(MakeSchedulePage.class)          // Work Schedule (Phân Lịch làm việc)
-//                NAV_TREE.get(LeaveApprovalPage.class),        // Leave Approval (Phê duyệt nghỉ phép)
-//                NAV_TREE.get(WorkExplanationApprovalPage.class) // Work Explanation Approval (Phê duyệt giải trình công)
-        );
 
 
 
@@ -116,15 +111,14 @@ public class MainModel {
 // Staff (Nhân viên) group
         var staff = NavTree.Item.group("Nhân viên", new FontIcon(Material2OutlinedMZ.PEOPLE));
         staff.getChildren().setAll(
-                NAV_TREE.get(StaffListPage.class),            // Staff List (Danh sách nhân viên)
-                NAV_TREE.get(AddStaffPage.class),             // Add Staff (Thêm mới nhân viên)
-                NAV_TREE.get(ChangePasswordPage.class)        // Change Password (Thay đổi mật khẩu)
+                NAV_TREE.get(StaffListPage.class)
         );
 
 // Configuration (Cấu hình) group
         var configuration = NavTree.Item.group("Cấu hình", new FontIcon(Material2OutlinedAL.ADMIN_PANEL_SETTINGS));
         configuration.getChildren().setAll(
-                NAV_TREE.get(ChangePasswordSettingsPage.class), // Change Password (Đổi mật khẩu)
+                NAV_TREE.get(ChangePasswordSettingsPage.class),
+                NAV_TREE.get(ChangeCashierCredentials.class),// Change Password (Đổi mật khẩu)
                 NAV_TREE.get(ChangeStoreInfoPage.class)
         );
 
@@ -135,7 +129,6 @@ public class MainModel {
                 orders,
                 warehouseManagement,
                 tables,
-                workShift,
                 salary,
                 staff,
                 configuration
@@ -153,6 +146,8 @@ public class MainModel {
         // Đơn hàng (Orders)
         map.put(RevenuePage.class, NavTree.Item.page("Doanh thu ", RevenuePage.class));
         map.put(OrderListPage.class, NavTree.Item.page("Danh sách đơn hàng", OrderListPage.class));
+      map.put(VoucherManager.class, NavTree.Item.page("Quản lý voucher", VoucherManager.class));
+      map.put(DiscountManager.class, NavTree.Item.page("Quản lý khuyến mãi", DiscountManager.class));
 
 
         // Quản lý kho (Warehouse Management)
@@ -165,10 +160,9 @@ public class MainModel {
 
         map.put(ProductListPage.class, NavTree.Item.page("Danh sách các đồ uống", ProductListPage.class));
 
-        // Công ca (Work Shift)
-        map.put(MakeSchedulePage.class , NavTree.Item.page("Tạo lịch làm việc", MakeSchedulePage.class));
-        map.put(LeaveApprovalPage.class, NavTree.Item.page("Phê duyệt nghỉ phép", LeaveApprovalPage.class));
-        map.put(WorkExplanationApprovalPage.class, NavTree.Item.page("Phê duyệt giải trình công", WorkExplanationApprovalPage.class));
+
+
+
 
 
 
@@ -182,11 +176,10 @@ public class MainModel {
 
         // Nhân viên (Staff)
         map.put(StaffListPage.class, NavTree.Item.page("Danh sách nhân viên", StaffListPage.class));
-        map.put(AddStaffPage.class, NavTree.Item.page("Thêm mới nhân viên", AddStaffPage.class));
-        map.put(ChangePasswordPage.class, NavTree.Item.page("Thay đổi mật khẩu nhân viên", ChangePasswordPage.class));
 
         // Cấu hình (Configuration)
         map.put(ChangePasswordSettingsPage.class, NavTree.Item.page("Đổi thông tin đăng nhập", ChangePasswordSettingsPage.class));
+        map.put(ChangeCashierCredentials.class, NavTree.Item.page("Thay đổi thông tin thu ngân", ChangeCashierCredentials.class));
         map.put(ChangeStoreInfoPage.class, NavTree.Item.page("Thau đổi thông tin quán", ChangeStoreInfoPage.class));
 
         return map;
