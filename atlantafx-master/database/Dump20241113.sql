@@ -85,7 +85,7 @@ CREATE TABLE `bill` (
   `price` double DEFAULT NULL,
   `voucher_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,7 +94,6 @@ CREATE TABLE `bill` (
 
 LOCK TABLES `bill` WRITE;
 /*!40000 ALTER TABLE `bill` DISABLE KEYS */;
-INSERT INTO `bill` VALUES (56,'Table A08','Nước ngọt',1,20000,NULL),(57,'Table A18','Cà phê sữa',1,35000,NULL),(58,'Table A10','Cà phê sữa',1,26250,25);
 /*!40000 ALTER TABLE `bill` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -107,16 +106,17 @@ DROP TABLE IF EXISTS `bill_detail`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_detail` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `bill_id` int NOT NULL,
+  `bill_order_id` int NOT NULL,
   `product_id` int NOT NULL,
   `quantity` int NOT NULL,
   `price` decimal(10,2) NOT NULL,
+  `voucher_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `bill_id` (`bill_id`),
+  KEY `bill_id` (`bill_order_id`),
   KEY `product_id` (`product_id`),
-  CONSTRAINT `bill_detail_ibfk_1` FOREIGN KEY (`bill_id`) REFERENCES `bill_order` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `bill_detail_ibfk_1` FOREIGN KEY (`bill_order_id`) REFERENCES `bill_order` (`id`) ON DELETE CASCADE,
   CONSTRAINT `bill_detail_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -125,6 +125,7 @@ CREATE TABLE `bill_detail` (
 
 LOCK TABLES `bill_detail` WRITE;
 /*!40000 ALTER TABLE `bill_detail` DISABLE KEYS */;
+INSERT INTO `bill_detail` VALUES (10,12,3,1,25000.00,0),(11,12,5,1,15000.00,0),(12,12,4,1,20000.00,0),(13,13,4,1,20000.00,0),(14,13,3,1,25000.00,0),(15,13,5,1,13500.00,10),(16,14,3,1,25000.00,0),(17,14,5,1,15000.00,0),(18,15,4,2,20000.00,0),(19,15,3,1,25000.00,0);
 /*!40000 ALTER TABLE `bill_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,9 +145,8 @@ CREATE TABLE `bill_order` (
   PRIMARY KEY (`id`),
   KEY `table_id` (`table_id`),
   KEY `payment_method_id` (`payment_method_id`),
-  CONSTRAINT `bill_order_ibfk_1` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`),
-  CONSTRAINT `bill_order_ibfk_2` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `bill_order_ibfk_1` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,6 +155,7 @@ CREATE TABLE `bill_order` (
 
 LOCK TABLES `bill_order` WRITE;
 /*!40000 ALTER TABLE `bill_order` DISABLE KEYS */;
+INSERT INTO `bill_order` VALUES (12,24,60000.00,3,'2024-11-12 18:16:58'),(13,26,58500.00,3,'2024-11-12 18:18:08'),(14,16,40000.00,3,'2024-11-12 18:20:25'),(15,25,65000.00,3,'2024-11-12 18:21:16');
 /*!40000 ALTER TABLE `bill_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -681,7 +682,7 @@ CREATE TABLE `tables` (
   PRIMARY KEY (`id`),
   KEY `status_id` (`status_id`),
   CONSTRAINT `tables_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `status_table` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -690,7 +691,7 @@ CREATE TABLE `tables` (
 
 LOCK TABLES `tables` WRITE;
 /*!40000 ALTER TABLE `tables` DISABLE KEYS */;
-INSERT INTO `tables` VALUES (1,'Table A01',3),(2,'Table A02',2),(3,'Table A03',3),(6,'Table A06',3),(7,'Table A07',3),(8,'Table A08',1),(9,'Table A09',3),(10,'Table A10',1),(11,'Table A11',3),(12,'Table A12',3),(13,'Table A13',3),(14,'Table A14',3),(15,'Table A15',3),(16,'Table A16',3),(17,'Table A17',3),(18,'Table A18',1),(19,'Table A19',3),(20,'Table A20',3),(21,'Table A21',3),(22,'Table A22',3),(23,'Table A23',3),(24,'Table A24',3),(25,'Table A25',3),(26,'Table A26',3),(27,'Table A27',3),(28,'Table A28',3),(29,'Table A29',3),(30,'Table A30',3),(31,'Table A31',3),(32,'Table A32',3),(33,'Table A33',3),(34,'Table A34',3),(35,'Table A05',3),(36,'Table A04',3);
+INSERT INTO `tables` VALUES (8,'Table A08',3),(11,'Table A11',3),(14,'Table A14',3),(15,'Table A15',2),(16,'Table A16',3),(17,'Table A17',3),(18,'Table A18',2),(19,'Table A19',3),(20,'Table A20',3),(21,'Table A21',3),(23,'Table A23',2),(24,'Table A24',2),(25,'Table A25',2),(26,'Table A26',3),(27,'Table A27',3),(28,'Table A28',3),(29,'Table A29',3),(30,'Table A30',3),(31,'Table A31',3),(32,'Table A32',3),(33,'Table A33',2),(34,'Table A34',3),(37,'Table A35',2),(38,'Table A36',2),(39,'Table A37',3),(40,'Table A38',3),(42,'Table A40',2),(43,'Table A07',3),(45,'Table A01',2),(46,'Table A22',3),(47,'Table A13',3);
 /*!40000 ALTER TABLE `tables` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -733,4 +734,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-10-31 21:08:57
+-- Dump completed on 2024-11-13  1:25:17

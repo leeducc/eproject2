@@ -1,10 +1,15 @@
 package atlantafx.sampler.cashier.page.components;
 
 import atlantafx.sampler.base.entity.common.Bill;
+import atlantafx.sampler.base.entity.common.BillDetail;
+import atlantafx.sampler.base.entity.common.BillOrder;
 import atlantafx.sampler.base.entity.common.Voucher;
+import atlantafx.sampler.base.enummethod.Payment;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.base.util.AlertUtil;
+
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import javafx.geometry.Insets;
@@ -90,27 +95,12 @@ public class OrderListPage {
 
     VBox billContainer = new VBox(10);
 
-    Label voucher = new Label("Giảm Tổng Đơn:");
-    ComboBox<String> comboBoxVoucherTotal = CashierService.createVoucherSelectionBox();
-    comboBoxVoucherTotal.getItems().add("Không");
-    comboBoxVoucherTotal.setValue("Giảm giá");
-    comboBoxVoucherTotal.getStyleClass().add("combo-box");
-
-
     Label totalLabel = new Label("Tổng cộng:");
     TextField totalField = new TextField("0");
     totalField.setEditable(false);
 
     ComboBox<String> methodComboBox = CashierService.createPayMethodSelectionBox();
 
-    comboBoxVoucherTotal.setOnAction(e ->{
-      if(!comboBoxVoucherTotal.getValue().equals("Không")) {
-        voucherAllBill(billContainer, totalField,
-            Integer.valueOf(removeLastChar(comboBoxVoucherTotal.getValue())));
-      }else {
-        updateAllBill(billContainer, totalField);
-      }
-    });
     comboBox.setOnAction(e -> {
       String selectedFilter = comboBox.getValue();
       if ("All".equals(selectedFilter)) {
@@ -144,27 +134,49 @@ public class OrderListPage {
       if (newBill == null || newBill.isEmpty()) {
         AlertUtil.showErrorAlert("Bàn " + TableListPage.getTitle() + " chưa có đặt đồ uống");
       } else {
-        updateAllBill(billContainer, totalField);
-        TableCoffeeService.updateStatusTable(2,
-            TableListPage.getTitle()); // Cập nhật trạng thái bàn thành "đã thanh toán"
-
         double totalAmount = Double.parseDouble(totalField.getText());
+
+
+        // Kiểm tra nếu tổng cộng sau giảm giá > 0
         if (totalAmount > 0) {
+          updateAllBill(billContainer, totalField);
           String selectedMethod = methodComboBox.getValue();
+          TableCoffeeService.updateStatusTable(2, TableListPage.getTitle()); // Cập nhật trạng thái bàn thành "đã thanh toán"
+
           if (selectedMethod != null) {
+            try {
+
+              BillOrder billOrder = new BillOrder(CashierService.getTableIdByName(TableListPage.getTitle()),Double.valueOf(totalField.getText()),
+                      CashierService.getIdByMethodEnum(String.valueOf(Payment.fromDisplayName(selectedMethod))));
+              CashierService.addNewBillOrder(billOrder);
+              BillOrder billOrderCurrent = CashierService.getBillOrderByTableId(CashierService.getTableIdByName(TableListPage.getTitle()));
+              List<Bill> bills = CashierService.getBillByNameTable(TableListPage.getTitle());
+              for (Bill bill : bills) {
+                int productId = CashierService.getProductByName(bill.getProductName()).getId();
+                BillDetail billDetail = new BillDetail(billOrderCurrent.getId(),productId,
+                        bill.getQuantity(),bill.getPrice(),bill.getVoucher());
+                CashierService.addNewBillDetail(billDetail);
+              }
+            } catch (SQLException ex) {
+              throw new RuntimeException(ex);
+            }
+
             AlertUtil.showErrorAlert(
-                "Thanh toán thành công!\n"
-                    + "Tổng tiền: " + totalField.getText() + " VND\n"
-                    + "Phương thức thanh toán: " + selectedMethod);
+                    "Thanh toán thành công!\n"
+                            + "Tổng tiền: " + totalField.getText() + " VND\n"
+                            + "Phương thức thanh toán: " + selectedMethod);
 
             // Reset đơn hàng và làm sạch giao diện
             CashierService.resetOrderBill(TableListPage.getTitle());
             billContainer.getChildren().clear();
-            updateTotalField(totalField, 0);
+            updateTotalField(totalField, 0); // Reset tổng đơn về 0 sau khi thanh toán
           }
+        } else {
+          AlertUtil.showErrorAlert("Số tiền sau giảm giá không hợp lệ!");
         }
       }
     });
+
 
     ScrollPane billScrollPane = new ScrollPane(billContainer);
     billScrollPane.setFitToWidth(true);
@@ -182,7 +194,7 @@ public class OrderListPage {
     HBox containersHBox = new HBox(10, drinkListContainer, billContainerContainer);
 
     VBox orderLayout = new VBox(10, selectedTableLabel, searchBar, comboBox, quantityLabel,
-        quantitySpinner, addButton, containersHBox, totalLabel, totalField,voucher, comboBoxVoucherTotal,
+        quantitySpinner, addButton, containersHBox, totalLabel, totalField,
         methodComboBox, checkOut);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
@@ -281,31 +293,6 @@ public class OrderListPage {
     }
     return str.substring(0, str.length() - 1);
   }
-
-//  private void handleVoucher(Bill bill, VBox billContainer, TextField totalField) {
-//
-//
-//
-//
-//      // Tìm và lấy chi tiết của phiếu giảm giá dựa trên mã phiếu
-//      Voucher voucher = CashierService.getVoucherByCode(voucherCode);
-//      if (voucher != null) {
-//        // Tính toán giảm giá
-//        double discount = voucher.getVoucherPercentage();
-//        double originalPrice = bill.getPrice() * bill.getQuantity();
-//        double discountedPrice = originalPrice - (originalPrice * (discount / 100));
-//
-//        // Cập nhật lại Bill và lưu vào database
-//        bill.setDiscount(discount);
-//        bill.setDiscountedPrice(discountedPrice);
-//        CashierService.updateOrderBill(bill);
-//
-//        // Cập nhật lại hiển thị trong billContainer và tổng tiền
-//        updateAllBill(billContainer, totalField);
-//      } else {
-//        AlertUtil.showErrorAlert("Phiếu giảm giá không hợp lệ hoặc đã hết hạn!");
-//      }
-//  }
 
   private void handleEditBill(Bill bill, VBox billContainer, TextField totalField) {
     Dialog<Bill> editDialog = new Dialog<>();

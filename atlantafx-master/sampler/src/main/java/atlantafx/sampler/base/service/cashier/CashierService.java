@@ -1,21 +1,16 @@
 package atlantafx.sampler.base.service.cashier;
 
 
+import atlantafx.sampler.admin.entity.OrderDetail;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
-import atlantafx.sampler.base.entity.common.Bill;
-import atlantafx.sampler.base.entity.common.PaymentMethod;
-import atlantafx.sampler.base.entity.common.Products;
-import atlantafx.sampler.base.entity.common.Voucher;
+import atlantafx.sampler.base.entity.common.*;
 import atlantafx.sampler.base.enummethod.Payment;
 import atlantafx.sampler.base.util.AlertUtil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -100,6 +95,115 @@ public class CashierService {
     return products;
   }
 
+  public static boolean addNewBillOrder(BillOrder billOrder) {
+    String sql = " INSERT INTO bill_order(table_id,total_amount,payment_method_id,created_at)VALUES(?,?,?,?)";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setInt(1, billOrder.getTableId()); // Replace with the actual table name
+      preparedStatement.setDouble(2, billOrder.getTotalAmount()); // Replace with the actual product name
+      preparedStatement.setInt(3, billOrder.getPaymentMethodId()); // Replace with the actual quantity
+      preparedStatement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+// Replace with the actual price
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+  public static BillOrder getBillOrderByTableId(int tableId) {
+    String sql = "SELECT * FROM bill_order WHERE table_id = ?";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      preparedStatement.setInt(1, tableId);
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+      if (resultSet.next()) {
+        // Khởi tạo đối tượng BillOrder từ các giá trị trong ResultSet
+        return new BillOrder(
+                resultSet.getInt("id"),
+                resultSet.getInt("table_id"),
+                resultSet.getDouble("total_amount"),
+                resultSet.getInt("payment_method_id"),
+                resultSet.getTimestamp("created_at")
+        );
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return null; // Trả về null nếu không tìm thấy bản ghi nào
+  }
+  public static int getTableIdByName(String name) {
+    String sql = "SELECT id FROM tables WHERE name = ?";
+    int id = 0;
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, name);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      if (resultSet.next()) {
+       id = resultSet.getInt("id");
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return id;
+
+  }
+  public static boolean addNewBillDetail(BillDetail billDetail) {
+    String sql = "INSERT INTO bill_detail (bill_order_id, product_id, quantity, price, voucher_id) VALUES (?, ?, ?, ?, ?)";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      // Kiểm tra sự tồn tại của `product_id` trong bảng `products`
+      if (!isProductIdExists(connection, billDetail.getProductId())) {
+        System.out.println("Error: product_id " + billDetail.getProductId() + " does not exist in products.");
+        return false;
+      }
+
+      preparedStatement.setInt(1, billDetail.getBillId());
+      preparedStatement.setInt(2, billDetail.getProductId());
+      preparedStatement.setInt(3, billDetail.getQuantity());
+      preparedStatement.setDouble(4, billDetail.getPrice());
+
+      if (billDetail.getVoucherId() == null) {
+        preparedStatement.setNull(5, java.sql.Types.INTEGER);
+      } else {
+        preparedStatement.setInt(5, billDetail.getVoucherId());
+      }
+
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  // Phương thức kiểm tra sự tồn tại của `product_id` trong bảng `products`
+  private static boolean isProductIdExists(Connection connection, int productId) throws SQLException {
+    String checkSql = "SELECT 1 FROM products WHERE id = ?";
+    try (PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
+      checkStatement.setInt(1, productId);
+      ResultSet resultSet = checkStatement.executeQuery();
+      return resultSet.next();
+    }
+  }
+
+
+  // Phương thức kiểm tra sự tồn tại của `bill_order_id` trong `bill_order`
+  private static boolean isBillOrderIdExists(Connection connection, int billOrderId) throws SQLException {
+    String checkSql = "SELECT 1 FROM bill_order WHERE id = ?";
+    try (PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
+      checkStatement.setInt(1, billOrderId);
+      ResultSet resultSet = checkStatement.executeQuery();
+      return resultSet.next();
+    }
+  }
+
+
   public static Products getProductsByProductName(String nameProduct) {
     Products product = null;
     String sql = "SELECT * FROM products WHERE name =?";
@@ -169,7 +273,8 @@ public class CashierService {
       preparedStatement.setString(1, name);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        product = new Products(resultSet.getString("image_link"),
+        product = new Products(resultSet.getInt("id"),
+                resultSet.getString("image_link"),
             resultSet.getString("name"),
             resultSet.getDouble("price"),
             resultSet.getInt("category_id")
@@ -554,6 +659,21 @@ public class CashierService {
       e.printStackTrace();
     }
     return true;
+  }
+  public static Integer getIdByMethodEnum(String method) throws SQLException {
+    String query = "SELECT id FROM payment_method WHERE method = ?";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+      preparedStatement.setString(1, method);
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+      if (resultSet.next()) {
+        return resultSet.getInt("id");
+      } else {
+        return null; // or throw an exception if needed
+      }
+    }
   }
 
   public static ComboBox createPayMethodSelectionBox() {

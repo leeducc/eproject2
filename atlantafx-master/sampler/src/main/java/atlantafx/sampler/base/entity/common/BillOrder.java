@@ -19,6 +19,19 @@ public class BillOrder {
         this.createdAt = createdAt;
         this.billDetails = billDetails;
     }
+    public BillOrder(int id, int tableId, double totalAmount, int paymentMethodId, Timestamp createdAt) {
+        this.id = id;
+        this.tableId = tableId;
+        this.totalAmount = totalAmount;
+        this.paymentMethodId = paymentMethodId;
+        this.createdAt = createdAt;
+    }
+
+    public BillOrder(int tableId, double totalAmount, int paymentMethodId) {
+        this.tableId = tableId;
+        this.totalAmount = totalAmount;
+        this.paymentMethodId = paymentMethodId;
+    }
 
     public BillOrder() {
     }

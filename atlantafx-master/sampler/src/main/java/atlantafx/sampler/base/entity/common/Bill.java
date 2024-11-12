@@ -37,6 +37,15 @@ public class Bill {
     this.voucher = voucher;
   }
 
+  public Bill(int id, String nameTable, String productName, int quantity, double price, int voucher) {
+    this.id = id;
+    this.nameTable = nameTable;
+    this.productName = productName;
+    this.quantity = quantity;
+    this.price = price;
+    this.voucher = voucher;
+  }
+
   public Bill(String nameTable, String productName, int quantity) {
     this.nameTable = nameTable;
     this.productName = productName;

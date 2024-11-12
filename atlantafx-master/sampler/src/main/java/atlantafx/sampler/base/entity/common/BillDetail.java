@@ -3,19 +3,29 @@ package atlantafx.sampler.base.entity.common;
 public class BillDetail {
     private int id;
     private int billId;
-    private int productId;
+    private Integer productId;
     private int quantity;
     private double price;
+    private int voucherId;
 
-    public BillDetail(int id, int billId, int productId, int quantity, double price) {
-        this.id = id;
+    public BillDetail( int billId, Integer productId, int quantity, double price, int voucherId) {
+
         this.billId = billId;
         this.productId = productId;
         this.quantity = quantity;
         this.price = price;
+        this.voucherId = voucherId;
     }
 
     public BillDetail() {
+    }
+
+    public Integer getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Integer voucherId) {
+        this.voucherId = voucherId;
     }
 
     public int getId() {
