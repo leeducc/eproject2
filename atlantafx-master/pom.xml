@@ -180,6 +180,12 @@
                 <version>${test.junit.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>24.0.1</version> <!-- Đảm bảo sử dụng phiên bản mới nhất -->
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

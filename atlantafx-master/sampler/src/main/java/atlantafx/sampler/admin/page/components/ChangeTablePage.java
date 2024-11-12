@@ -185,6 +185,7 @@ public final class ChangeTablePage extends OutlinePage {
                 case 3:
                     TableCoffeeService.deleteTableByName(tableName);
                     AlertUtil.showErrorAlert("Xóa Thành Công");
+                    refreshGrid();
                     break;
                 default:
                     break;
