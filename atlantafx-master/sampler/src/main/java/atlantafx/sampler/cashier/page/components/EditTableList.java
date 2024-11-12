@@ -179,14 +179,12 @@ public class EditTableList extends OutlinePage {
     if (result.isPresent() && result.get() == ButtonType.OK) {
       int StatusId = TableCoffeeService.getStatusByTableName(tableName);
       switch (StatusId) {
-        case 1:
+        case 1, 2:
           AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
           break;
-        case 2:
-          AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
-          break;
-        case 3:
+          case 3:
           TableCoffeeService.deleteTableByName(tableName);
+          refreshGrid();
           AlertUtil.showErrorAlert("Xóa Thành Công");
           break;
         default:

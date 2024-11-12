@@ -176,10 +176,7 @@ public final class ChangeTablePage extends OutlinePage {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             int StatusId = TableCoffeeService.getStatusByTableName(tableName);
             switch (StatusId) {
-                case 1:
-                    AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
-                    break;
-                case 2:
+                case 1, 2:
                     AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
                     break;
                 case 3:
