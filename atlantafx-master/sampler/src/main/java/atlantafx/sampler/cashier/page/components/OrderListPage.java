@@ -66,8 +66,8 @@ public class OrderListPage {
         drinkList.setItems(CashierService.InitializeProductName1());
       } else {
         drinkList.setItems(
-            CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
-                selectedFilter)));
+                CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
+                        selectedFilter)));
       }
     });
 
@@ -107,8 +107,8 @@ public class OrderListPage {
         drinkList.setItems(CashierService.InitializeProductName1());
       } else {
         drinkList.setItems(
-            CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
-                (selectedFilter))));
+                CashierService.InitializeProductNameCategory(CashierService.getIdByCategoryName(
+                        (selectedFilter))));
       }
 
       // Check for empty list state after setting items
@@ -194,8 +194,8 @@ public class OrderListPage {
     HBox containersHBox = new HBox(10, drinkListContainer, billContainerContainer);
 
     VBox orderLayout = new VBox(10, selectedTableLabel, searchBar, comboBox, quantityLabel,
-        quantitySpinner, addButton, containersHBox, totalLabel, totalField,
-        methodComboBox, checkOut);
+            quantitySpinner, addButton, containersHBox, totalLabel, totalField,
+            methodComboBox, checkOut);
     orderLayout.setPadding(new Insets(20));
     orderLayout.setAlignment(Pos.CENTER);
     dialog.setResultConverter(button -> {
@@ -211,7 +211,7 @@ public class OrderListPage {
   }
 
   private void handleAddToBill(String selectedDrink, int quantity, VBox billContainer,
-      TextField totalField) {
+                               TextField totalField) {
     Bill billCheck = CashierService.findOrderBillIsExist(TableListPage.getTitle(), selectedDrink);
     if (billCheck != null) {
       billCheck.setQuantity(quantity + billCheck.getQuantity());
@@ -232,10 +232,10 @@ public class OrderListPage {
   }
 
   private HBox createBillRow(Bill bill, VBox billContainer, TextField totalField, double subTotal,
-      int valueVoucher) {
+                             int valueVoucher) {
     HBox billRow = new HBox(10);
     Label billInfo = new Label(bill.getProductName() + " - Số lượng: " + bill.getQuantity()
-        + " - Giá: " + bill.getPrice() * bill.getQuantity() + " VND");
+            + " - Giá: " + bill.getPrice() * bill.getQuantity() + " VND");
     billInfo.getStyleClass().add("bill-container-label");
 
     Button editButton = new Button("Sửa");
@@ -276,7 +276,7 @@ public class OrderListPage {
   }
 
   private void handleVoucher(Bill bill, VBox billContainer, TextField totalField,
-      int valueVoucher) {
+                             int valueVoucher) {
     double originPrice = CashierService.getProductByName(bill.getProductName()).getPrice();
     double discount = originPrice * ((double) valueVoucher / 100);
     double discountedPrice = originPrice - discount;
@@ -338,7 +338,7 @@ public class OrderListPage {
           // Kiểm tra nếu sản phẩm trong row là sản phẩm đã chỉnh sửa
           if (label.getText().contains(bill.getProductName())) {
             label.setText(updatedBill.getProductName() + " - Số lượng: " + updatedBill.getQuantity()
-                + " - Giá: " + updatedBill.getPrice() * updatedBill.getQuantity() + " VND");
+                    + " - Giá: " + updatedBill.getPrice() * updatedBill.getQuantity() + " VND");
           }
         }
       }

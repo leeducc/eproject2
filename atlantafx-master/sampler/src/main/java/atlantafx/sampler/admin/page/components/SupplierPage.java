@@ -1,10 +1,10 @@
 package atlantafx.sampler.admin.page.components;
 
-import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.admin.entity.Supplier;
 import atlantafx.sampler.admin.page.dialog.EditSupplierDialog;
 import atlantafx.sampler.admin.page.OutlinePage;
 import atlantafx.sampler.admin.page.dialog.SuppliedItemsPage;
+import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;

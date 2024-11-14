@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
--- Host: localhost    Database: eproject2tt
+-- Host: localhost    Database: eproject2ttt
 -- ------------------------------------------------------
 -- Server version	8.0.36
 
@@ -26,6 +26,7 @@ CREATE TABLE `admin` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_unique` (`username`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -37,7 +38,7 @@ CREATE TABLE `admin` (
 
 LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
-INSERT INTO `admin` VALUES (1,'admin','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa');
+INSERT INTO `admin` VALUES (1,'admin','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','leminhduc1212001@gmail.com');
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -85,7 +86,7 @@ CREATE TABLE `bill` (
   `price` double DEFAULT NULL,
   `voucher_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,6 +95,7 @@ CREATE TABLE `bill` (
 
 LOCK TABLES `bill` WRITE;
 /*!40000 ALTER TABLE `bill` DISABLE KEYS */;
+INSERT INTO `bill` VALUES (56,'Table A08','Nước ngọt',1,20000,NULL),(64,'Table A02','Trà Sữa',1,15000,NULL),(65,'Table A02','Nước cam',1,25000,NULL),(68,'Table A10','Cà phê sữa',1,29750,15),(69,'Table A10','Trà Sữa',1,15000,NULL),(70,'Table A10','Trà Đào',1,25000,NULL);
 /*!40000 ALTER TABLE `bill` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -109,14 +111,14 @@ CREATE TABLE `bill_detail` (
   `bill_order_id` int NOT NULL,
   `product_id` int NOT NULL,
   `quantity` int NOT NULL,
-  `price` decimal(10,2) NOT NULL,
+  `price` decimal(10,2) DEFAULT NULL,
   `voucher_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `bill_id` (`bill_order_id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `bill_detail_ibfk_1` FOREIGN KEY (`bill_order_id`) REFERENCES `bill_order` (`id`) ON DELETE CASCADE,
   CONSTRAINT `bill_detail_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4440 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -125,7 +127,7 @@ CREATE TABLE `bill_detail` (
 
 LOCK TABLES `bill_detail` WRITE;
 /*!40000 ALTER TABLE `bill_detail` DISABLE KEYS */;
-INSERT INTO `bill_detail` VALUES (10,12,3,1,25000.00,0),(11,12,5,1,15000.00,0),(12,12,4,1,20000.00,0),(13,13,4,1,20000.00,0),(14,13,3,1,25000.00,0),(15,13,5,1,13500.00,10),(16,14,3,1,25000.00,0),(17,14,5,1,15000.00,0),(18,15,4,2,20000.00,0),(19,15,3,1,25000.00,0);
+INSERT INTO `bill_detail` VALUES (4435,2441,2,1,29750.00,15),(4436,2441,6,1,20000.00,0),(4437,2442,4,1,20000.00,0),(4438,2442,2,1,35000.00,0),(4439,2443,2,1,29750.00,15);
 /*!40000 ALTER TABLE `bill_detail` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -145,8 +147,9 @@ CREATE TABLE `bill_order` (
   PRIMARY KEY (`id`),
   KEY `table_id` (`table_id`),
   KEY `payment_method_id` (`payment_method_id`),
-  CONSTRAINT `bill_order_ibfk_1` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `bill_order_ibfk_1` FOREIGN KEY (`table_id`) REFERENCES `tables` (`id`),
+  CONSTRAINT `bill_order_ibfk_2` FOREIGN KEY (`payment_method_id`) REFERENCES `payment_method` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2444 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -155,7 +158,7 @@ CREATE TABLE `bill_order` (
 
 LOCK TABLES `bill_order` WRITE;
 /*!40000 ALTER TABLE `bill_order` DISABLE KEYS */;
-INSERT INTO `bill_order` VALUES (12,24,60000.00,3,'2024-11-12 18:16:58'),(13,26,58500.00,3,'2024-11-12 18:18:08'),(14,16,40000.00,3,'2024-11-12 18:20:25'),(15,25,65000.00,3,'2024-11-12 18:21:16');
+INSERT INTO `bill_order` VALUES (2441,1,49750.00,3,'2024-11-14 15:57:08'),(2442,10,55000.00,3,'2024-11-14 18:02:31'),(2443,18,29750.00,3,'2024-11-14 18:21:14');
 /*!40000 ALTER TABLE `bill_order` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,7 +199,7 @@ CREATE TABLE `category` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -205,7 +208,7 @@ CREATE TABLE `category` (
 
 LOCK TABLES `category` WRITE;
 /*!40000 ALTER TABLE `category` DISABLE KEYS */;
-INSERT INTO `category` VALUES (1,'Cà phê'),(2,'Nước ngọt'),(3,'Nước hoa quả'),(4,'Trà'),(5,'Đồ ăn vặt '),(6,'Đồ ăn');
+INSERT INTO `category` VALUES (1,'Cà phê'),(2,'Nước ngọt'),(3,'Nước hoa quả'),(4,'Trà'),(5,'Đồ ăn vặt '),(6,'Đồ ăn'),(7,'Sữa chua');
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -286,7 +289,7 @@ CREATE TABLE `discount` (
   PRIMARY KEY (`id`),
   KEY `product_id` (`product_id`),
   CONSTRAINT `discount_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -295,7 +298,7 @@ CREATE TABLE `discount` (
 
 LOCK TABLES `discount` WRITE;
 /*!40000 ALTER TABLE `discount` DISABLE KEYS */;
-INSERT INTO `discount` VALUES (1,1,'Autumn Sale',10.00,'2024-09-01','2024-12-31'),(2,2,'Holiday Special',12.50,'2024-10-01','2024-12-31'),(3,3,'Flash Discount',15.00,'2024-09-01','2024-11-30'),(4,4,'Back to School',10.50,'2024-08-15','2024-11-15'),(5,5,'Winter Deal',14.00,'2024-10-15','2025-01-15');
+INSERT INTO `discount` VALUES (1,1,'Autumn Sale',10.00,'2024-09-01','2024-12-31'),(2,2,'Holiday Special',12.50,'2024-10-01','2024-12-31'),(3,3,'Flash Discount',15.00,'2024-09-01','2024-11-30'),(4,4,'Back to School',10.50,'2024-08-15','2024-11-15'),(5,5,'Winter Deal',14.00,'2024-10-15','2025-01-15'),(6,1,'Happy',0.15,'2025-10-01','2024-11-30');
 /*!40000 ALTER TABLE `discount` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -398,7 +401,7 @@ CREATE TABLE `products` (
   PRIMARY KEY (`id`),
   KEY `fk_category_id` (`category_id`),
   CONSTRAINT `fk_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -407,7 +410,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'/images/products/cafe_den.jpg','Cà phê đen',30000.00,1),(2,'/images/products/cafe_sua.jpg','Cà phê sữa',35000.00,1),(3,'/images/products/nuoc_cam.jpg','Nước cam',25000.00,3),(4,'/images/products/nuoc_ngot.jpg','Nước ngọt',20000.00,2),(5,'/images/products/tra_sua.jpg','Trà Sữa',15000.00,4),(6,'/images/products/matcha.jpg','Matcha',20000.00,4),(7,'/images/products/tra_dao.jpg','Trà Đào',25000.00,4),(8,'/images/products/tra_dau.jpg','Trà Dâu',20000.00,4),(9,'/images/products/tra_vai.jpg','Trà Vải',15000.00,4),(10,'/images/products/cacao.jpg','CaCao',20000.00,5),(11,'/images/products/tra_xoai.jpg','Trà Xoài',15000.00,4),(29,'/images/products/1.jpg','9999',9999.00,2),(30,'/images/products/3.jpg','999',0.00,6);
+INSERT INTO `products` VALUES (1,'/images/products/cafe_den.jpg','Cà phê đen',30000.00,1),(2,'/images/products/cafe_sua.jpg','Cà phê sữa',35000.00,1),(3,'/images/products/nuoc_cam.jpg','Nước cam',25000.00,3),(4,'/images/products/nuoc_ngot.jpg','Nước ngọt',20000.00,2),(5,'/images/products/tra_sua.jpg','Trà Sữa',15000.00,4),(6,'/images/products/matcha.jpg','Matcha',20000.00,4),(7,'/images/products/tra_dao.jpg','Trà Đào',25000.00,4),(8,'/images/products/tra_dau.jpg','Trà Dâu',20000.00,4),(9,'/images/products/tra_vai.jpg','Trà Vải',15000.00,4);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -434,7 +437,7 @@ CREATE TABLE `role` (
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES (1,'Cửa hàng trưởng',50000.00,4000000.00),(2,'Cửa hàng phó',40000.00,3000000.00),(3,'Nhân viên fulltime',26000.00,2000000.00),(4,'Nhân viên parttime',24000.00,0.00);
+INSERT INTO `role` VALUES (1,'Cửa hàng trưởng',55000.00,4000000.00),(2,'Cửa hàng phó',40000.00,3000000.00),(3,'Nhân viên fulltime',26000.00,2000000.00),(4,'Nhân viên parttime',24000.00,0.00);
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -496,36 +499,6 @@ INSERT INTO `shift` VALUES (1,'Ca sáng','07:00:00','15:00:00'),(2,'Ca chiều',
 UNLOCK TABLES;
 
 --
--- Table structure for table `shift_assignment`
---
-
-DROP TABLE IF EXISTS `shift_assignment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `shift_assignment` (
-  `assignment_id` int NOT NULL AUTO_INCREMENT,
-  `staff_id` varchar(255) NOT NULL,
-  `shift_id` int NOT NULL,
-  `assigned_date` date NOT NULL,
-  PRIMARY KEY (`assignment_id`),
-  KEY `staff_id` (`staff_id`),
-  KEY `shift_id` (`shift_id`),
-  CONSTRAINT `shift_assignment_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`),
-  CONSTRAINT `shift_assignment_ibfk_2` FOREIGN KEY (`shift_id`) REFERENCES `shift` (`shift_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `shift_assignment`
---
-
-LOCK TABLES `shift_assignment` WRITE;
-/*!40000 ALTER TABLE `shift_assignment` DISABLE KEYS */;
-INSERT INTO `shift_assignment` VALUES (1,'60000002',4,'2024-09-30'),(2,'60000002',3,'2024-10-03'),(3,'60000002',3,'2024-10-04'),(4,'60000002',4,'2024-10-06'),(5,'60000002',3,'2024-10-02'),(6,'60000002',2,'2024-10-01'),(7,'60000002',2,'2024-10-05'),(8,'60000004',2,'2024-09-30'),(16,'60000001',2,'2024-10-03'),(20,'60000001',2,'2024-10-01'),(26,'60000005',2,'2024-10-02'),(43,'60000002',4,'2024-09-30'),(44,'60000002',3,'2024-10-03'),(45,'60000002',3,'2024-10-04'),(46,'60000002',4,'2024-10-06'),(47,'60000002',3,'2024-10-02'),(48,'60000002',2,'2024-10-01'),(49,'60000002',2,'2024-10-05'),(50,'60000004',2,'2024-09-30'),(51,'60000004',2,'2024-10-03'),(52,'60000004',3,'2024-10-04'),(53,'60000004',3,'2024-10-06'),(54,'60000004',1,'2024-10-02'),(55,'60000004',1,'2024-10-01'),(56,'60000004',4,'2024-10-05'),(57,'60000001',3,'2024-09-30'),(58,'60000001',2,'2024-10-03'),(59,'60000001',3,'2024-10-04'),(60,'60000001',3,'2024-10-06'),(61,'60000001',2,'2024-10-02'),(62,'60000001',2,'2024-10-01'),(63,'60000001',3,'2024-10-05'),(64,'60000005',1,'2024-09-30'),(65,'60000005',1,'2024-10-03'),(66,'60000005',4,'2024-10-04'),(67,'60000005',2,'2024-10-06'),(68,'60000005',2,'2024-10-02'),(69,'60000005',1,'2024-10-01'),(70,'60000005',3,'2024-10-05'),(71,'60000003',1,'2024-09-30'),(72,'60000003',1,'2024-10-03'),(73,'60000003',2,'2024-10-04'),(74,'60000003',2,'2024-10-06'),(75,'60000003',1,'2024-10-02'),(76,'60000003',1,'2024-10-01'),(77,'60000003',2,'2024-10-05'),(78,'60000006',1,'2024-09-30'),(79,'60000006',1,'2024-10-03'),(80,'60000006',1,'2024-10-04'),(81,'60000006',1,'2024-10-06'),(82,'60000006',1,'2024-10-02'),(83,'60000006',1,'2024-10-01'),(84,'60000006',2,'2024-10-05');
-/*!40000 ALTER TABLE `shift_assignment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `staff`
 --
 
@@ -541,11 +514,14 @@ CREATE TABLE `staff` (
   `role_id` int DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
   `gender` enum('male','female','other') DEFAULT NULL,
+  `status_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_role` (`role_id`),
   KEY `idx_staff_id` (`staff_id`),
-  CONSTRAINT `fk_role` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_status` (`status_id`),
+  CONSTRAINT `fk_role` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_status` FOREIGN KEY (`status_id`) REFERENCES `staff_status` (`status_id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -554,8 +530,32 @@ CREATE TABLE `staff` (
 
 LOCK TABLES `staff` WRITE;
 /*!40000 ALTER TABLE `staff` DISABLE KEYS */;
-INSERT INTO `staff` VALUES (4,'60000001','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Nguyễn Văn A','0123456789',1,'nguyenvana@example.com','male'),(5,'60000002','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Trần Thị B','0987654321',2,'tranthib@example.com','female'),(6,'60000003','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Lê Văn C','0123987654',3,'levanc@example.com','male'),(7,'60000004','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Phạm Thị D','0981234567',3,'phamthid@example.com','female'),(8,'60000005','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Ngô Văn E','0123456780',3,'ngovane@example.com','male'),(9,'60000006','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Bùi Thị F','0987654322',4,'buithif@example.com','female');
+INSERT INTO `staff` VALUES (4,'60000001','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Nguyễn Văn A','0123456789',1,'nguyenvana@example.com','male',1),(5,'60000002','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Trần Thị B','0987654321',2,'tranthib@example.com','female',1),(6,'60000003','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Lê Văn C','0123987654',3,'levanc@example.com','male',1),(7,'60000004','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Phạm Thị D','0981234567',3,'phamthid@example.com','female',1),(8,'60000005','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Ngô Văn E','0123456780',3,'ngovane@example.com','male',1),(9,'60000006','$2a$10$3wUX4YW5gOsIBCmZ.q61HOOJGcpQHR4mh18kprJJHH4ul5KDv4ufa','Bùi Thị F','0987654322',4,'buithif@example.com','female',1),(10,'64292547','$2a$10$ZAcXQLQkYHbQMEIpu0/MFu4wo4ZvlNvQCQ1NVYmB/QZ3CkSkOH6mS','le minh duc','0972176252',3,'leminhduc1212001@gmail.com','male',3),(11,'69653222','$2a$10$xGtNV95MS9SX8hmiXelBcOLgup5uoS/c7dqCSHRgm82HPXc/WNiZ6','le duc','0000000000',3,'leduc@gmail.com','male',3);
 /*!40000 ALTER TABLE `staff` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `staff_status`
+--
+
+DROP TABLE IF EXISTS `staff_status`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `staff_status` (
+  `status_id` int NOT NULL AUTO_INCREMENT,
+  `status_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`status_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `staff_status`
+--
+
+LOCK TABLES `staff_status` WRITE;
+/*!40000 ALTER TABLE `staff_status` DISABLE KEYS */;
+INSERT INTO `staff_status` VALUES (1,'active'),(2,'dropout'),(3,'fire');
+/*!40000 ALTER TABLE `staff_status` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -593,10 +593,11 @@ CREATE TABLE `store_info` (
   `id` int NOT NULL AUTO_INCREMENT,
   `store_name` varchar(255) NOT NULL,
   `store_email` varchar(255) NOT NULL,
+  `phone` varchar(20) NOT NULL,
   `store_address` text NOT NULL,
   `tax_code` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -605,6 +606,7 @@ CREATE TABLE `store_info` (
 
 LOCK TABLES `store_info` WRITE;
 /*!40000 ALTER TABLE `store_info` DISABLE KEYS */;
+INSERT INTO `store_info` VALUES (1,'Highland','highland@gmail.com','0909199226','656 Hà Huy Tập','010241214');
 /*!40000 ALTER TABLE `store_info` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -682,7 +684,7 @@ CREATE TABLE `tables` (
   PRIMARY KEY (`id`),
   KEY `status_id` (`status_id`),
   CONSTRAINT `tables_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `status_table` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -691,7 +693,7 @@ CREATE TABLE `tables` (
 
 LOCK TABLES `tables` WRITE;
 /*!40000 ALTER TABLE `tables` DISABLE KEYS */;
-INSERT INTO `tables` VALUES (8,'Table A08',3),(11,'Table A11',3),(14,'Table A14',3),(15,'Table A15',2),(16,'Table A16',3),(17,'Table A17',3),(18,'Table A18',2),(19,'Table A19',3),(20,'Table A20',3),(21,'Table A21',3),(23,'Table A23',2),(24,'Table A24',2),(25,'Table A25',2),(26,'Table A26',3),(27,'Table A27',3),(28,'Table A28',3),(29,'Table A29',3),(30,'Table A30',3),(31,'Table A31',3),(32,'Table A32',3),(33,'Table A33',2),(34,'Table A34',3),(37,'Table A35',2),(38,'Table A36',2),(39,'Table A37',3),(40,'Table A38',3),(42,'Table A40',2),(43,'Table A07',3),(45,'Table A01',2),(46,'Table A22',3),(47,'Table A13',3);
+INSERT INTO `tables` VALUES (1,'Table A01',2),(3,'Table A03',3),(4,'Table A04',3),(5,'Table A05',3),(6,'Table A06',3),(7,'Table A07',3),(8,'Table A08',1),(9,'Table A09',3),(10,'Table A10',1),(11,'Table A11',3),(12,'Table A12',3),(13,'Table A13',3),(14,'Table A14',3),(15,'Table A15',3),(16,'Table A16',3),(17,'Table A17',3),(18,'Table A18',2),(19,'Table A19',3),(20,'Table A20',3),(21,'Table A21',3),(22,'Table A22',3),(23,'Table A23',3),(25,'Table A02',1),(26,'Table A24',2);
 /*!40000 ALTER TABLE `tables` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -706,13 +708,13 @@ CREATE TABLE `voucher` (
   `id` int NOT NULL AUTO_INCREMENT,
   `voucher_code` varchar(50) NOT NULL,
   `voucher_name` varchar(255) NOT NULL,
-  `voucher_percentage` decimal(5,2) NOT NULL,
+  `voucher_percentage` decimal(5,2) DEFAULT NULL,
   `start_date` date NOT NULL,
   `end_date` date NOT NULL,
-  `status_id` int NOT NULL,
+  `status` enum('ACTIVE','INACTIVE','USED') NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `voucher_code` (`voucher_code`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -721,7 +723,7 @@ CREATE TABLE `voucher` (
 
 LOCK TABLES `voucher` WRITE;
 /*!40000 ALTER TABLE `voucher` DISABLE KEYS */;
-INSERT INTO `voucher` VALUES (1,'VC202401','New Year Offer',15.00,'2024-01-01','2024-01-31',1),(2,'VC202402','Valentine Special',20.00,'2024-02-01','2024-02-14',1),(3,'VC202403','Spring Sale',10.00,'2024-03-01','2024-03-31',2),(4,'VC202404','Summer Discount',25.00,'2024-06-01','2024-06-30',1),(5,'VC202405','Black Friday',30.00,'2024-11-01','2024-11-30',3);
+INSERT INTO `voucher` VALUES (1,'VOUCHER-1731374175710','Happy',15.00,'2024-11-01','2024-11-30','ACTIVE');
 /*!40000 ALTER TABLE `voucher` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -734,4 +736,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-13  1:25:17
+-- Dump completed on 2024-11-15  1:23:24

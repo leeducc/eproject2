@@ -1,7 +1,7 @@
 package atlantafx.sampler.admin.page.dialog;
 
-import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.admin.entity.Supplier;
+import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;

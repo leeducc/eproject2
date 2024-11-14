@@ -1,13 +1,12 @@
 package atlantafx.sampler.admin.page.components;
 
 import atlantafx.sampler.admin.entity.StaffSchedule;
-import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.admin.page.OutlinePage;
+import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.scene.layout.GridPane;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

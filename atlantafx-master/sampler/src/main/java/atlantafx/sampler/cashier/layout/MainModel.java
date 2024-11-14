@@ -1,10 +1,11 @@
 package atlantafx.sampler.cashier.layout;
 
-import atlantafx.sampler.cashier.page.components.TableListPage;
 import atlantafx.sampler.cashier.event.DefaultEventBus;
 import atlantafx.sampler.cashier.event.NavEvent;
 import atlantafx.sampler.cashier.page.Page;
-import atlantafx.sampler.cashier.page.components.*;
+import atlantafx.sampler.cashier.page.components.EditTableList;
+import atlantafx.sampler.cashier.page.components.ListProductPage;
+import atlantafx.sampler.cashier.page.components.TableListPage;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -70,33 +71,29 @@ public class MainModel {
     }
 
     private NavTree.Item createTree() {
-        // Bàn group
-        var tables = NavTree.Item.group("Bàn", new FontIcon(Material2OutlinedMZ.TABLET));
-        tables.getChildren().setAll(
-            NAV_TREE.get(TableListPage.class),
-            NAV_TREE.get(EditTableList.class)// Danh sách các bàn
-        );
-        var viewProduct = NavTree.Item.group("Menu đồ uống", new FontIcon(Material2OutlinedMZ.TABLET));
-        viewProduct.getChildren().setAll(
-            NAV_TREE.get(ListProductPage.class) // Danh sách các bàn
-        );
-
-        // Thông tin cá nhân group
-//    var personalInfo = NavTree.Item.group("Chức năng khác",
-//        new FontIcon(Material2OutlinedMZ.PEOPLE));
-//    personalInfo.getChildren().setAll(
-//        NAV_TREE.get(OrderListPages.class)
-//    );
-
-        // Add all categories to the root navigation tree
         var root = NavTree.Item.root();
+
+        // Grouped pages
+        var groupedPages = NavTree.Item.group("Grouped Pages", new FontIcon(Material2OutlinedMZ.TABLET));
+        groupedPages.getChildren().setAll(
+                NAV_TREE.get(TableListPage.class),
+                NAV_TREE.get(EditTableList.class)
+        );
+
+        // Non-grouped pages
+      var listProductPage = NAV_TREE.get(ListProductPage.class);
+if (listProductPage != null) {
+    listProductPage.setGraphic(new FontIcon(Material2OutlinedMZ.SHOPPING_CART));
+}
+
         root.getChildren().setAll(
-            tables,
-            viewProduct
+                groupedPages,
+                listProductPage
         );
 
         return root;
     }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // Nav Tree                                                              //

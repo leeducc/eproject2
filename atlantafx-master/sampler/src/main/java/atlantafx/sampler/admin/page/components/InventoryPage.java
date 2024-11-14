@@ -1,8 +1,8 @@
 package atlantafx.sampler.admin.page.components;
 
-import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.admin.entity.Supply;
 import atlantafx.sampler.admin.page.OutlinePage;
+import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;

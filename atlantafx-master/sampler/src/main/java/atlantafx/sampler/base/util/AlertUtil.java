@@ -1,8 +1,4 @@
 package atlantafx.sampler.base.util;
-
-import java.util.Objects;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -11,7 +7,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.Duration;
+
+import java.util.Objects;
 
 public class AlertUtil {
 
@@ -34,18 +31,13 @@ public class AlertUtil {
     vbox.setAlignment(Pos.CENTER);
     vbox.getStyleClass().add("custom-alert");
 
-    Scene alertScene = new Scene(vbox, 450, 300);
+    Scene alertScene = new Scene(vbox, 450, 200);
     // Apply the external CSS file
     alertScene.getStylesheets().add(
         Objects.requireNonNull(AlertUtil.class.getResource("/css/errorLoginAlert.css")).toExternalForm());
 
     alertStage.setScene(alertScene);
     alertStage.setTitle("Login Error");
-
-    Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(3), e -> alertStage.close()));
-    timeline.setCycleCount(1);  // Chạy một lần
-    timeline.play();  // Bắt đầu đếm thời gian
-
     alertStage.showAndWait();
   }
 }

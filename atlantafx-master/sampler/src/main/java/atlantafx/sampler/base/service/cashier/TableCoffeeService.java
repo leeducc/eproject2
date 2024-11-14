@@ -3,6 +3,7 @@ package atlantafx.sampler.base.service.cashier;
 
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.Tables;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

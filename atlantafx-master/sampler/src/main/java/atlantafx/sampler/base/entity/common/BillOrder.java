@@ -1,6 +1,7 @@
 package atlantafx.sampler.base.entity.common;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class BillOrder {
@@ -34,6 +35,14 @@ public class BillOrder {
     }
 
     public BillOrder() {
+    }
+
+    public BillOrder(int id, int tableId, double totalAmount, int paymentMethodId, LocalDateTime createdAt) {
+        this.id = id;
+        this.tableId = tableId;
+        this.totalAmount = totalAmount;
+        this.paymentMethodId = paymentMethodId;
+        this.createdAt = Timestamp.valueOf(createdAt);
     }
 
     public int getId() {
@@ -84,5 +93,3 @@ public class BillOrder {
         this.billDetails = billDetails;
     }
 }
-
-

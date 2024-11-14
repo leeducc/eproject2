@@ -4,34 +4,25 @@ import atlantafx.sampler.admin.page.OutlinePage;
 import atlantafx.sampler.base.entity.common.Products;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.util.AlertUtil;
-import atlantafx.sampler.cashier.page.components.ListProductPage;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-
 import java.util.List;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ProductListPage extends OutlinePage {
 
@@ -109,13 +100,15 @@ public class ProductListPage extends OutlinePage {
       Products newProduct = showNewProductDialog(primaryStage);
       if (newProduct != null) {
         CashierService.addNewProduct(newProduct);
-        updateProductGrid(gridPane, filteredProducts);
+        filteredProducts = CashierService.getAllProducts(); // Lấy lại danh sách sản phẩm
+        updateProductGrid(gridPane, filteredProducts); // Cập nhật lại grid với danh sách mới
         AlertUtil.showErrorAlert("Thêm Thành Công");
       } else {
         System.out.println("khong thay doi");
       }
     });
     addNewCategoryProductButton.setOnAction(e -> {
+      gridPane.getChildren().clear();
       String categoryName = showNewCategoryDialog(primaryStage);
       if (categoryName != null) {
         if (CashierService.getIdByCategoryName(categoryName) > 0) {
@@ -200,7 +193,7 @@ public class ProductListPage extends OutlinePage {
     Dialog<Products> dialog = new Dialog<>();
     dialog.setHeaderText(null);
     dialog.getDialogPane().getStylesheets().add(
-        ProductListPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
+            ProductListPage.class.getResource("/css/cssDiaLogAddNewProduct.css").toExternalForm()
     );
 
     TextField imageLink = new TextField();
@@ -214,7 +207,7 @@ public class ProductListPage extends OutlinePage {
 
     FileChooser fileChooser = new FileChooser();
     fileChooser.getExtensionFilters()
-        .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+            .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
 
     ImageView imageView = new ImageView();
     imageView.getStyleClass().add("dialog-image-view");
@@ -234,17 +227,6 @@ public class ProductListPage extends OutlinePage {
       }
     });
 
-    Button editButton = new Button("Edit Image");
-    editButton.getStyleClass().add("dialog-button");
-    editButton.setOnAction(e -> {
-      fileChooser.setTitle("Select New Image");
-      File newFile = fileChooser.showOpenDialog(primaryStage);
-      if (newFile != null) {
-        Image image = new Image(newFile.toURI().toString());
-        imageView.setImage(image);
-      }
-    });
-
     ComboBox<String> categoryField = CashierService.createPayCategoriesSelectionBox();
 
     TextField name = new TextField();
@@ -256,7 +238,6 @@ public class ProductListPage extends OutlinePage {
     grid.add(new Label("Ảnh"), 0, 0);
     grid.add(imageView, 1, 0);
     grid.add(uploadButton, 2, 0);
-    grid.add(editButton, 3, 0);
     grid.add(new Label("Loại Đồ Uống: "), 0, 1);
     grid.add(categoryField, 1, 1);
     grid.add(new Label("Tên Đồ Uống"), 0, 2);
@@ -271,42 +252,47 @@ public class ProductListPage extends OutlinePage {
       if (button == ButtonType.OK) {
         // Kiểm tra xem category, name và price có rỗng không
         if (name.getText() == null || name.getText().isEmpty() ||
-            price.getText() == null || price.getText().isEmpty()) {
+                price.getText() == null || price.getText().isEmpty() ||
+                categoryField.getValue() == null || categoryField.getValue().isEmpty()) {
           AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
-          return null; // Trả về null để giữ nguyên dialog
+          return null;
         }
 
         try {
           // Chuyển đổi giá từ String sang Double
           double parsedPrice = Double.parseDouble(price.getText());
 
-          // Kiểm tra xem selectedFile có hợp lệ không
+          // Kiểm tra và sao chép tệp nếu hợp lệ
           if (selectedFile != null && selectedFile.exists()) {
-            File destinationFile = new File(
-                "sampler/src/main/resources/images/products/" + selectedFile.getName());
-            // Sao chép tệp
+            // Tạo thư mục đích nếu chưa tồn tại
+            File destinationDir = new File("sampler/src/main/resources/images/products/");
+            if (!destinationDir.exists()) {
+              destinationDir.mkdirs();
+            }
+
+            File destinationFile = new File(destinationDir, selectedFile.getName());
             Files.copy(selectedFile.toPath(), destinationFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING);
+                    StandardCopyOption.REPLACE_EXISTING);
           } else {
             AlertUtil.showErrorAlert("Tệp không hợp lệ.");
-            return null; // Trả về null để giữ nguyên dialog
+            return null;
           }
 
           // Trả về đối tượng Products mới
           return new Products(
-              "/images/products/" + selectedFile.getName(),
-              name.getText(),
-              parsedPrice,
-              CashierService.getIdByCategoryName(categoryField.getValue())
+                  "/images/products/" + selectedFile.getName(),
+                  name.getText(),
+                  parsedPrice,
+                  CashierService.getIdByCategoryName(categoryField.getValue())
           );
 
         } catch (NumberFormatException e) {
           AlertUtil.showErrorAlert("Giá không hợp lệ.");
-          return null; // Trả về null để giữ nguyên dialog
+          return null;
         } catch (IOException ioException) {
           ioException.printStackTrace();
           AlertUtil.showErrorAlert("Lỗi khi sao chép tệp.");
-          return null; // Trả về null để giữ nguyên dialog
+          return null;
         }
       }
       return null;
@@ -314,4 +300,5 @@ public class ProductListPage extends OutlinePage {
 
     return dialog.showAndWait().orElse(null);
   }
-}
+  }
+

@@ -5,18 +5,15 @@ import atlantafx.sampler.base.entity.common.Tables;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.cashier.page.OutlinePage;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public final class TableListPage extends OutlinePage {
 

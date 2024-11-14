@@ -7,16 +7,12 @@ import atlantafx.base.controls.Spacer;
 import atlantafx.base.theme.Styles;
 import atlantafx.sampler.Resources;
 import atlantafx.sampler.base.util.Lazy;
-import atlantafx.sampler.cashier.event.BrowseEvent;
-import atlantafx.sampler.cashier.event.DefaultEventBus;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -25,8 +21,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.material2.Material2MZ;
-
-import java.net.URI;
 
 import static atlantafx.base.theme.Styles.TEXT_MUTED;
 import static atlantafx.base.theme.Styles.TEXT_SMALL;

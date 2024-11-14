@@ -5,6 +5,7 @@ import atlantafx.sampler.base.configJDBC.config.IDBConfig;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+
 public class JDBCConnect {
     public  static Connection getJDBCConnection() {
         Connection con = null;

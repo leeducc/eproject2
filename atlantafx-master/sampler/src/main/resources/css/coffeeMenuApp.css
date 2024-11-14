@@ -243,7 +243,7 @@
 }
 
 .product-card:hover {
-  -fx-transform: scale(1.02);
+  /*-fx-transform: scale(1.02);*/
   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0.3, 0, 5);
 }
 

@@ -4,13 +4,9 @@ import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.service.UserSession;
 import atlantafx.sampler.staff.entity.AttendanceRecord;
 import atlantafx.sampler.staff.page.OutlinePage;
-import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 
 import java.sql.*;

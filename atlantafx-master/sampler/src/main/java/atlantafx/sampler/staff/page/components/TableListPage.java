@@ -4,7 +4,6 @@ import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.base.util.Lazy;
 import atlantafx.sampler.staff.page.OutlinePage;
-import atlantafx.sampler.staff.page.dialog.TableDialog;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

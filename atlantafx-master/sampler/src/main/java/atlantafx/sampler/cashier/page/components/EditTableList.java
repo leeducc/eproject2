@@ -4,22 +4,17 @@ import atlantafx.sampler.base.entity.common.Tables;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.base.util.AlertUtil;
 import atlantafx.sampler.cashier.page.OutlinePage;
-import java.util.ArrayList;
-import java.util.Optional;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 public class EditTableList extends OutlinePage {
 
@@ -179,12 +174,14 @@ public class EditTableList extends OutlinePage {
     if (result.isPresent() && result.get() == ButtonType.OK) {
       int StatusId = TableCoffeeService.getStatusByTableName(tableName);
       switch (StatusId) {
-        case 1, 2:
+        case 1:
           AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
           break;
-          case 3:
+        case 2:
+          AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
+          break;
+        case 3:
           TableCoffeeService.deleteTableByName(tableName);
-          refreshGrid();
           AlertUtil.showErrorAlert("Xóa Thành Công");
           break;
         default:

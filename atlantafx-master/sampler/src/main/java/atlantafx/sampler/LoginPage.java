@@ -1,29 +1,27 @@
 package atlantafx.sampler;
 
-import atlantafx.sampler.admin.layout.AdminApp;
+
 import atlantafx.sampler.base.service.AuthService;
+import atlantafx.sampler.base.service.ForgotPasswordService;
 import atlantafx.sampler.base.service.UserSession;
 import atlantafx.sampler.cashier.layout.CashierApp;
 import atlantafx.sampler.staff.layout.StaffApp;
+import atlantafx.sampler.admin.layout.AdminApp;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos; // Import Pos
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import javafx.scene.text.Font; // Import Font
+import javafx.scene.text.Font;
 
 import java.util.Objects;
 
 public class LoginPage extends HBox {
 
-    private Stage stage;
+    private final Stage stage;
 
     public LoginPage(Stage stage) {
         this.stage = stage;
@@ -34,54 +32,53 @@ public class LoginPage extends HBox {
         // Left Pane with Image
         ImageView imageView = new ImageView(new Image(Objects.requireNonNull(Resources.getResourceAsStream("images/login.jpg"))));
         imageView.setFitWidth(400);
-        imageView.setFitHeight(500); // Set height to fill the pane
+        imageView.setFitHeight(500);
         imageView.setPreserveRatio(true);
-        imageView.setSmooth(true); // Smooth scaling
+        imageView.setSmooth(true);
 
         StackPane leftPane = new StackPane(imageView);
-        leftPane.setPrefSize(400, 500); // Ensure the left pane has a preferred size
-        leftPane.setStyle("-fx-background-color: #FFFFFF;"); // Set background color (or whatever fits your design)
+        leftPane.setPrefSize(400, 500);
+        leftPane.setStyle("-fx-background-color: #FFFFFF;");
 
         // Right Pane with Login Form
         GridPane rightPane = new GridPane();
-        rightPane.setPadding(new Insets(20)); // Adjust padding as needed
-        rightPane.setVgap(10); // Reduced vertical gap
+        rightPane.setPadding(new Insets(20));
+        rightPane.setVgap(10);
         rightPane.setHgap(10);
         rightPane.getStyleClass().add("login-form");
-        rightPane.setAlignment(Pos.CENTER); // Center align the grid pane contents
+        rightPane.setAlignment(Pos.CENTER);
 
         // Set Column Constraints for Right Pane
         ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(40); // Adjust as needed
+        column1.setPercentWidth(40);
         ColumnConstraints column2 = new ColumnConstraints();
-        column2.setPercentWidth(60); // Adjust as needed
+        column2.setPercentWidth(60);
         rightPane.getColumnConstraints().addAll(column1, column2);
 
         Label welcomeLabel = new Label("Welcome!");
-        welcomeLabel.setFont(new Font(36)); // Increase font size to 36
-        welcomeLabel.setTextFill(javafx.scene.paint.Color.BLUE); // Set text color to blue
+        welcomeLabel.setFont(new Font(36));
+        welcomeLabel.setTextFill(javafx.scene.paint.Color.BLUE);
         welcomeLabel.setPadding(new Insets(0, 0, 15, 0));
 
         // Input Labels and Fields
         Label userLabel = new Label("Username");
-        userLabel.setFont(new Font(16)); // Increase font size for username label
+        userLabel.setFont(new Font(16));
         TextField userField = new TextField();
         userField.setPromptText("Enter username");
-        userField.setPrefWidth(200); // Set preferred width to stretch
+        userField.setPrefWidth(200);
 
         Label passLabel = new Label("Password");
-        passLabel.setFont(new Font(16)); // Increase font size for password label
+        passLabel.setFont(new Font(16));
         PasswordField passField = new PasswordField();
         passField.setPromptText("Enter password");
-        passField.setPrefWidth(200); // Set preferred width to stretch
+        passField.setPrefWidth(200);
 
         Label roleLabel = new Label("Role");
-        roleLabel.setFont(new Font(16)); // Increase font size for role label
+        roleLabel.setFont(new Font(16));
         ComboBox<String> roleSelector = new ComboBox<>();
-        roleSelector.getItems().addAll("Admin", "Cashier", "Staff");
         roleSelector.setValue("Select role");
-        roleSelector.setPrefWidth(200); // Set preferred width to stretch
-        roleSelector.getStyleClass().add("combo-box");
+        roleSelector.getItems().addAll("Admin", "Cashier", "Staff");
+        roleSelector.setPrefWidth(200);
 
         Button loginButton = new Button("Login");
         loginButton.getStyleClass().add("login-button");
@@ -107,6 +104,36 @@ public class LoginPage extends HBox {
             }
         });
 
+        // Forgot Password Link
+        Hyperlink forgotPasswordLink = new Hyperlink("Forgot Password?");
+
+        // Show the "Forgot Password" link only if the selected role is not "Cashier"
+        forgotPasswordLink.setVisible(true);
+        roleSelector.valueProperty().addListener((observable, oldValue, newValue) -> {
+            // Show the link if the role is not "Cashier"
+            forgotPasswordLink.setVisible(!"Cashier".equals(newValue)); // Hide the link if the role is "Cashier"
+        });
+
+        forgotPasswordLink.setOnAction(event -> {
+            String username = userField.getText();
+            String role = roleSelector.getValue();
+
+            if (!username.isEmpty() && role != null) {
+                ForgotPasswordService.handleForgotPassword(role, username);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Password Reset");
+                alert.setHeaderText(null);
+                alert.setContentText("A password reset link has been sent to your email.");
+                alert.showAndWait();
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Missing Information");
+                alert.setHeaderText(null);
+                alert.setContentText("Please enter your username and select a role.");
+                alert.showAndWait();
+            }
+        });
+
         // Add controls to the right pane
         rightPane.add(welcomeLabel, 0, 0, 2, 1); // Add welcome label spanning two columns
         rightPane.add(userLabel, 0, 1);
@@ -116,11 +143,12 @@ public class LoginPage extends HBox {
         rightPane.add(roleLabel, 0, 3);
         rightPane.add(roleSelector, 1, 3);
         rightPane.add(loginButton, 1, 4);
+        rightPane.add(forgotPasswordLink, 1, 5); // Place forgot password link below the login button
 
         // Main layout with image on the left and login form on the right
         this.getChildren().addAll(leftPane, rightPane);
         this.setPrefSize(900, 500);
-        this.setStyle("-fx-background-color: #FFFFFF;"); // Set a consistent background color for the whole layout
+        this.setStyle("-fx-background-color: #FFFFFF;");
     }
 
     private void onLoginSuccess(Pane app) {

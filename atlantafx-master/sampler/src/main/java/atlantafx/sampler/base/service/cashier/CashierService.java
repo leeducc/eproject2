@@ -1,33 +1,16 @@
 package atlantafx.sampler.base.service.cashier;
 
 
-import atlantafx.sampler.admin.entity.OrderDetail;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.*;
 import atlantafx.sampler.base.enummethod.Payment;
 import atlantafx.sampler.base.util.AlertUtil;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -36,14 +19,23 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class CashierService {
 
   public static List<Products> getAllProducts() {
     List<Products> products = new ArrayList<>();
     String sql = "SELECT * FROM products";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet resultSet = preparedStatement.executeQuery()) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
       while (resultSet.next()) {
         Products product = new Products(resultSet.getInt("id"),
             resultSet.getString("image_link"),
@@ -170,7 +162,7 @@ public class CashierService {
       preparedStatement.setDouble(4, billDetail.getPrice());
 
       if (billDetail.getVoucherId() == null) {
-        preparedStatement.setNull(5, java.sql.Types.INTEGER);
+        preparedStatement.setNull(5, Types.INTEGER);
       } else {
         preparedStatement.setInt(5, billDetail.getVoucherId());
       }
@@ -412,6 +404,7 @@ public class CashierService {
     for (String category : categories) {
       ctComboBox.getItems().add(category);
     }
+    ctComboBox.setValue("Chọn loại đồ uống");
     return ctComboBox;
   }
 
@@ -438,7 +431,7 @@ public class CashierService {
             resultSet.getInt("voucher_percentage"),
             resultSet.getDate("start_date").toLocalDate(),
             resultSet.getDate("end_date").toLocalDate(),
-            resultSet.getInt("status_id")
+            resultSet.getString("status")
         );
         vouchers.add(voucher);
       }
@@ -563,8 +556,10 @@ public class CashierService {
     for (Products product : productList) {
       String imagePath = product.getImageLink();
 
-      if (imagePath != null && getClass().getResource(imagePath) != null) {
-        Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175,
+      if (imagePath != null) {
+        String imagePathFull = "sampler/src/main/resources" + imagePath;
+        File destinationFile = new File(imagePathFull);
+        Image productImage = new Image(destinationFile.toURI().toString(), 180, 175,
             false, false);
         ImageView imageView = new ImageView(productImage);
 

@@ -3,7 +3,6 @@ package atlantafx.sampler.staff.page.components;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.staff.entity.AttendanceRecord;
 import atlantafx.sampler.staff.page.OutlinePage;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;

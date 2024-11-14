@@ -1,33 +1,25 @@
 package atlantafx.sampler.base.entity.common;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Discount {
+
     private int id; // Corresponds to the 'id' column
-    private int productId; // Corresponds to the 'product_id' column
+    private String productName; // Instead of 'productId', use 'productName' for user-friendly reference
     private String discountName; // Corresponds to the 'discount_name' column
-    private BigDecimal discountPercentage; // Corresponds to the 'discount_percentage' column
+    private double discountPercentage; // Corresponds to the 'discount_percentage' column
     private LocalDate startDate; // Corresponds to the 'start_date' column
     private LocalDate endDate; // Corresponds to the 'end_date' column
 
     // Constructor
-    public Discount(int id, int productId, String discountName, BigDecimal discountPercentage,
+    public Discount(String productName, String discountName, double discountPercentage,
                     LocalDate startDate, LocalDate endDate) {
-        this.id = id;
-        this.productId = productId;
+        this.productName = productName;
         this.discountName = discountName;
         this.discountPercentage = discountPercentage;
         this.startDate = startDate;
         this.endDate = endDate;
     }
-
-    public boolean isValid() {
-        LocalDate today = LocalDate.now();
-        return (today.isEqual(startDate) || today.isAfter(startDate)) &&
-                (today.isEqual(endDate) || today.isBefore(endDate));
-    }
-
 
     // Getters and Setters
     public int getId() {
@@ -38,12 +30,12 @@ public class Discount {
         this.id = id;
     }
 
-    public int getProductId() {
-        return productId;
+    public String getProductName() {
+        return productName;
     }
 
-    public void setProductId(int productId) {
-        this.productId = productId;
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public String getDiscountName() {
@@ -54,11 +46,11 @@ public class Discount {
         this.discountName = discountName;
     }
 
-    public BigDecimal getDiscountPercentage() {
+    public double getDiscountPercentage() {
         return discountPercentage;
     }
 
-    public void setDiscountPercentage(BigDecimal discountPercentage) {
+    public void setDiscountPercentage(double discountPercentage) {
         this.discountPercentage = discountPercentage;
     }
 
@@ -76,5 +68,12 @@ public class Discount {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    // Validation method to check if the discount is currently valid
+    public boolean isValid() {
+        LocalDate today = LocalDate.now();
+        return (today.isEqual(startDate) || today.isAfter(startDate)) &&
+                (today.isEqual(endDate) || today.isBefore(endDate));
     }
 }

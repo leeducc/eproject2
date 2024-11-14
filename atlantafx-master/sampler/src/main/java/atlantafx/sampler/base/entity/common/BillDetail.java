@@ -68,4 +68,3 @@ public class BillDetail {
         this.price = price;
     }
 }
-
