@@ -28,7 +28,16 @@ public class Bill {
   }
 
   public Bill(String nameTable, String productName, int quantity, double price,
-      int voucher) {
+              int voucher) {
+    this.id = id;
+    this.nameTable = nameTable;
+    this.productName = productName;
+    this.quantity = quantity;
+    this.price = price;
+    this.voucher = voucher;
+  }
+
+  public Bill(int id, String nameTable, String productName, int quantity, double price, int voucher) {
     this.id = id;
     this.nameTable = nameTable;
     this.productName = productName;
@@ -94,12 +103,12 @@ public class Bill {
   @Override
   public String toString() {
     return "Bill{" +
-        "id=" + id +
-        ", nameTable='" + nameTable + '\'' +
-        ", productName='" + productName + '\'' +
-        ", quantity=" + quantity +
-        ", price=" + price +
-        ", voucher=" + voucher +
-        '}';
+            "id=" + id +
+            ", nameTable='" + nameTable + '\'' +
+            ", productName='" + productName + '\'' +
+            ", quantity=" + quantity +
+            ", price=" + price +
+            ", voucher=" + voucher +
+            '}';
   }
 }

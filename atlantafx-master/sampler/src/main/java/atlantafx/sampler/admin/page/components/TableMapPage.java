@@ -1,21 +1,27 @@
 package atlantafx.sampler.admin.page.components;
 
+
+import atlantafx.sampler.admin.page.OutlinePage;
 import atlantafx.sampler.base.entity.common.Bill;
 import atlantafx.sampler.base.entity.common.Tables;
 import atlantafx.sampler.base.service.cashier.CashierService;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
-import atlantafx.sampler.admin.page.OutlinePage;
-import javafx.scene.control.*;
+import atlantafx.sampler.cashier.page.components.OrderListPage;
+import atlantafx.sampler.cashier.page.components.TableListPage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-public final class TableListPage extends OutlinePage {
+public class TableMapPage extends OutlinePage {
 
   public static final String NAME = "Table List Page";
   private static Label selectedTableLabel;
@@ -25,26 +31,19 @@ public final class TableListPage extends OutlinePage {
   private final int itemsPerPage = 20;
   private String currentKeyword = ""; // Store the current search keyword
   private TextField searchField; // Text field for keyword search
+  static OrderListPage orderListPage = new OrderListPage();
 
-  public static String getTitle() {
-    return title;
-  }
-
-  public static void setTitle(String title) {
-    TableListPage.title = title;
-  }
 
   @Override
   public String getName() {
     return NAME;
   }
 
-  public TableListPage() {
+  public TableMapPage() {
     super();
     createGrid();
   }
 
-  // Creates the grid, search field, and pagination controls
   private void createGrid() {
     VBox layout = new VBox();
     layout.getStyleClass().add("vbox");
@@ -130,7 +129,8 @@ public final class TableListPage extends OutlinePage {
         Tables table = TableCoffeeService.getTableByName(tableName);
         updateTableButtonColor(tableButton, table);
 
-
+        // Set click event
+        tableButton.setOnAction(e -> handleTableButtonClick(tableButton, table));
 
         grid.add(tableButton, col, row);
         count++;
@@ -146,32 +146,32 @@ public final class TableListPage extends OutlinePage {
   private void setupStatusLegend(VBox statusBox) {
     Label reservedLabel = new Label("Đã đặt");
     reservedLabel.setStyle(
-        "-fx-background-color: #28a745; " +  // A green color for a reserved state
-            "-fx-text-fill: #ffffff; " +         // White text for good contrast
-            "-fx-padding: 8px 16px; " +          // Padding for a spacious look
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"       // Rounded corners for a modern look
+            "-fx-background-color: #28a745; " +  // A green color for a reserved state
+                    "-fx-text-fill: #ffffff; " +         // White text for good contrast
+                    "-fx-padding: 8px 16px; " +          // Padding for a spacious look
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"       // Rounded corners for a modern look
     );
 
     Label unavailableLabel = new Label("Đang dọn");
     unavailableLabel.setStyle(
-        "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
-            "-fx-text-fill: #ffffff; " +         // White text for contrast
-            "-fx-padding: 8px 16px; " +
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"
+            "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
+                    "-fx-text-fill: #ffffff; " +         // White text for contrast
+                    "-fx-padding: 8px 16px; " +
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"
     );
 
     Label availableLabel = new Label("Còn Chỗ");
     availableLabel.setStyle(
-        "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
-            "-fx-text-fill: #000000; " +         // Black text for better readability
-            "-fx-padding: 8px 16px; " +
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"
+            "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
+                    "-fx-text-fill: #000000; " +         // Black text for better readability
+                    "-fx-padding: 8px 16px; " +
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"
     );
 
     // Adjusting the widths to keep uniformity.
@@ -182,7 +182,30 @@ public final class TableListPage extends OutlinePage {
   }
 
 
+  private void handleTableButtonClick(Button tableButton, Tables table) {
+    int status = table.getStatusId();
+    if (status == 2) {
+      Alert confirmationDialog = new Alert(AlertType.CONFIRMATION);
+      confirmationDialog.setTitle("Xác nhận bàn đã dọn xong");
+      confirmationDialog.setHeaderText("Bạn có chắc chắn là bàn này khách đã dời đi và đã dọn xong");
+      confirmationDialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/cssDiaLog.css").toExternalForm());
 
+      Optional<ButtonType> result = confirmationDialog.showAndWait();
+      if (result.isPresent() && result.get() == ButtonType.OK) {
+        TableCoffeeService.updateStatusTable(3, table.getName());
+        table.setStatusId(3);
+        updateTableButtonColor(tableButton, table);
+      }
+    } else {
+      selectedTableLabel = new Label(tableButton.getText());
+      TableListPage.setTitle(tableButton.getText());
+      orderListPage.showCheckOrderDialog();
+
+      updateStatusTableByOrder(tableButton.getText());
+      table.setStatusId(TableCoffeeService.getStatusByTableName(table.getName()));
+      updateTableButtonColor(tableButton, table);
+    }
+  }
 
   private void updateTableButtonColor(Button tableButton, Tables table) {
     int statusId = table.getStatusId();
@@ -207,7 +230,3 @@ public final class TableListPage extends OutlinePage {
   }
 
 }
-
-
-
-

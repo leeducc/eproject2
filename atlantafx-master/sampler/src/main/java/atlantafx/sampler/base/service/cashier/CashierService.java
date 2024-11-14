@@ -1,19 +1,33 @@
 package atlantafx.sampler.base.service.cashier;
 
 
+import atlantafx.sampler.admin.entity.OrderDetail;
 import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
-import atlantafx.sampler.base.entity.common.Bill;
-import atlantafx.sampler.base.entity.common.PaymentMethod;
-import atlantafx.sampler.base.entity.common.Products;
-import atlantafx.sampler.base.entity.common.Voucher;
+import atlantafx.sampler.base.entity.common.*;
 import atlantafx.sampler.base.enummethod.Payment;
 import atlantafx.sampler.base.util.AlertUtil;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -22,32 +36,20 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 public class CashierService {
 
   public static List<Products> getAllProducts() {
     List<Products> products = new ArrayList<>();
     String sql = "SELECT * FROM products";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet resultSet = preparedStatement.executeQuery()) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
       while (resultSet.next()) {
         Products product = new Products(resultSet.getInt("id"),
-            resultSet.getString("image_link"),
-            resultSet.getString("name"),
-            resultSet.getDouble("price"),
-            resultSet.getInt("category_id")
+                resultSet.getString("image_link"),
+                resultSet.getString("name"),
+                resultSet.getDouble("price"),
+                resultSet.getInt("category_id")
         );
         products.add(product);
       }
@@ -93,18 +95,127 @@ public class CashierService {
     return products;
   }
 
+  public static boolean addNewBillOrder(BillOrder billOrder) {
+    String sql = " INSERT INTO bill_order(table_id,total_amount,payment_method_id,created_at)VALUES(?,?,?,?)";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setInt(1, billOrder.getTableId()); // Replace with the actual table name
+      preparedStatement.setDouble(2, billOrder.getTotalAmount()); // Replace with the actual product name
+      preparedStatement.setInt(3, billOrder.getPaymentMethodId()); // Replace with the actual quantity
+      preparedStatement.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+// Replace with the actual price
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+  public static BillOrder getBillOrderByTableId(int tableId) {
+    String sql = "SELECT * FROM bill_order WHERE table_id = ?";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      preparedStatement.setInt(1, tableId);
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+      if (resultSet.next()) {
+        // Khởi tạo đối tượng BillOrder từ các giá trị trong ResultSet
+        return new BillOrder(
+                resultSet.getInt("id"),
+                resultSet.getInt("table_id"),
+                resultSet.getDouble("total_amount"),
+                resultSet.getInt("payment_method_id"),
+                resultSet.getTimestamp("created_at")
+        );
+      }
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return null; // Trả về null nếu không tìm thấy bản ghi nào
+  }
+  public static int getTableIdByName(String name) {
+    String sql = "SELECT id FROM tables WHERE name = ?";
+    int id = 0;
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+      preparedStatement.setString(1, name);
+      ResultSet resultSet = preparedStatement.executeQuery();
+      if (resultSet.next()) {
+        id = resultSet.getInt("id");
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return id;
+
+  }
+  public static boolean addNewBillDetail(BillDetail billDetail) {
+    String sql = "INSERT INTO bill_detail (bill_order_id, product_id, quantity, price, voucher_id) VALUES (?, ?, ?, ?, ?)";
+
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+      // Kiểm tra sự tồn tại của `product_id` trong bảng `products`
+      if (!isProductIdExists(connection, billDetail.getProductId())) {
+        System.out.println("Error: product_id " + billDetail.getProductId() + " does not exist in products.");
+        return false;
+      }
+
+      preparedStatement.setInt(1, billDetail.getBillId());
+      preparedStatement.setInt(2, billDetail.getProductId());
+      preparedStatement.setInt(3, billDetail.getQuantity());
+      preparedStatement.setDouble(4, billDetail.getPrice());
+
+      if (billDetail.getVoucherId() == null) {
+        preparedStatement.setNull(5, java.sql.Types.INTEGER);
+      } else {
+        preparedStatement.setInt(5, billDetail.getVoucherId());
+      }
+
+      return preparedStatement.executeUpdate() > 0;
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
+  // Phương thức kiểm tra sự tồn tại của `product_id` trong bảng `products`
+  private static boolean isProductIdExists(Connection connection, int productId) throws SQLException {
+    String checkSql = "SELECT 1 FROM products WHERE id = ?";
+    try (PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
+      checkStatement.setInt(1, productId);
+      ResultSet resultSet = checkStatement.executeQuery();
+      return resultSet.next();
+    }
+  }
+
+
+  // Phương thức kiểm tra sự tồn tại của `bill_order_id` trong `bill_order`
+  private static boolean isBillOrderIdExists(Connection connection, int billOrderId) throws SQLException {
+    String checkSql = "SELECT 1 FROM bill_order WHERE id = ?";
+    try (PreparedStatement checkStatement = connection.prepareStatement(checkSql)) {
+      checkStatement.setInt(1, billOrderId);
+      ResultSet resultSet = checkStatement.executeQuery();
+      return resultSet.next();
+    }
+  }
+
+
   public static Products getProductsByProductName(String nameProduct) {
     Products product = null;
     String sql = "SELECT * FROM products WHERE name =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, nameProduct);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
         product = new Products(resultSet.getString("image_link"),
-            resultSet.getString("name"),
-            resultSet.getDouble("price"),
-            resultSet.getInt("category_id")
+                resultSet.getString("name"),
+                resultSet.getDouble("price"),
+                resultSet.getInt("category_id")
         );
       }
     } catch (SQLException e) {
@@ -121,7 +232,7 @@ public class CashierService {
   public static boolean addOrderBill(Bill bill) {
     String sql = " INSERT INTO bill(nameTable,productName,quantity,price)VALUES(?,?,?,?)";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, bill.getNameTable()); // Replace with the actual table name
       preparedStatement.setString(2, bill.getProductName()); // Replace with the actual product name
       preparedStatement.setInt(3, bill.getQuantity()); // Replace with the actual quantity
@@ -137,15 +248,15 @@ public class CashierService {
     Bill bill = new Bill();
     String sql = "SELECT * FROM bill WHERE nameTable =? AND productName =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, nameTable); // Replace with the actual table name
       preparedStatement.setString(2, productName); // Replace with the actual product name
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
         bill = new Bill(resultSet.getString("nameTable"),
-            resultSet.getString("productName"),
-            resultSet.getInt("quantity"),
-            resultSet.getDouble("price")
+                resultSet.getString("productName"),
+                resultSet.getInt("quantity"),
+                resultSet.getDouble("price")
         );
       }
     } catch (SQLException e) {
@@ -158,14 +269,15 @@ public class CashierService {
     Products product = null;
     String sql = "SELECT * FROM products WHERE name =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, name);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
-        product = new Products(resultSet.getString("image_link"),
-            resultSet.getString("name"),
-            resultSet.getDouble("price"),
-            resultSet.getInt("category_id")
+        product = new Products(resultSet.getInt("id"),
+                resultSet.getString("image_link"),
+                resultSet.getString("name"),
+                resultSet.getDouble("price"),
+                resultSet.getInt("category_id")
         );
       }
     } catch (SQLException e) {
@@ -177,7 +289,7 @@ public class CashierService {
   public static boolean updateOrderBill(Bill bill) {
     String sql = "UPDATE bill SET price = ?, quantity =?, voucher_id =? WHERE nameTable = ? AND productName = ?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setDouble(1, bill.getPrice()); // Replace with the actual price
       preparedStatement.setInt(2, bill.getQuantity()); // Replace with the actual quantity
       preparedStatement.setString(4, bill.getNameTable()); // Replace with the actual table name
@@ -194,15 +306,15 @@ public class CashierService {
     Bill bill = null;
     String sql = "SELECT * FROM bill WHERE productName =? AND nameTable =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, productName); // Replace with the actual product name
       preparedStatement.setString(2, tableName); // Replace with the actual table name
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
         bill = new Bill(resultSet.getString("nameTable"),
-            resultSet.getString("productName"),
-            resultSet.getInt("quantity"),
-            resultSet.getDouble("price")
+                resultSet.getString("productName"),
+                resultSet.getInt("quantity"),
+                resultSet.getDouble("price")
         );
       }
     } catch (SQLException e) {
@@ -214,7 +326,7 @@ public class CashierService {
   public static boolean resetOrderBill(String tableName) {
     String sql = "DELETE FROM bill WHERE nameTable = ?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, tableName); // Replace with the actual table name
       return preparedStatement.executeUpdate() > 0;
     } catch (SQLException e) {
@@ -228,7 +340,7 @@ public class CashierService {
     String sql = "SELECT * FROM bill WHERE nameTable = ?"; // Truy vấn với nameTable
 
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
       // Đặt giá trị tham số cho truy vấn
       preparedStatement.setString(1, tableName);
@@ -238,11 +350,11 @@ public class CashierService {
         while (resultSet.next()) {
           // Khởi tạo đối tượng Bill từ kết quả truy vấn
           Bill bill = new Bill(// Lấy giá trị id
-              resultSet.getString("nameTable"),     // Lấy giá trị nameTable
-              resultSet.getString("productName"),   // Lấy giá trị productName
-              resultSet.getInt("quantity"),         // Lấy giá trị quantity
-              resultSet.getDouble("price"),
-              resultSet.getInt("voucher_id")// Lấy giá trị price
+                  resultSet.getString("nameTable"),     // Lấy giá trị nameTable
+                  resultSet.getString("productName"),   // Lấy giá trị productName
+                  resultSet.getInt("quantity"),         // Lấy giá trị quantity
+                  resultSet.getDouble("price"),
+                  resultSet.getInt("voucher_id")// Lấy giá trị price
           );
           // Thêm Bill vào danh sách
           bills.add(bill);
@@ -258,7 +370,7 @@ public class CashierService {
     String sql = "DELETE FROM bill WHERE nameTable = ? AND productName = ? AND quantity = ?";
 
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
       // Thiết lập các tham số cho câu lệnh xóa
       preparedStatement.setString(1, bill.getNameTable());
@@ -282,7 +394,7 @@ public class CashierService {
     List<String> categories = new ArrayList<>();
     String sql = "SELECT * FROM category";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
         categories.add(resultSet.getString("name"));
@@ -317,16 +429,16 @@ public class CashierService {
     List<Voucher> vouchers = new ArrayList<>();
     String sql = "SELECT * FROM voucher";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
         Voucher voucher = new Voucher(resultSet.getInt("id"),
-            resultSet.getString("voucher_code"),
-            resultSet.getString("voucher_name"),
-            resultSet.getInt("voucher_percentage"),
-            resultSet.getDate("start_date").toLocalDate(),
-            resultSet.getDate("end_date").toLocalDate(),
-            resultSet.getString("status")
+                resultSet.getString("voucher_code"),
+                resultSet.getString("voucher_name"),
+                resultSet.getInt("voucher_percentage"),
+                resultSet.getDate("start_date").toLocalDate(),
+                resultSet.getDate("end_date").toLocalDate(),
+                resultSet.getString("status")
         );
         vouchers.add(voucher);
       }
@@ -340,14 +452,14 @@ public class CashierService {
     List<Products> products = new ArrayList<>();
     String sql = "SELECT * FROM products WHERE category_id =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setInt(1, category);
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
         Products product = new Products(resultSet.getString("image_link"),
-            resultSet.getString("name"),
-            resultSet.getDouble("price"),
-            resultSet.getInt("category_id")
+                resultSet.getString("name"),
+                resultSet.getDouble("price"),
+                resultSet.getInt("category_id")
         );
         products.add(product);
       }
@@ -361,14 +473,14 @@ public class CashierService {
     List<Products> products = new ArrayList<>();
     String sql = "SELECT * FROM products WHERE name LIKE?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, "%" + key + "%");
       ResultSet resultSet = preparedStatement.executeQuery();
       while (resultSet.next()) {
         Products product = new Products(resultSet.getString("image_link"),
-            resultSet.getString("name"),
-            resultSet.getDouble("price"),
-            resultSet.getInt("category_id")
+                resultSet.getString("name"),
+                resultSet.getDouble("price"),
+                resultSet.getInt("category_id")
         );
         products.add(product);
       }
@@ -381,7 +493,7 @@ public class CashierService {
   public static int getIdByCategoryName(String categoryName) {
     String sql = "SELECT id FROM category WHERE name =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, categoryName);
       ResultSet resultSet = preparedStatement.executeQuery();
       if (resultSet.next()) {
@@ -397,7 +509,7 @@ public class CashierService {
   public static boolean addNewProduct(Products obj) {
     String sql = "INSERT INTO products(image_link, category_id, name, price) VALUES(?,?,?,?)";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, obj.getImageLink());
       preparedStatement.setInt(2, obj.getCategoryId());
       preparedStatement.setString(3, obj.getName());
@@ -413,7 +525,7 @@ public class CashierService {
   public static boolean deleteProductsByProductName(String name) {
     String sql = "DELETE FROM products WHERE name =?";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
       preparedStatement.setString(1, name);
 
       return preparedStatement.executeUpdate() > 0;
@@ -427,12 +539,12 @@ public class CashierService {
     List<PaymentMethod> Payments = new ArrayList<>();
     String sql = "SELECT * FROM payment_method";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(sql);
-        ResultSet resultSet = preparedStatement.executeQuery()) {
+         PreparedStatement preparedStatement = connection.prepareStatement(sql);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
       while (resultSet.next()) {
         PaymentMethod method = new PaymentMethod(
-            resultSet.getInt("id"),
-            Payment.valueOf(resultSet.getString("method"))
+                resultSet.getInt("id"),
+                Payment.valueOf(resultSet.getString("method"))
         );
         Payments.add(method);
       }
@@ -453,7 +565,7 @@ public class CashierService {
 
       if (imagePath != null && getClass().getResource(imagePath) != null) {
         Image productImage = new Image(getClass().getResource(imagePath).toExternalForm(), 180, 175,
-            false, false);
+                false, false);
         ImageView imageView = new ImageView(productImage);
 
         Label nameLabel = new Label(product.getName());
@@ -485,7 +597,7 @@ public class CashierService {
           confirmationDialog.setHeaderText("Bạn có chắc chắn muốn xóa sản phẩm này?");
           confirmationDialog.setContentText("Hành động này không thể hoàn tác.");
           confirmationDialog.getDialogPane().getStylesheets().add(
-              getClass().getResource("/css/cssDiaLog.css").toExternalForm()
+                  getClass().getResource("/css/cssDiaLog.css").toExternalForm()
           );
 
           Optional<ButtonType> result = confirmationDialog.showAndWait();
@@ -534,8 +646,8 @@ public class CashierService {
 
   public static boolean updateProduct(Products product) {
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement statement = connection.prepareStatement(
-            "UPDATE products SET name=?, price=?, image_link=?, category_id =? WHERE id=?")) {
+         PreparedStatement statement = connection.prepareStatement(
+                 "UPDATE products SET name=?, price=?, image_link=?, category_id =? WHERE id=?")) {
       statement.setString(1, product.getName());
       statement.setDouble(2, product.getPrice());
       statement.setString(3, product.getImageLink());
@@ -548,6 +660,21 @@ public class CashierService {
     }
     return true;
   }
+  public static Integer getIdByMethodEnum(String method) throws SQLException {
+    String query = "SELECT id FROM payment_method WHERE method = ?";
+    try (Connection connection = JDBCConnect.getJDBCConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+      preparedStatement.setString(1, method);
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+      if (resultSet.next()) {
+        return resultSet.getInt("id");
+      } else {
+        return null; // or throw an exception if needed
+      }
+    }
+  }
 
   public static ComboBox createPayMethodSelectionBox() {
     List<PaymentMethod> Payments = new ArrayList<>();
@@ -555,7 +682,7 @@ public class CashierService {
     Payments = CashierService.getAllPayMethod();
     for (PaymentMethod Payment : Payments) {
       Payment currentMethod = atlantafx.sampler.base.enummethod.Payment.fromDisplayName(
-          Payment.getMethod().getStatus());
+              Payment.getMethod().getStatus());
       payComboBox.getItems().add(currentMethod.getStatus());
       payComboBox.setValue(currentMethod.getStatus());
     }
@@ -565,8 +692,8 @@ public class CashierService {
   public static String getCategoryById(int categoryId) {
     String categoryName = "";
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement statement = connection.prepareStatement(
-            "SELECT name FROM category WHERE id=?")) {
+         PreparedStatement statement = connection.prepareStatement(
+                 "SELECT name FROM category WHERE id=?")) {
       statement.setInt(1, categoryId);
       ResultSet resultSet = statement.executeQuery();
       if (resultSet.next()) {
@@ -599,7 +726,7 @@ public class CashierService {
       FileChooser fileChooser = new FileChooser();
       fileChooser.setTitle("Chọn ảnh sản phẩm");
       fileChooser.getExtensionFilters()
-          .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+              .add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
       selectedFile[0] = fileChooser.showOpenDialog(dialog.getOwner());
       if (selectedFile[0] != null) {
         imageLabel.setText(selectedFile[0].getName());
@@ -631,7 +758,7 @@ public class CashierService {
       if (button == saveButtonType) {
         // Kiểm tra xem các trường có trống không
         if (nameField.getText() == null || nameField.getText().isEmpty() ||
-            priceField.getText() == null || priceField.getText().isEmpty()) {
+                priceField.getText() == null || priceField.getText().isEmpty()) {
           AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
           return null;
         }
@@ -651,9 +778,9 @@ public class CashierService {
 
             // Sao chép ảnh mới
             File destinationFile = new File(
-                "sampler/src/main/resources/images/products/" + selectedFile[0].getName());
+                    "sampler/src/main/resources/images/products/" + selectedFile[0].getName());
             Files.copy(selectedFile[0].toPath(), destinationFile.toPath(),
-                StandardCopyOption.REPLACE_EXISTING);
+                    StandardCopyOption.REPLACE_EXISTING);
 
             // Cập nhật đường dẫn ảnh mới
             imagePath = "/images/products/" + selectedFile[0].getName();
@@ -661,11 +788,11 @@ public class CashierService {
 
           // Trả về đối tượng sản phẩm đã chỉnh sửa
           return new Products(
-              product.getId(),
-              imagePath,
-              nameField.getText(),
-              parsedPrice,
-              CashierService.getIdByCategoryName(categoryField.getValue())
+                  product.getId(),
+                  imagePath,
+                  nameField.getText(),
+                  parsedPrice,
+                  CashierService.getIdByCategoryName(categoryField.getValue())
           );
 
         } catch (NumberFormatException e) {
@@ -683,8 +810,8 @@ public class CashierService {
 
   public static boolean addNewCategory(String category) {
     try (Connection connection = JDBCConnect.getJDBCConnection();
-        PreparedStatement statement = connection.prepareStatement(
-            "INSERT INTO category (name) VALUES (?)")) {
+         PreparedStatement statement = connection.prepareStatement(
+                 "INSERT INTO category (name) VALUES (?)")) {
       statement.setString(1, category);
       statement.executeUpdate();
       System.out.println("Category added successfully.");

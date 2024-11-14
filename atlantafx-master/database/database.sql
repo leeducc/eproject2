@@ -18,7 +18,7 @@
 --
 -- Table structure for table `admin`
 --
-
+USE eproject2;
 DROP TABLE IF EXISTS `admin`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -497,36 +497,6 @@ INSERT INTO `shift` VALUES (1,'Ca sáng','07:00:00','15:00:00'),(2,'Ca chiều',
 UNLOCK TABLES;
 
 --
--- Table structure for table `shift_assignment`
---
-
-DROP TABLE IF EXISTS `shift_assignment`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `shift_assignment` (
-  `assignment_id` int NOT NULL AUTO_INCREMENT,
-  `staff_id` varchar(255) NOT NULL,
-  `shift_id` int NOT NULL,
-  `assigned_date` date NOT NULL,
-  PRIMARY KEY (`assignment_id`),
-  KEY `staff_id` (`staff_id`),
-  KEY `shift_id` (`shift_id`),
-  CONSTRAINT `shift_assignment_ibfk_1` FOREIGN KEY (`staff_id`) REFERENCES `staff` (`staff_id`),
-  CONSTRAINT `shift_assignment_ibfk_2` FOREIGN KEY (`shift_id`) REFERENCES `shift` (`shift_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `shift_assignment`
---
-
-LOCK TABLES `shift_assignment` WRITE;
-/*!40000 ALTER TABLE `shift_assignment` DISABLE KEYS */;
-INSERT INTO `shift_assignment` VALUES (1,'60000002',4,'2024-09-30'),(2,'60000002',3,'2024-10-03'),(3,'60000002',3,'2024-10-04'),(4,'60000002',4,'2024-10-06'),(5,'60000002',3,'2024-10-02'),(6,'60000002',2,'2024-10-01'),(7,'60000002',2,'2024-10-05'),(8,'60000004',2,'2024-09-30'),(16,'60000001',2,'2024-10-03'),(20,'60000001',2,'2024-10-01'),(26,'60000005',2,'2024-10-02'),(43,'60000002',4,'2024-09-30'),(44,'60000002',3,'2024-10-03'),(45,'60000002',3,'2024-10-04'),(46,'60000002',4,'2024-10-06'),(47,'60000002',3,'2024-10-02'),(48,'60000002',2,'2024-10-01'),(49,'60000002',2,'2024-10-05'),(50,'60000004',2,'2024-09-30'),(51,'60000004',2,'2024-10-03'),(52,'60000004',3,'2024-10-04'),(53,'60000004',3,'2024-10-06'),(54,'60000004',1,'2024-10-02'),(55,'60000004',1,'2024-10-01'),(56,'60000004',4,'2024-10-05'),(57,'60000001',3,'2024-09-30'),(58,'60000001',2,'2024-10-03'),(59,'60000001',3,'2024-10-04'),(60,'60000001',3,'2024-10-06'),(61,'60000001',2,'2024-10-02'),(62,'60000001',2,'2024-10-01'),(63,'60000001',3,'2024-10-05'),(64,'60000005',1,'2024-09-30'),(65,'60000005',1,'2024-10-03'),(66,'60000005',4,'2024-10-04'),(67,'60000005',2,'2024-10-06'),(68,'60000005',2,'2024-10-02'),(69,'60000005',1,'2024-10-01'),(70,'60000005',3,'2024-10-05'),(71,'60000003',1,'2024-09-30'),(72,'60000003',1,'2024-10-03'),(73,'60000003',2,'2024-10-04'),(74,'60000003',2,'2024-10-06'),(75,'60000003',1,'2024-10-02'),(76,'60000003',1,'2024-10-01'),(77,'60000003',2,'2024-10-05'),(78,'60000006',1,'2024-09-30'),(79,'60000006',1,'2024-10-03'),(80,'60000006',1,'2024-10-04'),(81,'60000006',1,'2024-10-06'),(82,'60000006',1,'2024-10-02'),(83,'60000006',1,'2024-10-01'),(84,'60000006',2,'2024-10-05');
-/*!40000 ALTER TABLE `shift_assignment` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `staff`
 --
 
@@ -764,4 +734,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-12 16:03:05
+-- Dump completed on 2024-11-14  7:15:58

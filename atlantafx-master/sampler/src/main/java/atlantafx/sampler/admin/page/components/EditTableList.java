@@ -1,31 +1,36 @@
 package atlantafx.sampler.admin.page.components;
 
+
+
+import atlantafx.sampler.admin.page.OutlinePage;
 import atlantafx.sampler.base.entity.common.Tables;
 import atlantafx.sampler.base.service.cashier.TableCoffeeService;
 import atlantafx.sampler.base.util.AlertUtil;
-import atlantafx.sampler.admin.page.OutlinePage;
+import java.util.ArrayList;
+import java.util.Optional;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
-import java.util.ArrayList;
-import java.util.Optional;
-
-public class EditTableList extends OutlinePage {
-
-  public static final String NAME = "Edit List Tables";
+public final class EditTableList extends OutlinePage {
+  public static final String NAME = "Change Table";
   private GridPane grid;
   private static String title;
   private int currentPage = 1;
   private final int itemsPerPage = 12;
   private String currentKeyword = ""; // Store the current search keyword
-  private TextField searchField; // Text field for keyword search
-
+  private TextField searchField;
 
   @Override
   public String getName() {
@@ -36,7 +41,6 @@ public class EditTableList extends OutlinePage {
     super();
     createGrid();
   }
-
   private void createGrid() {
     VBox layout = new VBox();
     layout.getStyleClass().add("vbox");
@@ -70,7 +74,7 @@ public class EditTableList extends OutlinePage {
 
     // Load initial table data based on the current page and search keyword
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(currentPage, itemsPerPage,
-        currentKeyword);
+            currentKeyword);
     addButtonsToGrid(grid, floorTables);
 
     // Pagination controls
@@ -88,7 +92,7 @@ public class EditTableList extends OutlinePage {
 
     nextButton.setOnAction(e -> {
       if ((currentPage - 1) * itemsPerPage + floorTables.size()
-          < TableCoffeeService.getFilteredTableCount(currentPage, itemsPerPage, currentKeyword)) {
+              < TableCoffeeService.getFilteredTableCount(currentPage, itemsPerPage, currentKeyword)) {
         currentPage++;
         refreshGrid();
       }
@@ -167,22 +171,20 @@ public class EditTableList extends OutlinePage {
     confirmationDialog.setHeaderText("Bạn có chắc chắn muốn xóa?");
     confirmationDialog.setContentText("Hành động này không thể hoàn tác.");
     confirmationDialog.getDialogPane().getStylesheets().add(
-        getClass().getResource("/css/cssDiaLog.css").toExternalForm()
+            getClass().getResource("/css/cssDiaLog.css").toExternalForm()
     );
     // Hiển thị dialog và xử lý lựa chọn của người dùng
     Optional<ButtonType> result = confirmationDialog.showAndWait();
     if (result.isPresent() && result.get() == ButtonType.OK) {
       int StatusId = TableCoffeeService.getStatusByTableName(tableName);
       switch (StatusId) {
-        case 1:
-          AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
-          break;
-        case 2:
+        case 1, 2:
           AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
           break;
         case 3:
           TableCoffeeService.deleteTableByName(tableName);
           AlertUtil.showErrorAlert("Xóa Thành Công");
+          refreshGrid();
           break;
         default:
           break;
@@ -196,39 +198,39 @@ public class EditTableList extends OutlinePage {
 
   private void refreshGrid() {
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(currentPage, itemsPerPage,
-        currentKeyword);
+            currentKeyword);
     addButtonsToGrid(grid, floorTables);
   }
 
   private void setupStatusLegend(VBox statusBox) {
     Label reservedLabel = new Label("Đã đặt");
     reservedLabel.setStyle(
-        "-fx-background-color: #28a745; " +  // A green color for a reserved state
-            "-fx-text-fill: #ffffff; " +         // White text for good contrast
-            "-fx-padding: 8px 16px; " +          // Padding for a spacious look
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"       // Rounded corners for a modern look
+            "-fx-background-color: #28a745; " +  // A green color for a reserved state
+                    "-fx-text-fill: #ffffff; " +         // White text for good contrast
+                    "-fx-padding: 8px 16px; " +          // Padding for a spacious look
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"       // Rounded corners for a modern look
     );
 
     Label unavailableLabel = new Label("Đang dọn");
     unavailableLabel.setStyle(
-        "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
-            "-fx-text-fill: #ffffff; " +         // White text for contrast
-            "-fx-padding: 8px 16px; " +
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"
+            "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
+                    "-fx-text-fill: #ffffff; " +         // White text for contrast
+                    "-fx-padding: 8px 16px; " +
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"
     );
 
     Label availableLabel = new Label("Còn Chỗ");
     availableLabel.setStyle(
-        "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
-            "-fx-text-fill: #000000; " +         // Black text for better readability
-            "-fx-padding: 8px 16px; " +
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"
+            "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
+                    "-fx-text-fill: #000000; " +         // Black text for better readability
+                    "-fx-padding: 8px 16px; " +
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"
     );
 
     // Adjusting the widths to keep uniformity.
@@ -310,7 +312,5 @@ public class EditTableList extends OutlinePage {
     dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/dialogEditListTable.css").toExternalForm());
     dialog.showAndWait();
   }
-
-
 
 }

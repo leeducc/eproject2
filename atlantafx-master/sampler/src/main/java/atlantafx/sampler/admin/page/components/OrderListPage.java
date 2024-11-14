@@ -6,11 +6,11 @@ import atlantafx.sampler.base.configJDBC.dao.JDBCConnect;
 import atlantafx.sampler.base.entity.common.BillOrder;
 import atlantafx.sampler.base.util.Lazy;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,12 +35,11 @@ public final class OrderListPage extends OutlinePage {
         super();
         initializeUI();
 
-        billDetailDialog = new Lazy<>(()-> {
+        billDetailDialog = new Lazy<>(() -> {
             var dialog = new BillDetailDialog();
             dialog.setClearOnClose(true);
             return dialog;
         });
-
     }
 
     private void initializeUI() {
@@ -57,13 +56,13 @@ public final class OrderListPage extends OutlinePage {
 
     private void setupTableColumns() {
         TableColumn<BillOrder, Integer> idColumn = new TableColumn<>("ID");
-        idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
         TableColumn<BillOrder, LocalDateTime> dateColumn = new TableColumn<>("Date");
-        dateColumn.setCellValueFactory(cellData -> cellData.getValue().createdAtProperty());
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 
         TableColumn<BillOrder, Double> totalColumn = new TableColumn<>("Total Amount");
-        totalColumn.setCellValueFactory(cellData -> cellData.getValue().totalAmountProperty().asObject());
+        totalColumn.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
 
         TableColumn<BillOrder, String> actionColumn = new TableColumn<>("Action");
         actionColumn.setCellFactory(col -> new TableCell<>() {
@@ -72,11 +71,11 @@ public final class OrderListPage extends OutlinePage {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
+                if (empty || getTableRow().getItem() == null) {
                     setGraphic(null);
                 } else {
                     setGraphic(viewButton);
-                    viewButton.setOnAction(e -> openBillDetailDialog(getTableRow().getItem()));
+//                    viewButton.setOnAction(e -> openBillDetailDialog(getTableRow().getItem()));
                 }
             }
         });
@@ -98,7 +97,9 @@ public final class OrderListPage extends OutlinePage {
                 while (resultSet.next()) {
                     BillOrder billOrder = new BillOrder(
                             resultSet.getInt("id"),
+                            resultSet.getInt("table_id"),
                             resultSet.getDouble("total_amount"),
+                            resultSet.getInt("payment_method_id"),
                             resultSet.getTimestamp("created_at").toLocalDateTime()
                     );
                     billOrderTable.getItems().add(billOrder);
@@ -108,12 +109,12 @@ public final class OrderListPage extends OutlinePage {
             }
         }
     }
-    private void openBillDetailDialog(BillOrder billOrder) {
-        if (billOrder != null) {
-            BillDetailDialog dialog = billDetailDialog.get();
-            dialog.getBillDetails(billOrder);  // Set the bill details
-            dialog.show(getScene());  // Show the dialog
-        }
-    }
 
+//    private void openBillDetailDialog(BillOrder billOrder) {
+//        if (billOrder != null) {
+//            BillDetailDialog dialog = billDetailDialog.get();
+//            dialog.loadBillDetails(billOrder);  // Adjusted to fetch bill details
+//            dialog.show(getScene());  // Show the dialog
+//        }
+//    }
 }

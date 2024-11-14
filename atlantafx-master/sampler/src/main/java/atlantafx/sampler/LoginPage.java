@@ -1,7 +1,8 @@
 package atlantafx.sampler;
 
-import atlantafx.sampler.base.service.ForgotPasswordService;
+
 import atlantafx.sampler.base.service.AuthService;
+import atlantafx.sampler.base.service.ForgotPasswordService;
 import atlantafx.sampler.base.service.UserSession;
 import atlantafx.sampler.cashier.layout.CashierApp;
 import atlantafx.sampler.staff.layout.StaffApp;
@@ -20,7 +21,7 @@ import java.util.Objects;
 
 public class LoginPage extends HBox {
 
-    private Stage stage;
+    private final Stage stage;
 
     public LoginPage(Stage stage) {
         this.stage = stage;

@@ -97,7 +97,7 @@ public class MainModel {
 // Tables (Bàn) group
         var tables = NavTree.Item.group("Bàn", new FontIcon(Material2OutlinedMZ.TABLET));
         tables.getChildren().setAll(
-                NAV_TREE.get(TableListPage.class),          // Table Layout (Sơ đồ bàn)
+                NAV_TREE.get(TableMapPage.class),          // Table Layout (Sơ đồ bàn)
                 NAV_TREE.get(EditTableList.class)           // Change Table (Thay đổi bàn)
         );
 
@@ -117,9 +117,7 @@ public class MainModel {
 // Configuration (Cấu hình) group
         var configuration = NavTree.Item.group("Cấu hình", new FontIcon(Material2OutlinedAL.ADMIN_PANEL_SETTINGS));
         configuration.getChildren().setAll(
-                NAV_TREE.get(ChangePasswordSettingsPage.class),
-                NAV_TREE.get(ChangeCashierCredentials.class),// Change Password (Đổi mật khẩu)
-                NAV_TREE.get(ChangeStoreInfoPage.class)
+                NAV_TREE.get(AdminSettingsPage.class)
         );
 
 
@@ -167,7 +165,7 @@ public class MainModel {
 
 
         // Bàn (Tables)
-        map.put(TableListPage.class, NavTree.Item.page("Sơ đồ bàn", TableListPage.class));
+        map.put(TableMapPage.class, NavTree.Item.page("Sơ đồ bàn", TableMapPage.class));
         map.put(EditTableList.class, NavTree.Item.page("Thay đổi bàn", EditTableList.class));
 
         // Lương (Salary)
@@ -178,9 +176,8 @@ public class MainModel {
         map.put(StaffListPage.class, NavTree.Item.page("Danh sách nhân viên", StaffListPage.class));
 
         // Cấu hình (Configuration)
-        map.put(ChangePasswordSettingsPage.class, NavTree.Item.page("Đổi thông tin đăng nhập", ChangePasswordSettingsPage.class));
-        map.put(ChangeCashierCredentials.class, NavTree.Item.page("Thay đổi thông tin thu ngân", ChangeCashierCredentials.class));
-        map.put(ChangeStoreInfoPage.class, NavTree.Item.page("Thau đổi thông tin quán", ChangeStoreInfoPage.class));
+
+        map.put(AdminSettingsPage.class, NavTree.Item.page("Settings", AdminSettingsPage.class));
 
         return map;
     }

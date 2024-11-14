@@ -28,14 +28,13 @@ module atlantafx.sampler {
 
 
     exports atlantafx.sampler.base.util;
-
+    exports atlantafx.sampler.base.service;
     exports atlantafx.sampler.admin.layout;
     exports atlantafx.sampler.admin.page;
     exports atlantafx.sampler.admin.entity;
     exports atlantafx.sampler.admin.event;
     exports atlantafx.sampler.admin.page.components;
 
-    opens atlantafx.sampler.base.entity.common;
 
 
 
@@ -44,6 +43,8 @@ module atlantafx.sampler {
 
     // resources
     opens atlantafx.sampler;
+    opens atlantafx.sampler.base.entity.common;
+    opens atlantafx.sampler.admin.event;
     opens atlantafx.sampler.assets.highlightjs;
     opens atlantafx.sampler.assets.styles;
     opens atlantafx.sampler.assets.styles.scss;
@@ -53,5 +54,6 @@ module atlantafx.sampler {
     opens atlantafx.sampler.admin.page;
     opens atlantafx.sampler.admin.page.components;
     opens atlantafx.sampler.base.entity.staff to javafx.base;
+    opens atlantafx.sampler.base.service;
 
 }
