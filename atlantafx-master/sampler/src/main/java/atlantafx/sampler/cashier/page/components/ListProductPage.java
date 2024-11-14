@@ -254,7 +254,7 @@ public class ListProductPage extends OutlinePage {
                 // Kiểm tra xem category, name và price có rỗng không
                 if (name.getText() == null || name.getText().isEmpty() ||
                         price.getText() == null || price.getText().isEmpty() ||
-                        categoryField.getValue() == null || categoryField.getValue().isEmpty()) {
+                        categoryField.getValue() == null) {
                     AlertUtil.showErrorAlert("Vui lòng nhập đầy đủ thông tin.");
                     return null;
                 }
@@ -270,7 +270,6 @@ public class ListProductPage extends OutlinePage {
                         if (!destinationDir.exists()) {
                             destinationDir.mkdirs();
                         }
-
                         File destinationFile = new File(destinationDir, selectedFile.getName());
                         Files.copy(selectedFile.toPath(), destinationFile.toPath(),
                                 StandardCopyOption.REPLACE_EXISTING);

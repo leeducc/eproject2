@@ -404,7 +404,7 @@ public class CashierService {
     for (String category : categories) {
       ctComboBox.getItems().add(category);
     }
-    ctComboBox.setValue("Chọn loại đồ uống");
+    ctComboBox.setValue(categories.get(0));
     return ctComboBox;
   }
 
