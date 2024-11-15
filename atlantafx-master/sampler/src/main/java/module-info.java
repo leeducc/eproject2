@@ -22,7 +22,9 @@ module atlantafx.sampler {
     requires jbcrypt;
     requires mysql.connector.j;
     requires org.apache.poi.ooxml;
-    requires java.mail;
+    requires jakarta.mail;
+    requires jakarta.activation;
+
 
     exports atlantafx.sampler;
 
