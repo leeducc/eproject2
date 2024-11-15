@@ -70,7 +70,7 @@ public class EditTableList extends OutlinePage {
 
     // Load initial table data based on the current page and search keyword
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(currentPage, itemsPerPage,
-        currentKeyword);
+            currentKeyword);
     addButtonsToGrid(grid, floorTables);
 
     // Pagination controls
@@ -88,7 +88,7 @@ public class EditTableList extends OutlinePage {
 
     nextButton.setOnAction(e -> {
       if ((currentPage - 1) * itemsPerPage + floorTables.size()
-          < TableCoffeeService.getFilteredTableCount(currentPage, itemsPerPage, currentKeyword)) {
+              < TableCoffeeService.getFilteredTableCount(currentPage, itemsPerPage, currentKeyword)) {
         currentPage++;
         refreshGrid();
       }
@@ -167,22 +167,20 @@ public class EditTableList extends OutlinePage {
     confirmationDialog.setHeaderText("Bạn có chắc chắn muốn xóa?");
     confirmationDialog.setContentText("Hành động này không thể hoàn tác.");
     confirmationDialog.getDialogPane().getStylesheets().add(
-        getClass().getResource("/css/cssDiaLog.css").toExternalForm()
+            getClass().getResource("/css/cssDiaLog.css").toExternalForm()
     );
     // Hiển thị dialog và xử lý lựa chọn của người dùng
     Optional<ButtonType> result = confirmationDialog.showAndWait();
     if (result.isPresent() && result.get() == ButtonType.OK) {
       int StatusId = TableCoffeeService.getStatusByTableName(tableName);
       switch (StatusId) {
-        case 1:
-          AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
-          break;
-        case 2:
+        case 1, 2:
           AlertUtil.showErrorAlert("Lỗi Không xóa được bàn");
           break;
         case 3:
           TableCoffeeService.deleteTableByName(tableName);
           AlertUtil.showErrorAlert("Xóa Thành Công");
+          refreshGrid();
           break;
         default:
           break;
@@ -196,39 +194,39 @@ public class EditTableList extends OutlinePage {
 
   private void refreshGrid() {
     ArrayList<String> floorTables = TableCoffeeService.getNameTable(currentPage, itemsPerPage,
-        currentKeyword);
+            currentKeyword);
     addButtonsToGrid(grid, floorTables);
   }
 
   private void setupStatusLegend(VBox statusBox) {
     Label reservedLabel = new Label("Đã đặt");
     reservedLabel.setStyle(
-        "-fx-background-color: #28a745; " +  // A green color for a reserved state
-            "-fx-text-fill: #ffffff; " +         // White text for good contrast
-            "-fx-padding: 8px 16px; " +          // Padding for a spacious look
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"       // Rounded corners for a modern look
+            "-fx-background-color: #28a745; " +  // A green color for a reserved state
+                    "-fx-text-fill: #ffffff; " +         // White text for good contrast
+                    "-fx-padding: 8px 16px; " +          // Padding for a spacious look
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"       // Rounded corners for a modern look
     );
 
     Label unavailableLabel = new Label("Đang dọn");
     unavailableLabel.setStyle(
-        "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
-            "-fx-text-fill: #ffffff; " +         // White text for contrast
-            "-fx-padding: 8px 16px; " +
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"
+            "-fx-background-color: #ff9800; " +  // A vibrant orange color for cleaning status
+                    "-fx-text-fill: #ffffff; " +         // White text for contrast
+                    "-fx-padding: 8px 16px; " +
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"
     );
 
     Label availableLabel = new Label("Còn Chỗ");
     availableLabel.setStyle(
-        "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
-            "-fx-text-fill: #000000; " +         // Black text for better readability
-            "-fx-padding: 8px 16px; " +
-            "-fx-pref-width: 150px; " +
-            "-fx-alignment: center; " +
-            "-fx-background-radius: 8px;"
+            "-fx-background-color: #dcdcdc; " +  // A subtle gray for available status
+                    "-fx-text-fill: #000000; " +         // Black text for better readability
+                    "-fx-padding: 8px 16px; " +
+                    "-fx-pref-width: 150px; " +
+                    "-fx-alignment: center; " +
+                    "-fx-background-radius: 8px;"
     );
 
     // Adjusting the widths to keep uniformity.
@@ -310,7 +308,6 @@ public class EditTableList extends OutlinePage {
     dialog.getDialogPane().getStylesheets().add(getClass().getResource("/css/dialogEditListTable.css").toExternalForm());
     dialog.showAndWait();
   }
-
 
 
 }
